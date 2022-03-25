@@ -110,7 +110,12 @@ void CMT2300Iint(void)
 		SPI_Write(i,Baseband_Bank[cnt]);
 	for(i=TX_Origin,cnt=0;i<=TX_End;i++,cnt++)
 		SPI_Write(i,TX_Bank[cnt]);	
-	CMT2300A_ConfigGpio((GPIO3_DATA|GPIO2_INT1|GPIO1_INT2));  
+	
+#if RF_STATUS
+	CMT2300A_ConfigGpio((GPIO3_DATA|GPIO2_INT2|GPIO1_INT1));   	//test by czg, switch for receiving test
+#else
+	CMT2300A_ConfigGpio((GPIO3_DATA|GPIO2_INT1|GPIO1_INT2));
+#endif
 	SPI_Write(CUS_INT_EN,(PKT_DONE_EN|TX_DONE_EN|CRC_OK_EN));            //开启接收完成和发射完成中断
 	i = SPI_Read(CUS_INT2_CTL);
 	SPI_Write(CUS_INT2_CTL,(i&0xE0)|INT_PKT_DONE);             //INT2映射接收成功中断            //

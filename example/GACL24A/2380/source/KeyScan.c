@@ -35,8 +35,12 @@ void KeyScan_Rx(void)
 {
 	unsigned char i=0;	
 	uint32_t   u32Data  = 0,length=0;
-	uint8_t    len;		  	    
+	uint8_t    len;	
+#if RF_STATUS	
+	if(Test_GPIO2())    //检测数据接收完成中断
+#else
 	if(Test_GPIO1())    //检测数据接收完成中断
+#endif
 	{
 		GO_STBY();      
 		KeyCode[0]=Read_FIFO();
@@ -50,7 +54,7 @@ void KeyScan_Rx(void)
 			{
 			KeyCode[1+i]=Read_FIFO(); 
 			Uart_SendData(UARTCH1,KeyCode[i]);	
-			KeyCode[i]=0; 
+//			KeyCode[i]=0; 
 			}	
 	  }		
 		GO_SLEEP();
