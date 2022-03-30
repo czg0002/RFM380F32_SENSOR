@@ -4,7 +4,7 @@
 #include "ddl.h"
 #include "CMT2300A_Register.h"
 
-#define  RF_STATUS   1//1为接收，0为发射
+#define  RF_STATUS   0//1为接收，0为发射
 
 typedef unsigned char byte;
 typedef unsigned int  word;
@@ -115,8 +115,8 @@ PxOD:开漏输出配置寄存器		1=使能		0=禁止(默认)
 
 
 
-#define SDIO_Oput() (M0P_GPIO->P2DIR&=(~SDIO))
-#define	SDIO_Intput() (M0P_GPIO->P2DIR|=SDIO)
+#define SDIO_Output() (M0P_GPIO->P2DIR&=(~SDIO))
+#define	SDIO_Input() (M0P_GPIO->P2DIR|=SDIO)
 
 #define Test_SDIO()  (M0P_GPIO->P2IN&SDIO)
 #define Test_GPIO1() (M0P_GPIO->P0IN&GPIO1)
@@ -175,7 +175,7 @@ extern void GO_TX(void);
 extern void Clr_INT(void);
 extern void Clr_FIFO(void);
 extern void Send_Pack(byte Str[],byte length,byte Pack_Cnt);
-extern void CMT2300Iint(void);
+extern void CMT2300A_Init(void);
 extern void CMT2300A_EnableReadFifo(void);
 
 #endif

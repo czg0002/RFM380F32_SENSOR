@@ -86,12 +86,12 @@ void CMT2300A_EnableLfosc(byte bEnable)
     SPI_Write(CUS_SYS2, tmp);
 }
 /***********************************
-**名字:CMT2300Iint
+**名字:CMT2300A_Init
 **功能:2300初始化
 **入参:无
 **出参:无
 ************************************/
-void CMT2300Iint(void)
+void CMT2300A_Init(void)
 {
 	byte i,tmp;
 	byte cnt;	
@@ -280,7 +280,7 @@ byte i;
         CSB_H();
         FCSB_L();
         SDIO_L();
-        SDIO_Oput();
+        SDIO_Output();
         SCLK_L();
         			
        for(i=0;i<8;i++)  
@@ -316,7 +316,7 @@ byte date=0;
       CSB_H();
       FCSB_L();
       SDIO_L();
-      SDIO_Intput();
+      SDIO_Input();
       SCLK_L();
       
       for(i=0;i<8;i++)  
@@ -334,7 +334,7 @@ byte date=0;
        SCLK_L();
        Delay(2); 
        FCSB_H();
-       SDIO_Oput();
+       SDIO_Output();
        SDIO_H();
        Delay(2);
        return date;
@@ -364,7 +364,7 @@ byte Read_SPI8Bit(void)
 byte num=0;
 byte i;						
     CSB_L();
-		SDIO_Intput();
+		SDIO_Input();
 		Delay(1);
     for(i=0;i<8;i++)		
 		{
@@ -379,7 +379,7 @@ byte i;
         num&=0xFE;
 		}	
 		SCLK_L();
-    SDIO_Oput();
+    SDIO_Output();
     SDIO_H();
 		CSB_H();
 		return num;
@@ -409,7 +409,7 @@ void Write_SPI8Bit(byte Data)
 {
 byte i;
     FCSB_H();
-    SDIO_Oput();
+    SDIO_Output();
     SDIO_H();
     Delay(1);						
     CSB_L();

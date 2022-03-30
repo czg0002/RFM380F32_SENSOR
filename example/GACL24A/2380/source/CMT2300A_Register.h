@@ -21,12 +21,31 @@
  * version    1.0
  * date       Dec 22 2016
  * author     QY Ruan
+ * vserion	  1.1
+ * date       March 30 2022
+ * author     Scott Chen, czg0002@163.com, Copyright (C) GOVA
  */
  
  #ifndef CMT2300A_Register_h
 	#define CMT2300A_Register_h 
 	
 #define CUS_CMT10               0x09
+
+/* ---------- CMT bank defines ---------- */
+#define CMT2300A_CMT_BANK_ADDR           0x00
+#define CMT2300A_CMT_BANK_SIZE           12
+#define CMT2300A_CUS_CMT1                0x00
+#define CMT2300A_CUS_CMT2                0x01
+#define CMT2300A_CUS_CMT3                0x02
+#define CMT2300A_CUS_CMT4                0x03
+#define CMT2300A_CUS_CMT5                0x04
+#define CMT2300A_CUS_CMT6                0x05
+#define CMT2300A_CUS_CMT7                0x06
+#define CMT2300A_CUS_CMT8                0x07
+#define CMT2300A_CUS_CMT9                0x08
+#define CMT2300A_CUS_CMT10               0x09
+#define CMT2300A_CUS_CMT11               0x0A
+#define CMT2300A_CUS_RSSI                0x0B
 
 /* ********** CMT2300A_CUS_SYS2 registers ********** */
 		#define CMT2300A_MASK_LFOSC_RECAL_EN     0x80

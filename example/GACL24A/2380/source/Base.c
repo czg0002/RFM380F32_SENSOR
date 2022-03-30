@@ -147,7 +147,7 @@ uint8_t i=0;
 ********************************/
 void MCU_Config(void)
 {
-	Clk_SetRCHFreq(ClkFreq16Mhz);//(ClkFreq16Mhz);	//16M
+//	Clk_SetRCHFreq(ClkFreq16Mhz);//(ClkFreq16Mhz);	//16M
 	Clk_SetHClkDiv(ClkDiv1);			//CPU时钟
 	Clk_SetPClkDiv(ClkDiv1);			//外设时钟
 }

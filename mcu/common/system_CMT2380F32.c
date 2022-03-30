@@ -43,9 +43,9 @@ void SystemInit(void)
 
     // TODO load trim from flash and enable RCH
     //hcr 4MHz manual trim.
-    Clk_Enable(ClkRCH, TRUE);
- //   Clk_SetRCHFreq(ClkFreq4Mhz);
-      Clk_SetRCHFreq(ClkFreq16Mhz);                                            
+    //Clk_Enable(ClkRCH, TRUE);
+		Clk_Enable(ClkXTH, TRUE);	
+    //Clk_SetRCHFreq(ClkFreq16Mhz);                                            
     SystemCoreClockUpdate();
 
     DDL_ZERO_STRUCT(stcCfg);

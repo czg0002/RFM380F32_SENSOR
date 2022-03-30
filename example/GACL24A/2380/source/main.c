@@ -155,11 +155,11 @@ int32_t main(void)
 	byte i=0;
 	word k=1;
 	MCU_Init(); 
-  CMT2300Iint();   
+  CMT2300A_Init();   
 
   UartP3536Int();	//初始化串口 19200 MODE3 even校验
-//	while(1)
-//		Send_Pack(u8RxData,8,0);
+	while(1)
+		Send_Pack(u8RxData,8,0);
 	#if RF_STATUS  
 	GO_STBY();	  
 	CMT2300A_EnableReadFifo();
