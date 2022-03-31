@@ -4,7 +4,7 @@
 #include "ddl.h"
 #include "CMT2300A_Register.h"
 
-#define  RF_STATUS   0//1为接收，0为发射
+#define  RF_STATUS   1//1为接收，0为发射
 
 typedef unsigned char byte;
 typedef unsigned int  word;

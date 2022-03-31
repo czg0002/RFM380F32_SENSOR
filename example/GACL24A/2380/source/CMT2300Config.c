@@ -2,7 +2,7 @@
 
 void CMT2300A_ConfigGpio(byte nGpioSel)
 {
-    SPI_Write(CUS_IO_SEL,nGpioSel);  //配置GPIO
+    SPI_Write(CMT2300A_CUS_IO_SEL,nGpioSel);  //配置GPIO
 }
 /*! ********************************************************
 * @name    SetPayloadLength
@@ -11,14 +11,14 @@ void CMT2300A_ConfigGpio(byte nGpioSel)
 * *********************************************************/
 void SetPayloadLength(word nLength)
 { 
-    byte tmp = SPI_Read(CUS_PKT14);
+    byte tmp = SPI_Read(CMT2300A_CUS_PKT14);
     
-    tmp &= ~MASK_PAYLOAD_LENG_10_8;
-    tmp |= (nLength >> 4) & MASK_PAYLOAD_LENG_10_8;
-    SPI_Write(CUS_PKT14, tmp);
+    tmp &= ~CMT2300A_MASK_PAYLOAD_LENG_10_8;
+    tmp |= (nLength >> 4) & CMT2300A_MASK_PAYLOAD_LENG_10_8;
+    SPI_Write(CMT2300A_CUS_PKT14, tmp);
     
-    tmp = nLength & MASK_PAYLOAD_LENG_7_0;
-    SPI_Write(CUS_PKT15, tmp);
+    tmp = nLength & CMT2300A_MASK_PAYLOAD_LENG_7_0;
+    SPI_Write(CMT2300A_CUS_PKT15, tmp);
 }
 
 /*! ********************************************************
@@ -29,14 +29,14 @@ void SetPayloadLength(word nLength)
 * *********************************************************/
 void EnableFifoMerge(byte bEnable)
 {
-    byte tmp = SPI_Read(CUS_FIFO_CTL);
+    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
 
     if(bEnable)
-        tmp |= MASK_FIFO_MERGE_EN;
+        tmp |= CMT2300A_MASK_FIFO_MERGE_EN;
     else
-        tmp &= ~MASK_FIFO_MERGE_EN;
+        tmp &= ~CMT2300A_MASK_FIFO_MERGE_EN;
 
-    SPI_Write(CUS_FIFO_CTL, tmp);
+    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
 }
 /*! ********************************************************
 * @name    CMT2300A_EnableReadFifo
@@ -44,10 +44,10 @@ void EnableFifoMerge(byte bEnable)
 * *********************************************************/
 void CMT2300A_EnableReadFifo(void)
 {
-    byte tmp = SPI_Read(CUS_FIFO_CTL);
-    tmp &= ~SPI_FIFO_RD_WR_SEL; 
-    tmp &= ~FIFO_RX_TX_SEL;
-    SPI_Write(CUS_FIFO_CTL, tmp);
+    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
+    tmp &= ~CMT2300A_MASK_SPI_FIFO_RD_WR_SEL; 
+    tmp &= ~CMT2300A_MASK_FIFO_RX_TX_SEL;
+    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
 }
 
 /*! ********************************************************
@@ -56,10 +56,10 @@ void CMT2300A_EnableReadFifo(void)
 * *********************************************************/
 void CMT2300A_EnableWriteFifo(void)
 {
-    byte tmp = SPI_Read(CUS_FIFO_CTL);
-    tmp |= SPI_FIFO_RD_WR_SEL;
-    tmp |= FIFO_RX_TX_SEL;
-    SPI_Write(CUS_FIFO_CTL, tmp);
+    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
+    tmp |= CMT2300A_MASK_SPI_FIFO_RD_WR_SEL;
+    tmp |= CMT2300A_MASK_FIFO_RX_TX_SEL;
+    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
 }
 
 /*! ********************************************************
@@ -70,7 +70,7 @@ void CMT2300A_EnableWriteFifo(void)
 * *********************************************************/
 void CMT2300A_EnableLfosc(byte bEnable)
 {
-    byte tmp = SPI_Read(CUS_SYS2);
+    byte tmp = SPI_Read(CMT2300A_CUS_SYS2);
     
     if(bEnable) {
         tmp |= CMT2300A_MASK_LFOSC_RECAL_EN;
@@ -83,7 +83,7 @@ void CMT2300A_EnableLfosc(byte bEnable)
         tmp &= ~CMT2300A_MASK_LFOSC_CAL2_EN;
     }
     
-    SPI_Write(CUS_SYS2, tmp);
+    SPI_Write(CMT2300A_CUS_SYS2, tmp);
 }
 /***********************************
 **名字:CMT2300A_Init
@@ -110,17 +110,16 @@ void CMT2300A_Init(void)
 		SPI_Write(i,Baseband_Bank[cnt]);
 	for(i=TX_Origin,cnt=0;i<=TX_End;i++,cnt++)
 		SPI_Write(i,TX_Bank[cnt]);	
-	
 #if RF_STATUS
-	CMT2300A_ConfigGpio((GPIO3_DATA|GPIO2_INT2|GPIO1_INT1));   	//test by czg, switch for receiving test
+	CMT2300A_ConfigGpio((CMT2300A_GPIO3_SEL_DOUT|CMT2300A_GPIO2_SEL_INT2|CMT2300A_GPIO1_SEL_INT1));
 #else
-	CMT2300A_ConfigGpio((GPIO3_DATA|GPIO2_INT1|GPIO1_INT2));
+	CMT2300A_ConfigGpio((CMT2300A_GPIO3_SEL_DOUT|CMT2300A_GPIO2_SEL_INT1|CMT2300A_GPIO1_SEL_INT2));
 #endif
-	SPI_Write(CUS_INT_EN,(PKT_DONE_EN|TX_DONE_EN|CRC_OK_EN));            //开启接收完成和发射完成中断
-	i = SPI_Read(CUS_INT2_CTL);
-	SPI_Write(CUS_INT2_CTL,(i&0xE0)|INT_PKT_DONE);             //INT2映射接收成功中断            //
-	i = SPI_Read(CUS_INT1_CTL);
-	SPI_Write(CUS_INT1_CTL,(i&0xE0)|INT_TX_DONE);              //INT1映射发射完成中断 
+	SPI_Write(CMT2300A_CUS_INT_EN,(CMT2300A_MASK_PKT_DONE_EN|CMT2300A_MASK_TX_DONE_EN|CMT2300A_MASK_CRC_OK_EN));            //开启接收完成和发射完成中断
+	i = SPI_Read(CMT2300A_CUS_INT2_CTL);
+	SPI_Write(CMT2300A_CUS_INT2_CTL,(i&0xE0)|CMT2300A_INT_SEL_PKT_DONE);             //INT2映射接收成功中断            //
+	i = SPI_Read(CMT2300A_CUS_INT1_CTL);
+	SPI_Write(CMT2300A_CUS_INT1_CTL,(i&0xE0)|CMT2300A_INT_SEL_TX_DONE);              //INT1映射发射完成中断 
 	Clr_FIFO();                                                //清除FIFO
 	Clr_INT();                                                 //清除中断
 	CMT2300A_EnableLfosc(0);
@@ -141,13 +140,13 @@ void Send_Pack(byte Str[],byte length,byte Pack_Cnt)
 		byte buf;  
 		GO_STBY();   
 		CMT2300A_EnableWriteFifo();  
-		SPI_Write(CUS_FIFO_CLR,FIFO_CLR_TX);            //清除TX FIFO      
+		SPI_Write(CMT2300A_CUS_FIFO_CLR, CMT2300A_MASK_FIFO_CLR_TX);            //清除TX FIFO      
 		Clr_INT(); 
 		SetPayloadLength(length);
 		for(buf=0;buf<length;buf++)                     //FIFO写入
 		Write_FIFO(Str[buf]);    	                   
-		buf=SPI_Read(CUS_PKT29);
-		SPI_Write(CUS_PKT29,buf|0x80);                  //打开restore TX FIFO
+		buf=SPI_Read(CMT2300A_CUS_PKT29);
+		SPI_Write(CMT2300A_CUS_PKT29,buf|0x80);                  //打开restore TX FIFO
 		GO_TX();			                            			//
 		while(1)
 		{
@@ -165,7 +164,7 @@ void Send_Pack(byte Str[],byte length,byte Pack_Cnt)
 ***************************************************************/
 void Clr_FIFO(void)
 {
-    SPI_Write(CUS_FIFO_CLR,(FIFO_CLR_RX|FIFO_CLR_TX));
+    SPI_Write(CMT2300A_CUS_FIFO_CLR,(CMT2300A_MASK_FIFO_CLR_RX|CMT2300A_MASK_FIFO_CLR_TX));
 }
 
 /***************************************************************
@@ -176,8 +175,8 @@ void Clr_FIFO(void)
 ***************************************************************/
 void Clr_INT(void)
 {
-    SPI_Write(CUS_INT_CLR1,(RX_TMO_CLR|SL_TMO_CLR|TX_DONE_CLR));
-    SPI_Write(CUS_INT_CLR2,(LBD_CLR|PREAM_OK_CLR|SYNC_OK_CLR|NODE_OK_CLR|CRC_OK_CLR|PKT_DONE_CLR));
+    SPI_Write(CMT2300A_CUS_INT_CLR1,(CMT2300A_MASK_RX_TMO_CLR|CMT2300A_MASK_SL_TMO_CLR|CMT2300A_MASK_TX_DONE_CLR));
+    SPI_Write(CMT2300A_CUS_INT_CLR2,(CMT2300A_MASK_LBD_CLR|CMT2300A_MASK_PREAM_OK_CLR|CMT2300A_MASK_SYNC_OK_CLR|CMT2300A_MASK_NODE_OK_CLR|CMT2300A_MASK_CRC_OK_CLR|CMT2300A_MASK_PKT_DONE_CLR));
 }
 
 
@@ -190,11 +189,11 @@ void Clr_INT(void)
 void GO_TX(void)
 {   
 byte START;	
-  SPI_Write(CUS_MODE_CTL,MODE_GO_TX);    //进入TX模式
+  SPI_Write(CMT2300A_CUS_MODE_CTL,CMT2300A_GO_TX);    //进入TX模式
 	for(SysTime=0;SysTime<2;)
 	{
-				START=SPI_Read(CUS_MODE_STA);
-				if((START&0x0F) == MODE_STA_TX)
+				START=SPI_Read(CMT2300A_CUS_MODE_STA);
+				if((START&0x0F) == CMT2300A_STA_TX)
 				break;
 	}
 }
@@ -208,11 +207,11 @@ byte START;
 void GO_RX(void)
 {  
 byte START;	
-	SPI_Write(CUS_MODE_CTL,MODE_GO_RX);    //进入RX模式
+	SPI_Write(CMT2300A_CUS_MODE_CTL,CMT2300A_GO_RX);    //进入RX模式
 	for(SysTime=0;SysTime<2;)
 	{
-		START=SPI_Read(CUS_MODE_STA);
-		if((START&0x0F) == MODE_STA_RX)
+		START=SPI_Read(CMT2300A_CUS_MODE_STA);
+		if((START&0x0F) == CMT2300A_STA_RX)
 			break;
 	}   
 }
@@ -227,12 +226,12 @@ byte START;
 void GO_STBY(void)
 {
 byte START;
-   SPI_Write(CUS_MODE_CTL,MODE_GO_STBY);    //进入STBY模式 
+   SPI_Write(CMT2300A_CUS_MODE_CTL,CMT2300A_GO_STBY);    //进入STBY模式 
 
 	 for(SysTime=0;SysTime<2;)
 	 {
-				START=SPI_Read(CUS_MODE_STA);
-				if((START&0x0F) == MODE_STA_STBY)
+				START=SPI_Read(CMT2300A_CUS_MODE_STA);
+				if((START&0x0F) == CMT2300A_STA_STBY)
 				break;
 	 } 
 
@@ -247,11 +246,11 @@ byte START;
 void GO_SLEEP(void)
 {
 byte START;	
-   SPI_Write(CUS_MODE_CTL,MODE_GO_SLEEP);    //进入SLEEP模式
+   SPI_Write(CMT2300A_CUS_MODE_CTL,CMT2300A_GO_SLEEP);    //进入SLEEP模式
 	 for(SysTime=0;SysTime<2;)
 	 {
-				START=SPI_Read(CUS_MODE_STA);
-				if((START&0x0F) == MODE_STA_SLEEP)
+				START=SPI_Read(CMT2300A_CUS_MODE_STA);
+				if((START&0x0F) == CMT2300A_STA_SLEEP)
 				break;
 	 }   
 }
@@ -265,7 +264,7 @@ byte START;
 ****************************************************************/
 void Reset(void)
 {
-   SPI_Write(CUS_SOFTRST,0xFF);    
+   SPI_Write(CMT2300A_CUS_SOFTRST,0xFF);    
 }
 
 /***************************************************************

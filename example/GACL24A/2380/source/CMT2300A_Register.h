@@ -24,13 +24,12 @@
  * vserion	  1.1
  * date       March 30 2022
  * author     Scott Chen, czg0002@163.com, Copyright (C) GOVA
+ * descri	  merge from cmt2300a demo
  */
  
  #ifndef CMT2300A_Register_h
 	#define CMT2300A_Register_h 
 	
-#define CUS_CMT10               0x09
-
 /* ---------- CMT bank defines ---------- */
 #define CMT2300A_CMT_BANK_ADDR           0x00
 #define CMT2300A_CMT_BANK_SIZE           12
@@ -47,519 +46,572 @@
 #define CMT2300A_CUS_CMT11               0x0A
 #define CMT2300A_CUS_RSSI                0x0B
 
+/* ---------- System bank defines ---------- */
+#define CMT2300A_SYSTEM_BANK_ADDR        0x0C
+#define CMT2300A_SYSTEM_BANK_SIZE        12
+#define CMT2300A_CUS_SYS1                0x0C
+#define CMT2300A_CUS_SYS2                0x0D
+#define CMT2300A_CUS_SYS3                0x0E
+#define CMT2300A_CUS_SYS4                0x0F
+#define CMT2300A_CUS_SYS5                0x10
+#define CMT2300A_CUS_SYS6                0x11
+#define CMT2300A_CUS_SYS7                0x12
+#define CMT2300A_CUS_SYS8                0x13
+#define CMT2300A_CUS_SYS9                0x14
+#define CMT2300A_CUS_SYS10               0x15
+#define CMT2300A_CUS_SYS11               0x16
+#define CMT2300A_CUS_SYS12               0x17
+
+/* ---------- Frequency bank defines ---------- */
+#define CMT2300A_FREQUENCY_BANK_ADDR     0x18
+#define CMT2300A_FREQUENCY_BANK_SIZE     8
+#define CMT2300A_CUS_RF1                 0x18
+#define CMT2300A_CUS_RF2                 0x19
+#define CMT2300A_CUS_RF3                 0x1A
+#define CMT2300A_CUS_RF4                 0x1B
+#define CMT2300A_CUS_RF5                 0x1C
+#define CMT2300A_CUS_RF6                 0x1D
+#define CMT2300A_CUS_RF7                 0x1E
+#define CMT2300A_CUS_RF8                 0x1F
+
+/* ---------- Data rate bank defines ---------- */
+#define CMT2300A_DATA_RATE_BANK_ADDR     0x20
+#define CMT2300A_DATA_RATE_BANK_SIZE     24
+#define CMT2300A_CUS_RF9                 0x20
+#define CMT2300A_CUS_RF10                0x21
+#define CMT2300A_CUS_RF11                0x22
+#define CMT2300A_CUS_RF12                0x23
+#define CMT2300A_CUS_FSK1                0x24
+#define CMT2300A_CUS_FSK2                0x25
+#define CMT2300A_CUS_FSK3                0x26
+#define CMT2300A_CUS_FSK4                0x27
+#define CMT2300A_CUS_FSK5                0x28
+#define CMT2300A_CUS_FSK6                0x29
+#define CMT2300A_CUS_FSK7                0x2A
+#define CMT2300A_CUS_CDR1                0x2B
+#define CMT2300A_CUS_CDR2                0x2C
+#define CMT2300A_CUS_CDR3                0x2D
+#define CMT2300A_CUS_CDR4                0x2E
+#define CMT2300A_CUS_AGC1                0x2F
+#define CMT2300A_CUS_AGC2                0x30
+#define CMT2300A_CUS_AGC3                0x31
+#define CMT2300A_CUS_AGC4                0x32
+#define CMT2300A_CUS_OOK1                0x33
+#define CMT2300A_CUS_OOK2                0x34
+#define CMT2300A_CUS_OOK3                0x35
+#define CMT2300A_CUS_OOK4                0x36
+#define CMT2300A_CUS_OOK5                0x37
+
+/* ---------- Baseband bank defines ---------- */
+#define CMT2300A_BASEBAND_BANK_ADDR      0x38
+#define CMT2300A_BASEBAND_BANK_SIZE      29
+#define CMT2300A_CUS_PKT1                0x38
+#define CMT2300A_CUS_PKT2                0x39
+#define CMT2300A_CUS_PKT3                0x3A
+#define CMT2300A_CUS_PKT4                0x3B
+#define CMT2300A_CUS_PKT5                0x3C
+#define CMT2300A_CUS_PKT6                0x3D
+#define CMT2300A_CUS_PKT7                0x3E
+#define CMT2300A_CUS_PKT8                0x3F
+#define CMT2300A_CUS_PKT9                0x40
+#define CMT2300A_CUS_PKT10               0x41
+#define CMT2300A_CUS_PKT11               0x42
+#define CMT2300A_CUS_PKT12               0x43
+#define CMT2300A_CUS_PKT13               0x44
+#define CMT2300A_CUS_PKT14               0x45
+#define CMT2300A_CUS_PKT15               0x46
+#define CMT2300A_CUS_PKT16               0x47
+#define CMT2300A_CUS_PKT17               0x48
+#define CMT2300A_CUS_PKT18               0x49
+#define CMT2300A_CUS_PKT19               0x4A
+#define CMT2300A_CUS_PKT20               0x4B
+#define CMT2300A_CUS_PKT21               0x4C
+#define CMT2300A_CUS_PKT22               0x4D
+#define CMT2300A_CUS_PKT23               0x4E
+#define CMT2300A_CUS_PKT24               0x4F
+#define CMT2300A_CUS_PKT25               0x50
+#define CMT2300A_CUS_PKT26               0x51
+#define CMT2300A_CUS_PKT27               0x52
+#define CMT2300A_CUS_PKT28               0x53
+#define CMT2300A_CUS_PKT29               0x54
+
+/* ---------- Tx bank defines ---------- */
+#define CMT2300A_TX_BANK_ADDR            0x55
+#define CMT2300A_TX_BANK_SIZE            11
+#define CMT2300A_CUS_TX1                 0x55
+#define CMT2300A_CUS_TX2                 0x56
+#define CMT2300A_CUS_TX3                 0x57
+#define CMT2300A_CUS_TX4                 0x58
+#define CMT2300A_CUS_TX5                 0x59
+#define CMT2300A_CUS_TX6                 0x5A
+#define CMT2300A_CUS_TX7                 0x5B
+#define CMT2300A_CUS_TX8                 0x5C
+#define CMT2300A_CUS_TX9                 0x5D
+#define CMT2300A_CUS_TX10                0x5E
+#define CMT2300A_CUS_LBD                 0x5F
+
+/* ---------- Control1 bank defines ---------- */
+#define CMT2300A_CONTROL1_BANK_ADDR      0x60
+#define CMT2300A_CONTROL1_BANK_SIZE      11
+#define CMT2300A_CUS_MODE_CTL            0x60
+#define CMT2300A_CUS_MODE_STA            0x61
+#define CMT2300A_CUS_EN_CTL              0x62
+#define CMT2300A_CUS_FREQ_CHNL           0x63
+#define CMT2300A_CUS_FREQ_OFS            0x64
+#define CMT2300A_CUS_IO_SEL              0x65
+#define CMT2300A_CUS_INT1_CTL            0x66
+#define CMT2300A_CUS_INT2_CTL            0x67
+#define CMT2300A_CUS_INT_EN              0x68
+#define CMT2300A_CUS_FIFO_CTL            0x69
+#define CMT2300A_CUS_INT_CLR1            0x6A
+
+/* ---------- Control2 bank defines ---------- */
+#define CMT2300A_CONTROL2_BANK_ADDR      0x6B
+#define CMT2300A_CONTROL2_BANK_SIZE      7
+#define CMT2300A_CUS_INT_CLR2            0x6B
+#define CMT2300A_CUS_FIFO_CLR            0x6C
+#define CMT2300A_CUS_INT_FLAG            0x6D
+#define CMT2300A_CUS_FIFO_FLAG           0x6E
+#define CMT2300A_CUS_RSSI_CODE           0x6F
+#define CMT2300A_CUS_RSSI_DBM            0x70
+#define CMT2300A_CUS_LBD_RESULT          0x71
+#define CMT2300A_CUS_SOFTRST			 0x7f
+
+/* ********** CMT2300A_CUS_CMT2 registers ********** */
+#define CMT2300A_MASK_PRODUCT_ID         0xFF
+
+/* ********** CMT2300A_CUS_CMT5 registers ********** */
+#define CMT2300A_MASK_LMT_CODE           0xC0
+
+/* ********** CMT2300A_CUS_CMT9 registers ********** */
+#define CMT2300A_MASK_RSSI_OFFSET_SIGN   0x80
+#define CMT2300A_MASK_DIG_CLKDIV         0x1F
+
+/* ********** CMT2300A_CUS_RSSI registers ********** */
+#define CMT2300A_MASK_RSSI_OFFSET        0xF8
+#define CMT2300A_MASK_RSSI_SLOPE         0x07
+
+/* ********** CMT2300A_CUS_SYS1 registers ********** */
+#define CMT2300A_MASK_LMT_VTR            0xC0
+#define CMT2300A_MASK_MIXER_BIAS         0x30
+#define CMT2300A_MASK_LNA_MODE           0x0C
+#define CMT2300A_MASK_LNA_BIAS           0x03
+
 /* ********** CMT2300A_CUS_SYS2 registers ********** */
-		#define CMT2300A_MASK_LFOSC_RECAL_EN     0x80
-		#define CMT2300A_MASK_LFOSC_CAL1_EN      0x40
-		#define CMT2300A_MASK_LFOSC_CAL2_EN      0x20
-		#define CMT2300A_MASK_RX_TIMER_EN        0x10
-		#define CMT2300A_MASK_SLEEP_TIMER_EN     0x08
-		#define CMT2300A_MASK_TX_DC_EN           0x04
-		#define CMT2300A_MASK_RX_DC_EN           0x02
-		#define CMT2300A_MASK_DC_PAUSE           0x01	
-	//*********************************************************
-	//System Bank Register
-	//*********************************************************
-	#define CUS_SYS1				0x0C	//LMT_VTR | MIXER_BIAS | LNA_MODE | LNA_BIAS 
-	
-	#define CUS_SYS2				0x0D	//About DutyCycle Setting	
-		#define LFOSC_RECAL_EN		(1<<7)	//
-		#define LFOSC_CAL1_EN		(1<<6)	//
-		#define LFOSC_CAL2_EN		(1<<5)	//
-		#define RX_TIMER_EN			(1<<4)	//RxTimer Enable
-		#define	SLEEP_TIMER_EN		(1<<3)	//SleepTimer Enable
-		#define TX_DC_EN			(1<<2)	//Tx DutyCycle Enable
-		#define RX_DC_EN			(1<<1)	//Rx DutyCycle Enable
-		#define DC_PAUSE			(1<<0)	//DutyCycle Pause
-		
-	#define CUS_SYS3				0x0E	//XTAL_STB_TIME | TX_EXIT_STATE | RX_EXIT_STATE
-		#define	SLEEP_BYPASS_EN		(1<<7)	
-		
-		#define XTAL_STB_20US		(0<<4)
-		#define XTAL_STB_40US		(1<<4)
-		#define XTAL_STB_80US		(2<<4)
-		#define XTAL_STB_160US		(3<<4)	//[default]
-		#define XTAL_STB_320US		(4<<4)
-		#define XTAL_STB_640US		(5<<4)
-		#define	XTAL_STB_1MS		(6<<4)
-		#define XTAL_STB_2MS		(7<<4)
-		
-		#define TX_EXIT_SLEEP		(0<<2)	//TxDutyCycle Exit to Sleep	
-		#define TX_EXIT_STBY		(1<<2)	//TxDutyCycle Exit to Standby
-		#define TX_EXIT_FS			(2<<2)	//TxDutyCycle Exit to TFS
-		
-		#define RX_EXIT_SLEEP		(0<<0)	//RxDutyCycle Exit to Sleep	
-		#define RX_EXIT_STBY		(1<<0)	//RxDutyCycle Exit to Standby
-		#define RX_EXIT_FS			(2<<0)	//RxDutyCycle Exit to RFS
+#define CMT2300A_MASK_LFOSC_RECAL_EN     0x80
+#define CMT2300A_MASK_LFOSC_CAL1_EN      0x40
+#define CMT2300A_MASK_LFOSC_CAL2_EN      0x20
+#define CMT2300A_MASK_RX_TIMER_EN        0x10
+#define CMT2300A_MASK_SLEEP_TIMER_EN     0x08
+#define CMT2300A_MASK_TX_DC_EN           0x04
+#define CMT2300A_MASK_RX_DC_EN           0x02
+#define CMT2300A_MASK_DC_PAUSE           0x01
 
-	#define CUS_SYS4				0x0F	//SLEEP_TIMER_M[7:0]
-	#define CUS_SYS5				0x10	//(SLEEP_TIMER_M[10:8]<<4) | SLEEP_TIMER_R[3:0]
-	#define CUS_SYS6				0x11	//RX_TIMER_T1_M[7:0]
-	#define CUS_SYS7				0x12	//(RX_TIMER_T1_M[10:8]<<4) | RX_TIMER_T1_R[3:0]
-	#define CUS_SYS8				0x13	//RX_TIMER_T2_M[7:0]
-	#define CUS_SYS9				0x14	//(RX_TIMER_T2_M[10:8]<<4) | RX_TIMER_T2_R[3:0]
-	
-	#define CUS_SYS10				0x15
-		#define COL_DET_EN			(1<<7)
-		#define COL_OFS_SEL			(1<<6)
-		#define RX_AUTO_EXIT_DIS	(1<<5)	//[Should be set 1]
-		#define DOUT_MUTE			(1<<4)	
-		
-		//14种模式用于SLP
-		#define RX_EXT_NONE			(0<<0)	//Rx extend mode disable
-		//T1窗口检测：检测到符合条件，退出T1
-		#define RX_EXIT_T1_RSSI		(1<<0)	//Rx exit T1 by Rssi
-		#define RX_EXIT_T1_PREAM	(2<<0)	//Rx exit T1 by Preamble
-		#define RX_EXIT_T1_RP		(3<<0)	//Rx exit T1 by Rssi & Preamble
-		#define RX_EXIT_T1_ARSSI	(4<<0)	//Rx exit T1 by Rssi, and hold by Rssi
-		//T2延收：检测到符合T1条件，进入T2；T2计时退出，不延长接收；
-		#define RX_EXT_T2_RSSI		(5<<0)	//Rx extend to T2 by Rssi
-		#define RX_EXT_T2_PREAM		(6<<0)	//Rx extend to T2 by Rssi
-		#define RX_EXT_T2_RP		(7<<0)	//Rx extend to T2 by Rssi & Preamble
-		#define RX_EXT_T2_PorS		(8<<0)	//Rx extend to T2 by Preamble or Sync
-		#define RX_EXT_T2_PorN		(9<<0)	//Rx extend to T2 by Preamble or Node
-		#define RX_EXT_T2_PSN		(10<<0)	//Rx extend to T2 by Preamble or Sync or Node
-		//T2窗口检测：检测到符合T1条件，进入T2；T2检测到Sync，退出T2
-		#define RX_EXIT_T2_RSSI		(11<<0)	//Rx exit T1 by Rssi, and exit T2 by Sync
-		#define RX_EXIT_T2_PREAM	(12<<0)	//Rx exit T1 by Preamble, and exit T2 by Sync
-		#define RX_EXIT_T2_RP		(13<<0)	//Rx exit T1 by Rssi & Preamble , and exit T2 by Sync
-	
-	#define CUS_SYS11				0x16
-		#define PJD_TH_SEL			(0<<7)	//[Should be set 0]
-		
-		//CCA INT for RSSI_VLD [for FSK used]
-		#define CCA_INT_ONLY_PJD	(0<<5)	//RSSI_VLD==PJD
-		#define CCA_INT_ONLY_RSSI	(1<<5)	//RSSI_VLD==RSSI [when used OOK mode, should be set 1]		
-		#define CCA_INT_PJD_RSSI	(2<<5)	//RSSI_VLD==PJD+RSSI
-		
-		#define RSSI_DET_ALWAYS		(0<<3)	//RSSI always detect
-		#define RSSI_DET_PREAM		(1<<3)	//RSSI detect when Preamble ok
-		#define RSSI_DET_SYNC		(2<<3)	//RSSI detect when Sync ok
-		#define RSSI_DET_PKT		(3<<3)	//RSSI detect when packet ok
-		
-		#define RSSI_AVG_DISABLE	(0<<0)	//RSSI detect average filter step
-		#define RSSI_AVG_4Step		(1<<0)
-		#define RSSI_AVG_8Step		(2<<0)
-		#define RSSI_AVG_16Step		(3<<0)
-		#define RSSI_AVG_32Step		(4<<0)
+/* ********** CMT2300A_CUS_SYS3 registers ********** */
+#define CMT2300A_MASK_SLEEP_BYPASS_EN    0x80
+#define CMT2300A_MASK_XTAL_STB_TIME      0x70
+#define CMT2300A_MASK_TX_EXIT_STATE      0x0C
+#define CMT2300A_MASK_RX_EXIT_STATE      0x03
 
-	#define CUS_SYS12				0x17
-		//select for PJD 
-		#define PJD_WIN_4			(0<<6)	//4 times phase jump
-		#define PJD_WIN_6			(1<<6)
-		#define PJD_WIN_8			(2<<6)	//[default]
-		#define PJD_WIN_10			(3<<6)	
-		
-		#define CLKOUT_EN			(1<<5)
-		
-		#define CLKOUT_DIV_64		(31<<0)
-		#define CLKOUT_DIV_32		(15<<0)
-		#define CLKOUT_DIV_16		(7<<0)
-		#define CLKOUT_DIV_8		(3<<0)
-		#define CLKOUT_DIV_4		(1<<0)
-		#define CLKOUT_DIV_2		(0<<0)
+/* ********** CMT2300A_CUS_SYS4 registers ********** */
+#define CMT2300A_MASK_SLEEP_TIMER_M_7_0  0xFF
 
-	//*********************************************************
-	//Frequency Bank Register
-	//*********************************************************
-	#define	CUS_RF1					0x18	//Rx Frequency N[7:0]
-	#define CUS_RF2					0x19	//Rx Frequency K[7:0]
-	#define CUS_RF3					0x1A	//Rx Frequency K[15:8]
-	#define CUS_RF4					0x1B	//FREQ_PALDO_SEL | FREQ_DIVX_CODE | FREQ_RX_K[19:16]
-	#define CUS_RF5					0x1C	//Tx Frequency N[7:0]
-	#define CUS_RF6					0x1D	//Tx Frequency K[7:0]
-	#define CUS_RF7					0x1E	//Tx Frequency K[15:8]
-	#define CUS_RF8					0x1F	//FSK_SWT | FREQ_VCO_BANK | FREQ_TX_K[19:16]	
-	
-	//*********************************************************
-	//BitRate Bank Register: about BitRate & RxModulation
-	//*********************************************************
-	#define CUS_RF9					0x20	//BRX64_DIV[7:0]
-	#define CUS_RF10				0x21	//BRX64_DIV[15:8]	
-	#define CUS_RF11				0x22	//RX_FSK_OOK_SEL | MIXER_BW_SEL | FLT_BW_SEL | BRX64_DIV[19:16]
-	#define CUS_RF12 				0x23	
-	#define CUS_FSK1				0x24
-	#define CUS_FSK2				0x25	
-	#define CUS_FSK3				0x26
-	#define CUS_FSK4				0x27
-	#define CUS_FSK5				0x28
-	#define CUS_FSK6				0x29
-	#define CUS_FSK7				0x2A
-	#define CUS_CDR1				0x2B
-		#define CDR_AVG_SEL_SHIFT   4      	//[6:4]
-		#define CDR_RANGE_SEL_SHIFT 2       //[3:2]
-		#define CDR_MODE_SHIFT      0       //[1:0]
-		
-		#define CDR_TRACING_MODE    0
-		#define CDR_COUNTING_MODE   1
-		#define CDR_MANCHESTER_MODE 2
-		#define CDR_RAWDATA_MODE    3
-		
-	#define CUS_CDR2				0x2C
-		#define CDR_DET_SEL         (1<<7)	//
-		#define CDR_3RD_EN          (1<<6)	//
-		#define CDR_4TH_EN			(1<<5)	//
-		
-	#define CUS_CDR3				0x2D
-	#define CUS_CDR4				0x2E
-	#define CUS_AGC1				0x2F
-	#define	CUS_AGC2				0x30
-	#define CUS_AGC3				0x31
-	#define	CUS_AGC4				0x32
-	#define CUS_OOK1				0x33
-	#define CUS_OOK2				0x34
-	#define	CUS_OOK3				0x35    //AUTO_ABS_TH (OOK) / RSSI_TRIG_TH (FSK) [7:0]
-	#define	CUS_OOK4				0x36
-	#define CUS_OOK5				0x37
+/* ********** CMT2300A_CUS_SYS5 registers ********** */
+#define CMT2300A_MASK_SLEEP_TIMER_M_10_8 0x70
+#define CMT2300A_MASK_SLEEP_TIMER_R      0x0F
 
-	//*********************************************************
-	//Base Bank Register
-	//*********************************************************
-	#define CUS_PKT1				0x38
-		#define DIRECT_MODE			(0<<0)
-		#define BUFFER_MODE			(1<<0)
-		#define PACKET_MODE			(2<<0)	//[default]
-		
-		#define PREAM_UNIT_BYTE		(0<<2)	//Preamble unit 8bit [default]
-		#define PREAM_UNIT_NIBBLE	(1<<2)	//Preamble unit 4bit
-		
-		#define	RX_PREAM_SIZE_SHIFT	3		//[4:0]
-		
-	#define CUS_PKT2				0x39	//TX_PREAM_SIZE[7:0]
-	#define CUS_PKT3				0x3A	//TX_PREAM_SIZE[15:8]
-	#define CUS_PKT4				0x3B	//Preamble Value [0xAA or 0x55 is better]
-	#define CUS_PKT5				0x3C
-		#define SYNC_TOL_NONE		(0<<4)	
-		#define SYNC_TOL_0			(0<<4)
-		#define SYNC_TOL_1			(1<<4)
-		#define SYNC_TOL_2			(2<<4)
-		#define SYNC_TOL_3			(3<<4)
-		#define SYNC_TOL_4			(4<<4)
-		#define SYNC_TOL_5			(5<<4)
-		#define SYNC_TOL_6			(6<<4)
-		#define SYNC_TOL_7			(7<<4)
-		
-		#define	SYNC_SIZE_1			(0<<1)
-		#define SYNC_SIZE_2			(1<<1)
-		#define SYNC_SIZE_3			(2<<1)
-		#define SYNC_SIZE_4			(3<<1)
-		#define SYNC_SIZE_5			(4<<1)
-		#define SYNC_SIZE_6			(5<<1)
-		#define SYNC_SIZE_7			(6<<1)
-		#define SYNC_SIZE_8			(7<<1)
-		
-		#define SYNC_MAN_EN			(1<<0)	//enable Sync manchester encode, when manchester code enable
-		#define SYNC_MAN_DIS		(0<<0)	
-		
-	#define CUS_PKT6				0x3D	//SYNC_VALUE[7:0]
-	#define CUS_PKT7				0x3E	//SYNC_VALUE[15:8]
-	#define CUS_PKT8				0x3F	//SYNC_VALUE[23:16]	
-	#define CUS_PKT9				0x40	//SYNC_VALUE[31:24]	
-	#define CUS_PKT10				0x41	//SYNC_VALUE[39:32]	
-	#define CUS_PKT11				0x42	//SYNC_VALUE[47:40]	
-	#define CUS_PKT12				0x43	//SYNC_VALUE[55:48]	
-	#define CUS_PKT13				0x44	//SYNC_VALUE[63:56]	
+/* ********** CMT2300A_CUS_SYS6 registers ********** */
+#define CMT2300A_MASK_RX_TIMER_T1_M_7_0  0xFF
 
-/* ********** CUS_PKT14 registers ********** */
-  #define MASK_PAYLOAD_LENG_10_8  0x70   //add
-	/* ********** CUS_PKT15 registers ********** */
-  #define MASK_PAYLOAD_LENG_7_0   0xFF   //add
+/* ********** CMT2300A_CUS_SYS7 registers ********** */
+#define CMT2300A_MASK_RX_TIMER_T1_M_10_8 0x70
+#define CMT2300A_MASK_RX_TIMER_T1_R      0x0F
 
-	#define CUS_PKT14				0x45	
-		#define PAYLOAD_LENG_SHIFT	4		//PAYLOAD_LENG[11:8]
-		
-		#define AUTO_ACK_EN			(1<<3)
-		#define AUTO_ACK_DIS		(0<<3)
-		
-		#define NODE_LENG_POS_HEAD	(0<<2)
-		#define NODE_LENG_POS_NODE	(1<<2)
-		
-		#define PAYLOAD_BIT_ORDER_MSB	(0<<1)	//Normal used [default]	
-		#define PAYLOAD_BIT_ORDER_LSB	(1<<1)
-		
-		#define PKT_TYPE_FIXED		(0<<0)	//固定包长
-		#define PKT_TYPE_VARIABLE	(1<<0)	//可变包长
-		
-	#define CUS_PKT15				0x46	//PAYLOAD_LENG[7:0]
-		
-	#define CUS_PKT16				0x47	
-		#define NODE_FREE_EN		(1<<5)
-		#define NODE_ERR_MASK		(1<<4)
-		
-		#define NODE_SIZE_1			(0<<2)
-		#define	NODE_SIZE_2			(1<<2)
-		#define NODE_SIZE_3			(2<<2)
-		#define NODE_SIZE_4			(3<<2)
-		
-		#define NODE_DET_DISABLE	(0<<0)
-		#define NODE_DET_NODE		(1<<0)	//detect NodeID only
-		#define NODE_DET_NODE_ZERO	(2<<0)	//detect NodeID or Zero
-		#define NODE_DET_ALL		(3<<0)	//detect NodeID or Zero or All'1'
-		
-	#define CUS_PKT17				0x48	//NODE_VALUE[7:0]
-	#define CUS_PKT18				0x49	//NODE_VALUE[15:8]
-	#define CUS_PKT19				0x4A	//NODE_VALUE[23:16]	
-	#define CUS_PKT20				0x4B	//NODE_VALUE[31:24]
+/* ********** CMT2300A_CUS_SYS8 registers ********** */
+#define CMT2300A_MASK_RX_TIMER_T2_M_7_0  0xFF
 
-	#define CUS_PKT21				0x4C
-		#define FEC_TYPE_A			(0<<7)	//FEC=X^3+X+1
-		#define FEC_TYPE_B			(1<<7)	//FEC=X^3+X^2+1
-		
-		#define FEC_DIS				(0<<6)
-		#define FEC_EN				(1<<6)
-		
-		#define CRC_BYTE_SWAP		(1<<5)	//[15:8]<->[7:0]
-		
-		#define CRC_BIT_INV			(1<<4)	//CRC result invert
-		
-		#define CRC_RANGE_ONLY_DATA	(1<<3)	//[0]:Full Payload; [1]:Only Data
-		
-		#define CRC_TYPE_CCITT		(0<<1)
-		#define CRC_TYPE_IBM		(1<<1)
-		#define CRC_TYPE_ITU		(2<<1)
-		#define CRC_TYPE_NA			(3<<1)
-		
-		#define CRC_EN				(1<<0)
-		#define CRC_DIS				(0<<0)
-	
-	#define CUS_PKT22				0x4D	//CRC Seed[7:0]
-	#define CUS_PKT23				0x4E	//CRC Seed[15:8]
-	
-	#define CUS_PKT24				0x4F	
-		#define CRC_BIT_ORDER		(1<<7)	//[0]:MSB-LSB, Normally; [1]:LSB-MSB
-		
-		#define WHITEN_SEED_SHIFT	6
-		#define WHITEN_SEED_TYPE	(1<<5)	//[0]:as A7139; [1]:by whiten_seed value;  when PN7 active
-		
-		#define WHITEN_TYPE_CCITT	(0<<3)
-		#define WHITEN_TYPE_IBM		(1<<3)
-		#define WHITEN_TYPE_PN7		(2<<3)
-		
-		#define WHITEN_EN			(1<<2)
-		
-		#define MANCH_TYPE_A		(0<<1)	//Logic0=10; Logic1=01; Normally
-		#define MANCH_TYPE_B		(1<<1)	//Logic0=01; Logic1=10;
-		
-		#define MANCH_EN			(1<<0)
-		
-	#define CUS_PKT25				0x50	//WHITEN_SEED[7:0]
-	
-	#define CUS_PKT26				0x51	//
-		#define TX_PREFIX_ZERO		(0<<0)
-		#define TX_PREFIX_HIGH		(1<<0)
-		#define TX_PREFIX_PREAM		(2<<0)	//
-	
-	#define CUS_PKT27				0x52	//TX_PKT_NUM[7:0]
-	#define CUS_PKT28				0x53	//TX_PKT_GAP[7:0]
-	#define CUS_PKT29				0x54	//FIFO_TH[6:0]
-		#define FIFO_AUTO_RES_EN	(1<<7)	
+/* ********** CMT2300A_CUS_SYS9 registers ********** */
+#define CMT2300A_MASK_RX_TIMER_T2_M_10_8 0x70
+#define CMT2300A_MASK_RX_TIMER_T2_R      0x0F
 
-	//*********************************************************
-	//Tx Bank Register
-	//*********************************************************
-	#define CUS_TX1					0x55	
-		#define BT_SEL_3			(0<<6)
-		#define BT_SEL_5			(1<<6)
-		#define BT_SEL_8			(2<<6)
-		#define BT_SEL_10			(3<<6)
-		#define GAUS_EN				(1<<5)
-		
-		#define TX_DIN_FIFO			(0<<2)	//TxData from Fifo
-		#define TX_DIN_GPIO			(1<<2)	//TxData from GPIO
-	
-	#define CUS_TX2					0x56	//TX_DEV[7:0]
-	#define CUS_TX3					0x57	//TX_DEV[15:8]	
-	#define CUS_TX4					0x58	//RAMP_STEP[11:8] | TX_DEV[19:16]
-	#define CUS_TX5					0x59	//RAMP_STEP[7:0]
-	#define CUS_TX6					0x5A	//PA_RAMP_RSEL[2:0] | FSK_MOD_DLY[4:0]
-	#define CUS_TX7					0x5B	//OOK_MOD_DLY[7:0]
-	#define CUS_TX8					0x5C	//POWER_CODE[7:0]	
-	#define CUS_TX9					0x5D	//LBD_COMP_OFFSET[2:0] | PCODE_ADJ[4:0]
-	#define CUS_TX10				0x5E	//TX_PLL_BW_CODE[1:0] | IDAC_CODE[5:0]
-		
-		#define TX_PLL_75K			(0<<6)	//<150Kbps
-		#define TX_PLL_100K			(1<<6)	//<200Kbps
-		#define TX_PLL_150K         (2<<6)	//<300Kbps
-		#define TX_PLL_225K         (3<<6)	//<450Kbps
-		
-	#define CUS_LBD					0x5F	//LBD_TH[7:0]
+/* ********** CMT2300A_CUS_SYS10 registers ********** */
+#define CMT2300A_MASK_COL_DET_EN         0x80
+#define CMT2300A_MASK_COL_OFS_SEL        0x40
+#define CMT2300A_MASK_RX_AUTO_EXIT_DIS   0x20
+#define CMT2300A_MASK_DOUT_MUTE          0x10
+#define CMT2300A_MASK_RX_EXTEND_MODE     0x0F
 
-	//*********************************************************
-	//Control Bank1 Register
-	//*********************************************************
-	#define CUS_MODE_CTL			0x60
-		#define	MODE_GO_EEPROM		(1<<0)	//0x01
-		#define	MODE_GO_STBY		(1<<1)	//0x02
-		#define	MODE_GO_RFS			(1<<2)	//0x04
-		#define	MODE_GO_RX			(1<<3)	//0x08
-		#define	MODE_GO_SLEEP		(1<<4)	//0x10
-		#define	MODE_GO_TFS			(1<<5)	//0x20
-		#define	MODE_GO_TX			(1<<6)	//0x40
-		#define	MODE_GO_SWITCH		(1<<7)	//0x80			
-	
-	#define CUS_MODE_STA			0x61
-		#define RSTN_IN_EN			(1<<5)	//Enable GPIO4 for Reset Pin 
-		#define RSTN_IN_DIS			(0<<5)	
-		#define	CFG_RETAIN			(1<<4)	//does not clear when reset
-	
-		#define	MODE_MASK_STA		0x0F
-		
-		#define	MODE_STA_IDLE		0x00
-		#define	MODE_STA_SLEEP		0x01
-		#define	MODE_STA_STBY		0x02
-		#define	MODE_STA_RFS		0x03
-		#define MODE_STA_TFS		0x04
-		#define	MODE_STA_RX			0x05
-		#define	MODE_STA_TX			0x06
-		#define	MODE_STA_EEPROM		0x07
-		#define	MODE_STA_TUNE		0x08			
-		
-	#define CUS_EN_CTL				0x62
-		#define UNLOCK_STOP_EN		(1<<5)	//
-		#define LBD_STOP_EN			(1<<4)	//
-	
-	#define CUS_FREQ_CHNL			0x63	//FHSS_CHANNEL[7:0]
-	#define CUS_FREQ_OFS			0x64	//FHSS_OFFSET[7:0]
-	
-	#define CUS_IO_SEL				0x65
-		#define	GPIO1_DATA			(0<<0)	//DOUT/DIN
-		#define GPIO1_INT1			(1<<0)	//
-		#define	GPIO1_INT2			(2<<0)	//
-		#define GPIO1_DCLK			(3<<0)	//
-		
-		#define	GPIO2_INT1			(0<<2)	//
-		#define	GPIO2_INT2			(1<<2)	//
-		#define	GPIO2_DATA			(2<<2)	//DOUT/DIN
-		#define	GPIO2_DCLK			(3<<2)	//
-		
-		#define	GPIO3_CLKO			(0<<4)	//CLK output
-		#define GPIO3_DATA			(1<<4)	//DOUT/DIN
-		#define	GPIO3_INT2			(2<<4)	//
-		#define	GPIO3_DCLK			(3<<4)	//
-		
-		#define	GPIO4_NRST			(0<<6)	//
-		#define	GPIO4_INT1			(1<<6)	//
-		#define	GPIO4_DOUT			(2<<6)	//Only DOUT
-		#define	GPIO4_DCLK			(3<<6)	//	
-	
-	#define CUS_INT1_CTL			0x66
-		#define	RF_SWT1_EN 			(1<<7)	//GPIO1 会输出 RX_ACTIVE，GPIO2 会输出 TX_ACTIVE
-		#define RF_SWT2_EN          (1<<6)	//GPIO1 会输出 RX_ACTIVE， GPIO2 会输出 RX_ACTIVE 取反，即完全差分
-		#define	INT_POLAR			(1<<5)
+/* ********** CMT2300A_CUS_SYS11 registers ********** */
+#define CMT2300A_MASK_PJD_TH_SEL         0x80
+#define CMT2300A_MASK_CCA_INT_SEL        0x60
+#define CMT2300A_MASK_RSSI_DET_SEL       0x18
+#define CMT2300A_MASK_RSSI_AVG_MODE      0x07
 
-	#define CUS_INT2_CTL			0x67
-		#define	TX_DIN_INV			(1<<5)	//Tx Data invert
+/* ********** CMT2300A_CUS_SYS12 registers ********** */
+#define CMT2300A_MASK_PJD_WIN_SEL        0xC0
+#define CMT2300A_MASK_CLKOUT_EN          0x20
+#define CMT2300A_MASK_CLKOUT_DIV         0x1F
 
-		#define	INT_MASK			0xE0	
-		#define	INT_RX_ACTIVE		0x00	
-		#define	INT_TX_ACTIVE		0x01
-		#define	INT_RSSI_VLD		0x02
-		#define	INT_PREAM_OK		0x03
-		#define	INT_SYNC_OK			0x04
-		#define	INT_NODE_OK			0x05
-		#define	INT_CRC_OK			0x06
-		#define	INT_PKT_OK			0x07
-		#define	INT_SL_TMO			0x08
-		#define	INT_RX_TMO			0x09
-		#define	INT_TX_DONE			0x0A
-		#define	INT_RX_FIFO_NMTY	0x0B
-		#define INT_RX_FIFO_TH		0x0C
-		#define	INT_RX_FIFO_FULL	0x0D
-		#define	INT_RX_FIFO_WBYTE	0x0E
-		#define	INT_RX_FIFO_OVF		0x0F
-		#define	INT_TX_FIFO_NMTY	0x10
-		#define	INT_TX_FIFO_TH		0x11
-		#define	INT_TX_FIFO_FULL	0x12
-		#define	INT_STATE_IS_STBY	0x13
-		#define	INT_STATE_IS_FS		0x14
-		#define	INT_STATE_IS_RX		0x15
-		#define	INT_STATE_IS_TX		0x16
-		#define	INT_LBD				0x17
-		#define	INT_TRX_ACTIVE		0x18		
-		#define INT_PKT_DONE		0x19	//PKT_OK | COL_ERR | PKT_ERR
-	
-	#define CUS_INT_EN				0x68
-		#define	SL_TMO_EN			(1<<7)	//
-		#define	RX_TMO_EN			(1<<6)	//
-		#define	TX_DONE_EN			(1<<5)	//
-		#define	PREAM_OK_EN			(1<<4)	//
-		#define	SYNC_OK_EN			(1<<3)	//
-		#define	NODE_OK_EN			(1<<2)	//
-		#define	CRC_OK_EN			(1<<1)	//
-		#define	PKT_DONE_EN			(1<<0)	//
-		
-/* ********** CUS_FIFO_CTL registers ********** */
-   #define MASK_TX_DIN_EN          0x80
-   #define MASK_TX_DIN_SEL         0x60
-   #define MASK_FIFO_AUTO_CLR_DIS  0x10
-   #define MASK_FIFO_TX_RD_EN      0x08
-   #define MASK_FIFO_RX_TX_SEL     0x04
-   #define MASK_FIFO_MERGE_EN      0x02
-   #define MASK_SPI_FIFO_RD_WR_SEL 0x01		
-	
-	#define CUS_FIFO_CTL			0x69
-		#define	TX_DIN_EN			(1<<7)	//[0]:DOUT, for Rx; [1]:DIN, for Tx 
-		
-		#define TX_DIN_GPIO1		(0<<5)
-		#define TX_DIN_GPIO2  		(1<<5)
-		#define TX_DIN_GPIO3		(2<<5)
-		#define TX_DIN_HIGH			(3<<5)
-				
-		#define	FIFO_AUTO_CLR_DIS	(1<<4)	//0: Entry Rx, auto clear fifo
-		#define	FIFO_TX_RD_EN		(1<<3)	//0: Tx FIFO can not be read
-		#define	FIFO_RX_TX_SEL		(1<<2)	//when "FIFO_SHARE_EN=1" active, 0=use for Rx; 1=use for Tx
-		#define	FIFO_MERGE_EN		(1<<1)	//0: not share, both 32Byte for Tx/Rx FIFO; 1: total 64Byte
-		#define	SPI_FIFO_RD_WR_SEL	(1<<0)	//0: SPI use to read FIFO;  1: SPI use to write FIFO;
-	
-	#define CUS_INT_CLR1			0x6A
-		#define	SL_TMO_FLG			(1<<5)	//
-		#define	RX_TMO_FLG			(1<<4)	//
-		#define	TX_DONE_FLG			(1<<3)	//
-		#define	TX_DONE_CLR			(1<<2)	//
-		#define	SL_TMO_CLR			(1<<1)	//
-		#define	RX_TMO_CLR			(1<<0)	//			
+/* ********** CMT2300A_CUS_RF1 registers ********** */
+#define CMT2300A_MASK_FREQ_RX_N          0xFF
 
+/* ********** CMT2300A_CUS_RF2 registers ********** */
+#define CMT2300A_MASK_FREQ_RX_K_7_0      0xFF
 
-	//*********************************************************
-	//Control Bank2 Register
-	//*********************************************************
-	#define CUS_INT_CLR2			0x6B
-		#define	LBD_CLR				(1<<5)	//
-		#define	PREAM_OK_CLR		(1<<4)	//
-		#define	SYNC_OK_CLR			(1<<3)	//
-		#define	NODE_OK_CLR			(1<<2)	//
-		#define	CRC_OK_CLR			(1<<1)	//
-		#define	PKT_DONE_CLR		(1<<0)	//
-	
-	#define CUS_FIFO_CLR			0x6C
-		#define	FIFO_RESTORE		(1<<2)	//
-		#define	FIFO_CLR_RX			(1<<1)	//
-		#define	FIFO_CLR_TX			(1<<0)	//
-	
-	#define CUS_INT_FLAG			0x6D	//Read Only
-		#define	LBD_FLG				(1<<7)	//
-		#define	COL_ERR_FLG			(1<<6)	//
-		#define	PKT_ERR_FLG			(1<<5)	//
-		#define	PREAM_OK_FLG		(1<<4)	//
-		#define	SYNC_OK_FLG			(1<<3)	//
-		#define	NODE_OK_FLG			(1<<2)	//
-		#define	CRC_OK_FLG			(1<<1)	//
-		#define	PKT_OK_FLG			(1<<0)	//
-	
-	#define CUS_FIFO_FLAG			0x6E	//Read Only
-		#define RX_FIFO_FULL_FLG	(1<<6)	//Rx Fifo Full
-		#define	RX_FIFO_NMTY_FLG	(1<<5)	//Rx Fifo Not Empty
-		#define	RX_FIFO_TH_FLG		(1<<4)	//Rx Fifo Threshold
-		#define	RX_FIFO_OVF_FLG		(1<<3)	//Rx Fifo Overflow
-		#define	TX_FIFO_FULL_FLG	(1<<2)	//Tx Fifo Full
-		#define	TX_FIFO_NMTY_FLG	(1<<1)	//Tx Fifo Not Empty
-		#define	TX_FIFO_TH_FLG		(1<<0)	//Tx Fifo Threshold
+/* ********** CMT2300A_CUS_RF3 registers ********** */
+#define CMT2300A_MASK_FREQ_RX_K_15_8     0xFF
 
+/* ********** CMT2300A_CUS_RF4 registers ********** */
+#define CMT2300A_MASK_FREQ_PALDO_SEL     0x80
+#define CMT2300A_MASK_FREQ_DIVX_CODE     0x70
+#define CMT2300A_MASK_FREQ_RX_K_19_16    0x0F
 
-	#define CUS_RSSI_CODE			0x6F	//RSSI_Code[7:0]  Read Only
-	#define CUS_RSSI_DBM			0x70	//RSSI_dBm[7:0]   Read Only
-	#define CUS_LBD_RESULT			0x71	//LBD_RESULT[7:0] Read Only	
+/* ********** CMT2300A_CUS_RF5 registers ********** */
+#define CMT2300A_MASK_FREQ_TX_N          0xFF
 
-	#define	CUS_SOFTRST				0x7F	//SoftReset
+/* ********** CMT2300A_CUS_RF6 registers ********** */
+#define CMT2300A_MASK_FREQ_TX_K_7_0      0xFF
+
+/* ********** CMT2300A_CUS_RF7 registers ********** */
+#define CMT2300A_MASK_FREQ_TX_K_15_8     0xFF
+
+/* ********** CMT2300A_CUS_RF8 registers ********** */
+#define CMT2300A_MASK_FSK_SWT            0x80
+#define CMT2300A_MASK_FREQ_VCO_BANK      0x70
+#define CMT2300A_MASK_FREQ_TX_K_19_16    0x0F
+
+/* ********** CMT2300A_CUS_PKT1 registers ********** */
+#define CMT2300A_MASK_RX_PREAM_SIZE      0xF8
+#define CMT2300A_MASK_PREAM_LENG_UNIT    0x04
+#define CMT2300A_MASK_DATA_MODE          0x03
+/* CMT2300A_MASK_PREAM_LENG_UNIT options */
+#define CMT2300A_PREAM_LENG_UNIT_8_BITS  0x00
+#define CMT2300A_PREAM_LENG_UNIT_4_BITS  0x04
+/* CMT2300A_MASK_DATA_MODE options */
+#define CMT2300A_DATA_MODE_DIRECT        0x00
+#define CMT2300A_DATA_MODE_PACKET        0x02
+
+/* ********** CMT2300A_CUS_PKT2 registers ********** */
+#define CMT2300A_MASK_TX_PREAM_SIZE_7_0  0xFF
+
+/* ********** CMT2300A_CUS_PKT3 registers ********** */
+#define CMT2300A_MASK_TX_PREAM_SIZE_15_8 0xFF
+
+/* ********** CMT2300A_CUS_PKT4 registers ********** */
+#define CMT2300A_MASK_PREAM_VALUE        0xFF
+
+/* ********** CMT2300A_CUS_PKT5 registers ********** */
+#define CMT2300A_MASK_SYNC_TOL           0x70
+#define CMT2300A_MASK_SYNC_SIZE          0x0E
+#define CMT2300A_MASK_SYNC_MAN_EN        0x01
+
+/* ********** CMT2300A_CUS_PKT6 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_7_0     0xFF
+
+/* ********** CMT2300A_CUS_PKT7 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_15_8    0xFF
+
+/* ********** CMT2300A_CUS_PKT8 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_23_16   0xFF
+
+/* ********** CMT2300A_CUS_PKT9 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_31_24   0xFF
+
+/* ********** CMT2300A_CUS_PKT10 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_39_32   0xFF
+
+/* ********** CMT2300A_CUS_PKT11 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_47_40   0xFF
+
+/* ********** CMT2300A_CUS_PKT12 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_55_48   0xFF
+
+/* ********** CMT2300A_CUS_PKT13 registers ********** */
+#define CMT2300A_MASK_SYNC_VALUE_63_56   0xFF
+
+/* ********** CMT2300A_CUS_PKT14 registers ********** */
+#define CMT2300A_MASK_PAYLOAD_LENG_10_8  0x70
+#define CMT2300A_MASK_AUTO_ACK_EN        0x08
+#define CMT2300A_MASK_NODE_LENG_POS_SEL  0x04
+#define CMT2300A_MASK_PAYLOAD_BIT_ORDER  0x02
+#define CMT2300A_MASK_PKT_TYPE           0x01
+/* CMT2300A_MASK_NODE_LENG_POS_SEL options */
+#define CMT2300A_NODE_LENG_FIRST_NODE    0x00
+#define CMT2300A_NODE_LENG_FIRST_LENGTH  0x04
+/* CMT2300A_MASK_PAYLOAD_BIT_ORDER options */
+#define CMT2300A_PAYLOAD_BIT_ORDER_MSB   0x00
+#define CMT2300A_PAYLOAD_BIT_ORDER_LSB   0x02
+/* CMT2300A_MASK_PKT_TYPE options */
+#define CMT2300A_PKT_TYPE_FIXED          0x00
+#define CMT2300A_PKT_TYPE_VARIABLE       0x01
+
+/* ********** CMT2300A_CUS_PKT15 registers ********** */
+#define CMT2300A_MASK_PAYLOAD_LENG_7_0   0xFF
+
+/* ********** CMT2300A_CUS_PKT16 registers ********** */
+#define CMT2300A_MASK_NODE_FREE_EN       0x20
+#define CMT2300A_MASK_NODE_ERR_MASK      0x10
+#define CMT2300A_MASK_NODE_SIZE          0x0C
+#define CMT2300A_MASK_NODE_DET_MODE      0x03
+/* CMT2300A_MASK_NODE_DET_MODE options */
+#define CMT2300A_NODE_DET_NODE           0x00
+#define CMT2300A_NODE_DET_VALUE          0x01
+#define CMT2300A_NODE_DET_VALUE_0        0x02
+#define CMT2300A_NODE_DET_VALUE_0_1      0x03
+
+/* ********** CMT2300A_CUS_PKT17 registers ********** */
+#define CMT2300A_MASK_NODE_VALUE_7_0     0xFF
+
+/* ********** CMT2300A_CUS_PKT18 registers ********** */
+#define CMT2300A_MASK_NODE_VALUE_15_8    0xFF
+
+/* ********** CMT2300A_CUS_PKT19 registers ********** */
+#define CMT2300A_MASK_NODE_VALUE_23_16   0xFF
+
+/* ********** CMT2300A_CUS_PKT20 registers ********** */
+#define CMT2300A_MASK_NODE_VALUE_31_24   0xFF
+
+/* ********** CMT2300A_CUS_PKT21 registers ********** */
+#define CMT2300A_MASK_FEC_TYPE           0x80
+#define CMT2300A_MASK_FEC_EN             0x40
+#define CMT2300A_MASK_CRC_BYTE_SWAP      0x20
+#define CMT2300A_MASK_CRC_BIT_INV        0x10
+#define CMT2300A_MASK_CRC_RANGE          0x08
+#define CMT2300A_MASK_CRC_TYPE           0x06
+#define CMT2300A_MASK_CRC_EN             0x01
+/* CMT2300A_MASK_CRC_BYTE_SWAP options */
+#define CMT2300A_CRC_ORDER_HBYTE         0x00
+#define CMT2300A_CRC_ORDER_LBYTE         0x20
+/* CMT2300A_MASK_CRC_RANGE options */
+#define CMT2300A_CRC_RANGE_PAYLOAD       0x00
+#define CMT2300A_CRC_RANGE_DATA          0x08
+/* CMT2300A_MASK_CRC_TYPE options */
+#define CMT2300A_CRC_TYPE_CCITT16        0x00
+#define CMT2300A_CRC_TYPE_IBM16          0x02
+#define CMT2300A_CRC_TYPE_ITU16          0x04
+
+/* ********** CMT2300A_CUS_PKT22 registers ********** */
+#define CMT2300A_MASK_CRC_SEED_7_0       0xFF
+
+/* ********** CMT2300A_CUS_PKT23 registers ********** */
+#define CMT2300A_MASK_CRC_SEED_15_8      0xFF
+
+/* ********** CMT2300A_CUS_PKT24 registers ********** */
+#define CMT2300A_MASK_CRC_BIT_ORDER      0x80
+#define CMT2300A_MASK_WHITEN_SEED_8_8    0x40
+#define CMT2300A_MASK_WHITEN_SEED_TYPE   0x20
+#define CMT2300A_MASK_WHITEN_TYPE        0x18
+#define CMT2300A_MASK_WHITEN_EN          0x04
+#define CMT2300A_MASK_MANCH_TYPE         0x02
+#define CMT2300A_MASK_MANCH_EN           0x01
+/* CMT2300A_MASK_CRC_BIT_ORDER options */
+#define CMT2300A_CRC_BIT_ORDER_MSB       0x00
+#define CMT2300A_CRC_BIT_ORDER_LSB       0x80
+/* CMT2300A_MASK_WHITEN_SEED_TYPE options */
+#define CMT2300A_WHITEN_SEED_TYPE_1      0x00
+#define CMT2300A_WHITEN_SEED_TYPE_2      0x20
+/* CMT2300A_MASK_WHITEN_TYPE options */
+#define CMT2300A_WHITEN_TYPE_PN9_CCITT   0x00
+#define CMT2300A_WHITEN_TYPE_PN9_IBM     0x08
+#define CMT2300A_WHITEN_TYPE_PN7         0x10
+/* CMT2300A_MASK_MANCH_TYPE options */
+#define CMT2300A_MANCH_TYPE_ONE_01       0x00
+#define CMT2300A_MANCH_TYPE_ONE_10       0x02
+
+/* ********** CMT2300A_CUS_PKT25 registers ********** */
+#define CMT2300A_MASK_WHITEN_SEED_7_0    0xFF
+
+/* ********** CMT2300A_CUS_PKT26 registers ********** */
+#define CMT2300A_MASK_TX_PREFIX_TYPE     0x03
+
+/* ********** CMT2300A_CUS_PKT27 registers ********** */
+#define CMT2300A_MASK_TX_PKT_NUM         0xFF
+
+/* ********** CMT2300A_CUS_PKT28 registers ********** */
+#define CMT2300A_MASK_TX_PKT_GAP         0xFF
+
+/* ********** CMT2300A_CUS_PKT29 registers ********** */
+#define CMT2300A_MASK_FIFO_AUTO_RES_EN   0x80
+#define CMT2300A_MASK_FIFO_TH            0x7F
+
+/* ********** CMT2300A_CUS_MODE_CTL registers ********** */
+#define CMT2300A_MASK_CHIP_MODE_SWT      0xFF
+/* CMT2300A_MASK_CHIP_MODE_SWT options */
+#define CMT2300A_GO_EEPROM               0x01
+#define CMT2300A_GO_STBY                 0x02
+#define CMT2300A_GO_RFS                  0x04
+#define CMT2300A_GO_RX                   0x08
+#define CMT2300A_GO_SLEEP                0x10
+#define CMT2300A_GO_TFS                  0x20
+#define CMT2300A_GO_TX                   0x40
+#define CMT2300A_GO_SWITCH               0x80
+
+/* ********** CMT2300A_CUS_MODE_STA registers ********** */
+#define CMT2300A_MASK_RSTN_IN_EN         0x20
+#define CMT2300A_MASK_CFG_RETAIN         0x10
+#define CMT2300A_MASK_CHIP_MODE_STA      0x0F
+/* CMT2300A_MASK_CHIP_MODE_STA options */
+#define CMT2300A_STA_IDLE                0x00
+#define CMT2300A_STA_SLEEP               0x01
+#define CMT2300A_STA_STBY                0x02
+#define CMT2300A_STA_RFS                 0x03
+#define CMT2300A_STA_TFS                 0x04
+#define CMT2300A_STA_RX                  0x05
+#define CMT2300A_STA_TX                  0x06
+#define CMT2300A_STA_EEPROM              0x07
+#define CMT2300A_STA_ERROR               0x08
+#define CMT2300A_STA_CAL                 0x09
+
+/* ********** CMT2300A_CUS_EN_CTL registers ********** */
+#define CMT2300A_MASK_LOCKING_EN         0x20
+
+/* ********** CMT2300A_CUS_FREQ_CHNL registers ********** */
+#define CMT2300A_MASK_FH_CHANNEL         0xFF
+
+/* ********** CMT2300A_CUS_FREQ_OFS registers ********** */
+#define CMT2300A_MASK_FH_OFFSET          0xFF
+
+/* ********** CMT2300A_CUS_IO_SEL registers ********** */
+#define CMT2300A_MASK_GPIO4_SEL          0xC0
+#define CMT2300A_MASK_GPIO3_SEL          0x30
+#define CMT2300A_MASK_GPIO2_SEL          0x0C
+#define CMT2300A_MASK_GPIO1_SEL          0x03
+/* CMT2300A_MASK_GPIO4_SEL options */
+#define CMT2300A_GPIO4_SEL_RSTIN         0x00
+#define CMT2300A_GPIO4_SEL_INT1          0x40
+#define CMT2300A_GPIO4_SEL_DOUT          0x80
+#define CMT2300A_GPIO4_SEL_DCLK          0xC0
+/* CMT2300A_MASK_GPIO3_SEL options */
+#define CMT2300A_GPIO3_SEL_CLKO          0x00
+#define CMT2300A_GPIO3_SEL_DOUT          0x10
+#define CMT2300A_GPIO3_SEL_DIN           0x10
+#define CMT2300A_GPIO3_SEL_INT2          0x20
+#define CMT2300A_GPIO3_SEL_DCLK          0x30
+/* CMT2300A_MASK_GPIO2_SEL options */
+#define CMT2300A_GPIO2_SEL_INT1          0x00
+#define CMT2300A_GPIO2_SEL_INT2          0x04
+#define CMT2300A_GPIO2_SEL_DOUT          0x08
+#define CMT2300A_GPIO2_SEL_DIN           0x08
+#define CMT2300A_GPIO2_SEL_DCLK          0x0C
+/* CMT2300A_MASK_GPIO1_SEL options */
+#define CMT2300A_GPIO1_SEL_DOUT          0x00
+#define CMT2300A_GPIO1_SEL_DIN           0x00
+#define CMT2300A_GPIO1_SEL_INT1          0x01
+#define CMT2300A_GPIO1_SEL_INT2          0x02
+#define CMT2300A_GPIO1_SEL_DCLK          0x03
+
+/* ********** CMT2300A_CUS_INT1_CTL registers ********** */
+#define CMT2300A_MASK_RF_SWT1_EN         0x80
+#define CMT2300A_MASK_RF_SWT2_EN         0x40
+#define CMT2300A_MASK_INT_POLAR          0x20
+#define CMT2300A_MASK_INT1_SEL           0x1F
+/* CMT2300A_MASK_INT_POLAR options */
+#define CMT2300A_INT_POLAR_SEL_0         0x00
+#define CMT2300A_INT_POLAR_SEL_1         0x20
+/* CMT2300A_MASK_INT1_SEL options */
+#define CMT2300A_INT_SEL_RX_ACTIVE       0x00
+#define CMT2300A_INT_SEL_TX_ACTIVE       0x01
+#define CMT2300A_INT_SEL_RSSI_VLD        0x02
+#define CMT2300A_INT_SEL_PREAM_OK        0x03
+#define CMT2300A_INT_SEL_SYNC_OK         0x04
+#define CMT2300A_INT_SEL_NODE_OK         0x05
+#define CMT2300A_INT_SEL_CRC_OK          0x06
+#define CMT2300A_INT_SEL_PKT_OK          0x07
+#define CMT2300A_INT_SEL_SL_TMO          0x08
+#define CMT2300A_INT_SEL_RX_TMO          0x09
+#define CMT2300A_INT_SEL_TX_DONE         0x0A
+#define CMT2300A_INT_SEL_RX_FIFO_NMTY    0x0B
+#define CMT2300A_INT_SEL_RX_FIFO_TH      0x0C
+#define CMT2300A_INT_SEL_RX_FIFO_FULL    0x0D
+#define CMT2300A_INT_SEL_RX_FIFO_WBYTE   0x0E
+#define CMT2300A_INT_SEL_RX_FIFO_OVF     0x0F
+#define CMT2300A_INT_SEL_TX_FIFO_NMTY    0x10
+#define CMT2300A_INT_SEL_TX_FIFO_TH      0x11
+#define CMT2300A_INT_SEL_TX_FIFO_FULL    0x12
+#define CMT2300A_INT_SEL_STATE_IS_STBY   0x13
+#define CMT2300A_INT_SEL_STATE_IS_FS     0x14
+#define CMT2300A_INT_SEL_STATE_IS_RX     0x15
+#define CMT2300A_INT_SEL_STATE_IS_TX     0x16
+#define CMT2300A_INT_SEL_LED             0x17
+#define CMT2300A_INT_SEL_TRX_ACTIVE      0x18
+#define CMT2300A_INT_SEL_PKT_DONE        0x19
+
+/* ********** CMT2300A_CUS_INT2_CTL registers ********** */
+#define CMT2300A_MASK_LFOSC_OUT_EN       0x40
+#define CMT2300A_MASK_TX_DIN_INV         0x20
+#define CMT2300A_MASK_INT2_SEL           0x1F
+
+/* ********** CMT2300A_CUS_INT_EN registers ********** */
+#define CMT2300A_MASK_SL_TMO_EN          0x80
+#define CMT2300A_MASK_RX_TMO_EN          0x40
+#define CMT2300A_MASK_TX_DONE_EN         0x20
+#define CMT2300A_MASK_PREAM_OK_EN        0x10
+#define CMT2300A_MASK_SYNC_OK_EN         0x08
+#define CMT2300A_MASK_NODE_OK_EN         0x04
+#define CMT2300A_MASK_CRC_OK_EN          0x02
+#define CMT2300A_MASK_PKT_DONE_EN        0x01
+
+/* ********** CMT2300A_CUS_FIFO_CTL registers ********** */
+#define CMT2300A_MASK_TX_DIN_EN          0x80
+#define CMT2300A_MASK_TX_DIN_SEL         0x60
+#define CMT2300A_MASK_FIFO_AUTO_CLR_DIS  0x10
+#define CMT2300A_MASK_FIFO_TX_RD_EN      0x08
+#define CMT2300A_MASK_FIFO_RX_TX_SEL     0x04
+#define CMT2300A_MASK_FIFO_MERGE_EN      0x02
+#define CMT2300A_MASK_SPI_FIFO_RD_WR_SEL 0x01
+/* CMT2300A_MASK_TX_DIN_SEL options */
+#define CMT2300A_TX_DIN_SEL_GPIO1        0x00
+#define CMT2300A_TX_DIN_SEL_GPIO2        0x20
+#define CMT2300A_TX_DIN_SEL_GPIO3        0x40
+
+/* ********** CMT2300A_CUS_INT_CLR1 registers ********** */
+#define CMT2300A_MASK_SL_TMO_FLG         0x20
+#define CMT2300A_MASK_RX_TMO_FLG         0x10
+#define CMT2300A_MASK_TX_DONE_FLG        0x08
+#define CMT2300A_MASK_TX_DONE_CLR        0x04
+#define CMT2300A_MASK_SL_TMO_CLR         0x02
+#define CMT2300A_MASK_RX_TMO_CLR         0x01
+
+/* ********** CMT2300A_CUS_INT_CLR2 registers ********** */
+#define CMT2300A_MASK_LBD_CLR            0x20
+#define CMT2300A_MASK_PREAM_OK_CLR       0x10
+#define CMT2300A_MASK_SYNC_OK_CLR        0x08
+#define CMT2300A_MASK_NODE_OK_CLR        0x04
+#define CMT2300A_MASK_CRC_OK_CLR         0x02
+#define CMT2300A_MASK_PKT_DONE_CLR       0x01
+
+/* ********** CMT2300A_CUS_FIFO_CLR registers ********** */
+#define CMT2300A_MASK_FIFO_RESTORE       0x04
+#define CMT2300A_MASK_FIFO_CLR_RX        0x02
+#define CMT2300A_MASK_FIFO_CLR_TX        0x01
+
+/* ********** CMT2300A_CUS_INT_FLAG registers ********** */
+#define CMT2300A_MASK_LBD_FLG            0x80
+#define CMT2300A_MASK_COL_ERR_FLG        0x40
+#define CMT2300A_MASK_PKT_ERR_FLG        0x20
+#define CMT2300A_MASK_PREAM_OK_FLG       0x10
+#define CMT2300A_MASK_SYNC_OK_FLG        0x08
+#define CMT2300A_MASK_NODE_OK_FLG        0x04
+#define CMT2300A_MASK_CRC_OK_FLG         0x02
+#define CMT2300A_MASK_PKT_OK_FLG         0x01
+
+/* ********** CMT2300A_CUS_FIFO_FLAG registers ********** */
+#define CMT2300A_MASK_RX_FIFO_FULL_FLG   0x40
+#define CMT2300A_MASK_RX_FIFO_NMTY_FLG   0x20
+#define CMT2300A_MASK_RX_FIFO_TH_FLG     0x10
+#define CMT2300A_MASK_RX_FIFO_OVF_FLG    0x08
+#define CMT2300A_MASK_TX_FIFO_FULL_FLG   0x04
+#define CMT2300A_MASK_TX_FIFO_NMTY_FLG   0x02
+#define CMT2300A_MASK_TX_FIFO_TH_FLG     0x01
+
+/* ********** CMT2300A_CUS_RSSI_CODE registers ********** */
+#define CMT2300A_MASK_RSSI_CODE          0xFF
+
+/* ********** CMT2300A_CUS_RSSI_DBM registers ********** */
+#define CMT2300A_MASK_RSSI_DBM           0xFF
+
+/* ********** CMT2300A_CUS_LBD_RESULT registers ********** */
+#define CMT2300A_MASK_LBD_RESULT         0xFF
 
  #else
 	#warning "CMT2300A_Register.h have been defined!"
