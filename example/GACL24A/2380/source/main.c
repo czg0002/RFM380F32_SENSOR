@@ -153,7 +153,7 @@ void UartP3536Int(void)
 int32_t main(void)
 {  
 	byte i=0;
-	word k=1;
+	uint32_t k=1;
 	MCU_Init(); 
   CMT2300A_Init();   
 

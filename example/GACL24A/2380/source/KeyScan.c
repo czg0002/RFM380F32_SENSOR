@@ -1,4 +1,5 @@
 #include "CMT2380F32_Demo.h"
+#include "cmt2300a_params.h"
 #include "uart.h"
 #include "flash.h"
 #include "Flash_ID.h"
@@ -30,7 +31,7 @@ uint8_t   txlen;
 **入参:无        
 **出参:无          
 ***************************************/
-word num=0;
+uint32_t num=0;
 void KeyScan_Rx(void)
 {
 	unsigned char i=0;	

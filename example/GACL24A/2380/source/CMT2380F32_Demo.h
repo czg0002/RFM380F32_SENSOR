@@ -3,8 +3,8 @@
 #define _CMT2380F32_DEMO_
 #include "ddl.h"
 #include "cmt2300a_defs.h"
-
-#define  RF_STATUS   1//1为接收，0为发射
+//#include "cmt2300a_params.h"
+#define  RF_STATUS   0//1为接收，0为发射
 
 typedef unsigned char byte;
 typedef unsigned int  word;
@@ -127,13 +127,13 @@ PxOD:开漏输出配置寄存器		1=使能		0=禁止(默认)
 
 //变量
 extern word SysTime;
-extern byte CMT_Bank[12];
-extern byte System_Bank[12];
-extern byte Frequency_Bank[8];
-extern byte Data_Rate_Bank[24];
-extern byte Baseband_Bank[29];
-extern byte TX_Bank[11];
-extern byte Prodution_ID[3];
+//extern byte CMT_Bank[12];
+//extern byte System_Bank[12];
+//extern byte Frequency_Bank[8];
+//extern byte Data_Rate_Bank[24];
+//extern byte Baseband_Bank[29];
+//extern byte TX_Bank[11];
+//extern byte Prodution_ID[3];
 extern byte TX_Buf[64];
 extern word ResetTime;
 extern uint16_t  sleep_time_cnt;

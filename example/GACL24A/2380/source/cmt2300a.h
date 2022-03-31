@@ -16,12 +16,17 @@
  * @version 1.3
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
+ *
+ * @version 1.a
+ * @date    Jul 17 2017
+ * @author  czg0002@163.com
+ * @brief   modified for rfm380f32 demo project;
+ *			for simplicity, merge cmt2300_hal
  */
 
 #ifndef __CMT2300A_H
 #define __CMT2300A_H
 
-#include "typedefs.h"
 #include "cmt2300a_defs.h"
 #include "cmt2300a_hal.h"
 

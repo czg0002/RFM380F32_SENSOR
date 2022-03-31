@@ -1,5 +1,5 @@
 #include "CMT2380F32_Demo.h"
-
+#include "cmt2300a_params.h"
 void CMT2300A_ConfigGpio(byte nGpioSel)
 {
     SPI_Write(CMT2300A_CUS_IO_SEL,nGpioSel);  //≈‰÷√GPIO
