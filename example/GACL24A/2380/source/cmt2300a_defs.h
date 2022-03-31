@@ -1,34 +1,29 @@
 /*
- * THE FOLLOWING FIRMWARE IS PROVIDED: 
- *  (1) "AS IS" WITH NO WARRANTY; 
- *  (2) TO ENABLE ACCESS TO CODING INFORMATION TO GUIDE AND FACILITATE CUSTOMER.
- * CONSEQUENTLY, HopeRF SHALL NOT BE HELD LIABLE FOR ANY DIRECT, INDIRECT OR
+ * THE FOLLOWING FIRMWARE IS PROVIDED: (1) "AS IS" WITH NO WARRANTY; AND
+ * (2)TO ENABLE ACCESS TO CODING INFORMATION TO GUIDE AND FACILITATE CUSTOMER.
+ * CONSEQUENTLY, CMOSTEK SHALL NOT BE HELD LIABLE FOR ANY DIRECT, INDIRECT OR
  * CONSEQUENTIAL DAMAGES WITH RESPECT TO ANY CLAIMS ARISING FROM THE CONTENT
  * OF SUCH FIRMWARE AND/OR THE USE MADE BY CUSTOMERS OF THE CODING INFORMATION
  * CONTAINED HEREIN IN CONNECTION WITH THEIR PRODUCTS.
- * 
- * Copyright (C) HopeRF
  *
- * website: www.HopeRF.com
- *          www.HopeRF.cn     
+ * Copyright (C) CMOSTEK SZ.
  */
 
-/*! 
- * file       CMT2300A_Register.h
- * brief      define register
- *            
+/*!
+ * @file    cmt2300a_defs.h
+ * @brief   CMT2300A registers defines
  *
- * version    1.0
- * date       Dec 22 2016
- * author     QY Ruan
- * vserion	  1.1
+ * @version 1.2
+ * @date    Jul 17 2017
+ * @author  CMOSTEK R@D
+ *
  * date       March 30 2022
  * author     Scott Chen, czg0002@163.com, Copyright (C) GOVA
- * descri	  merge from cmt2300a demo
+ * descri	  merge from cmt2300a demo, add softreset reg define
  */
  
- #ifndef CMT2300A_Register_h
-	#define CMT2300A_Register_h 
+#ifndef __CMT2300A_DEFS_H
+#define __CMT2300A_DEFS_H
 	
 /* ---------- CMT bank defines ---------- */
 #define CMT2300A_CMT_BANK_ADDR           0x00
@@ -613,7 +608,4 @@
 /* ********** CMT2300A_CUS_LBD_RESULT registers ********** */
 #define CMT2300A_MASK_LBD_RESULT         0xFF
 
- #else
-	#warning "CMT2300A_Register.h have been defined!"
-
- #endif
+#endif

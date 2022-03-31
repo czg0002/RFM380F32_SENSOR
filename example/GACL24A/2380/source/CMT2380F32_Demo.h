@@ -2,7 +2,7 @@
 #ifndef	_CMT2380F32_DEMO_
 #define _CMT2380F32_DEMO_
 #include "ddl.h"
-#include "CMT2300A_Register.h"
+#include "cmt2300a_defs.h"
 
 #define  RF_STATUS   1//1为接收，0为发射
 
