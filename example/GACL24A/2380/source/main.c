@@ -155,9 +155,9 @@ int32_t main(void)
 	byte i=0;
 	uint32_t k=1;
 	MCU_Init(); 
-  CMT2300A_Init();   
+  CMT2300A_Init();
 
-  UartP3536Int();	//初始化串口 19200 MODE3 even校验
+//  UartP3536Int();	//初始化串口 19200 MODE3 even校验
 	
 	#if RF_STATUS  
 	GO_STBY();	  

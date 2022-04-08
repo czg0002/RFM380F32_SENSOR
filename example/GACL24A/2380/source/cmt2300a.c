@@ -17,7 +17,7 @@
  * @date    Jul 17 2017
  * @author  CMOSTEK R@D
  */
-
+#include "common.h"
 #include "cmt2300a.h"
 
 /*! ********************************************************
@@ -44,7 +44,7 @@ void CMT2300A_SoftReset(void)
 *          CMT2300A_STA_ERROR
 *          CMT2300A_STA_CAL
 * *********************************************************/
-u8 CMT2300A_GetChipStatus(void)
+uint8_t CMT2300A_GetChipStatus(void)
 {
     return  CMT2300A_ReadReg(CMT2300A_CUS_MODE_STA) & CMT2300A_MASK_CHIP_MODE_STA;
 }
@@ -55,11 +55,11 @@ u8 CMT2300A_GetChipStatus(void)
 * @param   nGoCmd: the chip next status
 * @return  TRUE or FALSE
 * *********************************************************/
-BOOL CMT2300A_AutoSwitchStatus(u8 nGoCmd)
+BOOL CMT2300A_AutoSwitchStatus(uint8_t nGoCmd)
 {
 #ifdef ENABLE_AUTO_SWITCH_CHIP_STATUS
-    u32 nBegTick = CMT2300A_GetTickCount();
-    u8  nWaitStatus;
+    uint32_t nBegTick = CMT2300A_GetTickCount();
+    uint8_t  nWaitStatus;
     
     switch(nGoCmd)
     {
@@ -191,7 +191,7 @@ BOOL CMT2300A_GoRx(void)
 *            CMT2300A_GPIO4_SEL_DOUT 
 *            CMT2300A_GPIO4_SEL_DCLK
 * *********************************************************/
-void CMT2300A_ConfigGpio(u8 nGpioSel)
+void CMT2300A_ConfigGpio(uint8_t nGpioSel)
 {
     CMT2300A_WriteReg(CMT2300A_CUS_IO_SEL, nGpioSel);
 }
@@ -227,7 +227,7 @@ void CMT2300A_ConfigGpio(u8 nGpioSel)
 *            CMT2300A_INT_SEL_TRX_ACTIVE
 *            CMT2300A_INT_SEL_PKT_DONE
 * *********************************************************/
-void CMT2300A_ConfigInterrupt(u8 nInt1Sel, u8 nInt2Sel)
+void CMT2300A_ConfigInterrupt(uint8_t nInt1Sel, uint8_t nInt2Sel)
 {
     nInt1Sel &= CMT2300A_MASK_INT1_SEL;
     nInt1Sel |= (~CMT2300A_MASK_INT1_SEL) & CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
@@ -246,7 +246,7 @@ void CMT2300A_ConfigInterrupt(u8 nInt1Sel, u8 nInt2Sel)
 * *********************************************************/
 void CMT2300A_SetInterruptPolar(BOOL bActiveHigh)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
 
     if(bActiveHigh)
         tmp &= ~CMT2300A_MASK_INT_POLAR;
@@ -261,9 +261,9 @@ void CMT2300A_SetInterruptPolar(BOOL bActiveHigh)
 * @desc    Set FIFO threshold.
 * @param   nFifoThreshold
 * *********************************************************/
-void CMT2300A_SetFifoThreshold(u8 nFifoThreshold)
+void CMT2300A_SetFifoThreshold(uint8_t nFifoThreshold)
 { 
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT29);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT29);
     
     tmp &= ~CMT2300A_MASK_FIFO_TH;
     tmp |= nFifoThreshold & CMT2300A_MASK_FIFO_TH;
@@ -281,9 +281,9 @@ void CMT2300A_SetFifoThreshold(u8 nFifoThreshold)
 *            1: RF_SWT1_EN=0, RF_SWT2_EN=1
 *               GPIO1: RX_ACTIVE, GPIO2: ~RX_ACTIVE
 * *********************************************************/
-void CMT2300A_EnableAntennaSwitch(u8 nMode)
+void CMT2300A_EnableAntennaSwitch(uint8_t nMode)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
 
     if(0 == nMode) {
         tmp |= CMT2300A_MASK_RF_SWT1_EN;
@@ -310,7 +310,7 @@ void CMT2300A_EnableAntennaSwitch(u8 nMode)
 *            CMT2300A_MASK_CRC_OK_EN   |
 *            CMT2300A_MASK_PKT_DONE_EN
 * *********************************************************/
-void CMT2300A_EnableInterrupt(u8 nEnable)
+void CMT2300A_EnableInterrupt(uint8_t nEnable)
 {
     CMT2300A_WriteReg(CMT2300A_CUS_INT_EN, nEnable);
 }
@@ -323,7 +323,7 @@ void CMT2300A_EnableInterrupt(u8 nEnable)
 * *********************************************************/
 void CMT2300A_EnableRxFifoAutoClear(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
 
     if(bEnable)
         tmp &= ~CMT2300A_MASK_FIFO_AUTO_CLR_DIS;
@@ -341,7 +341,7 @@ void CMT2300A_EnableRxFifoAutoClear(BOOL bEnable)
 * *********************************************************/
 void CMT2300A_EnableFifoMerge(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
 
     if(bEnable)
         tmp |= CMT2300A_MASK_FIFO_MERGE_EN;
@@ -357,7 +357,7 @@ void CMT2300A_EnableFifoMerge(BOOL bEnable)
 * *********************************************************/
 void CMT2300A_EnableReadFifo(void)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
     tmp &= ~CMT2300A_MASK_SPI_FIFO_RD_WR_SEL; 
     tmp &= ~CMT2300A_MASK_FIFO_RX_TX_SEL;
     CMT2300A_WriteReg(CMT2300A_CUS_FIFO_CTL, tmp);
@@ -369,7 +369,7 @@ void CMT2300A_EnableReadFifo(void)
 * *********************************************************/
 void CMT2300A_EnableWriteFifo(void)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
     tmp |= CMT2300A_MASK_SPI_FIFO_RD_WR_SEL;
     tmp |= CMT2300A_MASK_FIFO_RX_TX_SEL;
     CMT2300A_WriteReg(CMT2300A_CUS_FIFO_CTL, tmp);
@@ -396,9 +396,9 @@ void CMT2300A_RestoreFifo(void)
 *            CMT2300A_MASK_TX_FIFO_NMTY_FLG |
 *            CMT2300A_MASK_TX_FIFO_TH_FLG
 * *********************************************************/
-u8 CMT2300A_ClearTxFifo(void)
+uint8_t CMT2300A_ClearTxFifo(void)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG);
     CMT2300A_WriteReg(CMT2300A_CUS_FIFO_CLR, CMT2300A_MASK_FIFO_CLR_TX);
     return tmp;
 }
@@ -415,9 +415,9 @@ u8 CMT2300A_ClearTxFifo(void)
 *            CMT2300A_MASK_TX_FIFO_NMTY_FLG |
 *            CMT2300A_MASK_TX_FIFO_TH_FLG
 * *********************************************************/
-u8 CMT2300A_ClearRxFifo(void)
+uint8_t CMT2300A_ClearRxFifo(void)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_FLAG);
     CMT2300A_WriteReg(CMT2300A_CUS_FIFO_CLR, CMT2300A_MASK_FIFO_CLR_RX);
     return tmp;
 }
@@ -435,13 +435,13 @@ u8 CMT2300A_ClearRxFifo(void)
 *            CMT2300A_MASK_CRC_OK_FLG   |
 *            CMT2300A_MASK_PKT_OK_FLG
 * *********************************************************/
-u8 CMT2300A_ClearInterruptFlags(void)
+uint8_t CMT2300A_ClearInterruptFlags(void)
 {
-    u8 nFlag1, nFlag2;
-    u8 nClr1 = 0;
-    u8 nClr2 = 0;
-    u8 nRet  = 0;
-    u8 nIntPolar;
+    uint8_t nFlag1, nFlag2;
+    uint8_t nClr1 = 0;
+    uint8_t nClr2 = 0;
+    uint8_t nRet  = 0;
+    uint8_t nIntPolar;
     
     nIntPolar = CMT2300A_ReadReg(CMT2300A_CUS_INT1_CTL);
     nIntPolar = (nIntPolar & CMT2300A_MASK_INT_POLAR) ?1 :0;
@@ -528,9 +528,9 @@ u8 CMT2300A_ClearInterruptFlags(void)
 *            CMT2300A_TX_DIN_SEL_GPIO2
 *            CMT2300A_TX_DIN_SEL_GPIO3
 * *********************************************************/
-void CMT2300A_ConfigTxDin(u8 nDinSel)
+void CMT2300A_ConfigTxDin(uint8_t nDinSel)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
     tmp &= ~CMT2300A_MASK_TX_DIN_SEL;
     tmp |= nDinSel;
     CMT2300A_WriteReg(CMT2300A_CUS_FIFO_CTL, tmp);
@@ -544,7 +544,7 @@ void CMT2300A_ConfigTxDin(u8 nDinSel)
 * *********************************************************/
 void CMT2300A_EnableTxDin(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FIFO_CTL);
 
     if(bEnable)
         tmp |= CMT2300A_MASK_TX_DIN_EN;
@@ -562,7 +562,7 @@ void CMT2300A_EnableTxDin(BOOL bEnable)
 * *********************************************************/
 void CMT2300A_EnableTxDinInvert(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT2_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT2_CTL);
 
     if(bEnable)
         tmp |= CMT2300A_MASK_TX_DIN_INV;
@@ -579,7 +579,7 @@ void CMT2300A_EnableTxDinInvert(BOOL bEnable)
 * *********************************************************/
 BOOL CMT2300A_IsExist(void)
 {
-    u8 back, dat;
+    uint8_t back, dat;
 
     back = CMT2300A_ReadReg(CMT2300A_CUS_PKT17);
     CMT2300A_WriteReg(CMT2300A_CUS_PKT17, 0xAA);
@@ -598,7 +598,7 @@ BOOL CMT2300A_IsExist(void)
 * @desc    Get RSSI code.
 * @return  RSSI code
 * *********************************************************/
-u8 CMT2300A_GetRssiCode(void)
+uint8_t CMT2300A_GetRssiCode(void)
 {
     return CMT2300A_ReadReg(CMT2300A_CUS_RSSI_CODE);
 }
@@ -619,7 +619,7 @@ int CMT2300A_GetRssiDBm(void)
 *          for fast frequency hopping operation.
 * @param   nChann: the frequency channel
 * *********************************************************/
-void CMT2300A_SetFrequencyChannel(u8 nChann)
+void CMT2300A_SetFrequencyChannel(uint8_t nChann)
 {
     CMT2300A_WriteReg(CMT2300A_CUS_FREQ_CHNL, nChann);
 }
@@ -631,7 +631,7 @@ void CMT2300A_SetFrequencyChannel(u8 nChann)
 *          One step size is 2.5 kHz.
 * @param   nOffset: the frequency step
 * *********************************************************/
-void CMT2300A_SetFrequencyStep(u8 nOffset)
+void CMT2300A_SetFrequencyStep(uint8_t nOffset)
 {
     CMT2300A_WriteReg(CMT2300A_CUS_FREQ_OFS, nOffset);
 }
@@ -641,9 +641,9 @@ void CMT2300A_SetFrequencyStep(u8 nOffset)
 * @desc    Set payload length.
 * @param   nLength
 * *********************************************************/
-void CMT2300A_SetPayloadLength(u16 nLength)
+void CMT2300A_SetPayloadLength(uint16_t nLength)
 { 
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT14);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT14);
     
     tmp &= ~CMT2300A_MASK_PAYLOAD_LENG_10_8;
     tmp |= (nLength >> 4) & CMT2300A_MASK_PAYLOAD_LENG_10_8;
@@ -661,7 +661,7 @@ void CMT2300A_SetPayloadLength(u16 nLength)
 * *********************************************************/
 void CMT2300A_EnableLfosc(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_SYS2);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_SYS2);
     
     if(bEnable) {
         tmp |= CMT2300A_MASK_LFOSC_RECAL_EN;
@@ -685,7 +685,7 @@ void CMT2300A_EnableLfosc(BOOL bEnable)
 * *********************************************************/
 void CMT2300A_EnableLfoscOutput(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT2_CTL);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_INT2_CTL);
     
     if(bEnable)
         tmp |= CMT2300A_MASK_LFOSC_OUT_EN;
@@ -703,7 +703,7 @@ void CMT2300A_EnableLfoscOutput(BOOL bEnable)
 * *********************************************************/
 void CMT2300A_EnableAfc(BOOL bEnable)
 {
-    u8 tmp = CMT2300A_ReadReg(CMT2300A_CUS_FSK5);
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_FSK5);
     
     if(bEnable)
         tmp |= 0x10;
@@ -718,7 +718,7 @@ void CMT2300A_EnableAfc(BOOL bEnable)
 * @desc    This is optional, only needed when using Rx fast frequency hopping.
 * @param   afcOvfTh: AFC_OVF_TH see AN142 and AN197 for details.
 * *********************************************************/
-void CMT2300A_SetAfcOvfTh(u8 afcOvfTh)
+void CMT2300A_SetAfcOvfTh(uint8_t afcOvfTh)
 {
     CMT2300A_WriteReg(CMT2300A_CUS_FSK4, afcOvfTh);
 }
@@ -729,7 +729,7 @@ void CMT2300A_SetAfcOvfTh(u8 afcOvfTh)
 * *********************************************************/
 void CMT2300A_Init(void)
 {
-    u8 tmp;
+    uint8_t tmp;
 
     CMT2300A_SoftReset();
     CMT2300A_DelayMs(20);
@@ -754,9 +754,9 @@ void CMT2300A_Init(void)
 * @name    CMT2300A_ConfigRegBank
 * @desc    Config one register bank.
 * *********************************************************/
-BOOL CMT2300A_ConfigRegBank(u8 base_addr, const u8 bank[], u8 len)
+BOOL CMT2300A_ConfigRegBank(uint8_t base_addr, const uint8_t bank[], uint8_t len)
 {
-    u8 i;
+    uint8_t i;
     for(i=0; i<len; i++)
         CMT2300A_WriteReg(i+base_addr, bank[i]);
 
