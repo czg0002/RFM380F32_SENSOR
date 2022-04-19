@@ -1,2 +1,3 @@
 # RFM380F32_SENSOR
-using RFM380F32 (provided by CMOS Tech) in a wireless sensor
+使用RFM380F32 (华普微提供)作为无线传感器的核心；
+整合CMT2300A的驱动代码（）以及单片机外设代码。
