@@ -152,8 +152,6 @@ void UartP3536Int(void)
  ******************************************************************************/
 int32_t main(void)
 {  
-	byte i=0;
-	uint32_t k=1;
 	MCU_Init(); 
   CMT2300A_Init();
 
@@ -174,25 +172,6 @@ int32_t main(void)
 		 	#if RF_STATUS  	
 			KeyScan_Rx();  
 			#else 	
-			if(u8RxFlg)
-			{
-				Uart_DisableIrq(UARTCH1,UartRxIrq);//当成功收到一包数据后，首先关掉串口中断服务程序，
-				//防止应用程序再处理发射和打印任务的时候，串口还在接收出错
-				u8RxFlg = 0;	
-		//		if(u8RxData[1]==0x32)
-		//		KeyScan_Tx();	//这个地方发射的数据量尽量短,这个地方后续优化一下，当这个在处理的时候关掉
-				Send_Pack(u8RxData,CoutNum,0);
-				for(i=0;i<CoutNum;i++)
-				{
-					Uart_SendData(UARTCH1,u8RxData[i]);	
-					u8RxData[i]=0;
-				}
-					CoutNum=0;
-         /*当处理完发射和打印任务的时候，串口中断再次打开去接收数据*/				
-				Uart_EnableIrq(UARTCH1,UartRxIrq); //UART通信中断使能函数设置
-				Uart_ClrStatus(UARTCH1,UartRxFull); //UART通道通信状态清除
-				Uart_EnableFunc(UARTCH1,UartRx);  //UART通道发送或接收使能设置				
-			}	   		
 			 #endif	
 	  }
 }

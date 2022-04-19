@@ -18,6 +18,9 @@
  * @author  CMOSTEK R@D
  */
 #include "common.h"
+#include "cmt2300a_defs.h"
+#include "cmt2300a_params.h"
+#include "cmt2300a_hal.h"
 #include "cmt2300a.h"
 
 /*! ********************************************************
@@ -26,7 +29,7 @@
 * *********************************************************/
 void CMT2300A_SoftReset(void)
 {
-    CMT2300A_WriteReg(0x7F, 0xFF);
+    CMT2300A_WriteReg(CMT2300A_CUS_SOFTRST, 0xFF);
 }
 
 /*! ********************************************************
@@ -728,26 +731,33 @@ void CMT2300A_SetAfcOvfTh(uint8_t afcOvfTh)
 * @desc    Initialize chip status.
 * *********************************************************/
 void CMT2300A_Init(void)
+	//Just copy from demo code, TODO: may be better use rf_init function to wrap
 {
     uint8_t tmp;
 
     CMT2300A_SoftReset();
-    CMT2300A_DelayMs(20);
+    CMT2300A_DelayMs(30);
     
     CMT2300A_GoStby();
 
-    tmp  = CMT2300A_ReadReg(CMT2300A_CUS_MODE_STA);
-    tmp |= CMT2300A_MASK_CFG_RETAIN;         /* Enable CFG_RETAIN */
-    tmp &= ~CMT2300A_MASK_RSTN_IN_EN;        /* Disable RSTN_IN */
-    CMT2300A_WriteReg(CMT2300A_CUS_MODE_STA, tmp);
-
-    tmp  = CMT2300A_ReadReg(CMT2300A_CUS_EN_CTL);
-    tmp |= CMT2300A_MASK_LOCKING_EN;         /* Enable LOCKING_EN */
-    CMT2300A_WriteReg(CMT2300A_CUS_EN_CTL, tmp);
+    /* Config registers */
+    CMT2300A_ConfigRegBank(CMT2300A_CMT_BANK_ADDR       , g_cmt2300aCmtBank       , CMT2300A_CMT_BANK_SIZE       );
+    CMT2300A_ConfigRegBank(CMT2300A_SYSTEM_BANK_ADDR    , g_cmt2300aSystemBank    , CMT2300A_SYSTEM_BANK_SIZE    );
+    CMT2300A_ConfigRegBank(CMT2300A_FREQUENCY_BANK_ADDR , g_cmt2300aFrequencyBank , CMT2300A_FREQUENCY_BANK_SIZE );
+    CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR , g_cmt2300aDataRateBank  , CMT2300A_DATA_RATE_BANK_SIZE );
+    CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR  , g_cmt2300aBasebandBank  , CMT2300A_BASEBAND_BANK_SIZE  );
+    CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR        , g_cmt2300aTxBank        , CMT2300A_TX_BANK_SIZE        );
     
-    CMT2300A_EnableLfosc(FALSE);             /* Diable LFOSC */
+	CMT2300A_ConfigGpio((CMT2300A_GPIO3_SEL_DOUT|CMT2300A_GPIO2_SEL_INT1|CMT2300A_GPIO1_SEL_INT2));	//GPIO2 map to int1
+	CMT2300A_EnableInterrupt(CMT2300A_MASK_PKT_DONE_EN|CMT2300A_MASK_TX_DONE_EN|CMT2300A_MASK_CRC_OK_EN);
+	CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_TX_DONE, CMT2300A_INT_SEL_PKT_DONE);
 
-    CMT2300A_ClearInterruptFlags();
+	CMT2300A_ClearTxFifo();
+	CMT2300A_ClearRxFifo();
+	CMT2300A_ClearInterruptFlags();
+    CMT2300A_EnableLfosc(FALSE);             /* Diable LFOSC */
+	CMT2300A_EnableReadFifo();
+	CMT2300A_EnableWriteFifo();
 }
 
 /*! ********************************************************

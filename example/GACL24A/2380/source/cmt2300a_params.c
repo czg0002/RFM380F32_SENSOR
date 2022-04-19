@@ -2,9 +2,9 @@
 
 word SysTime;			//TODO: these variable to be rm from this file
 //FlagSTR  _System_F;
-//byte Prodution_ID[3];
+//uint8_t Prodution_ID[3];
 
-byte TX_Buf[64];
+uint8_t TX_Bufs[64];
 
 word ResetTime;
 //FlagSTR  		_LedTime;
@@ -67,7 +67,7 @@ word ResetTime;
 //; Preamble Tx Size          = 8
 //; Preamble Value            = 85
 //; Preamble Unit             = 8-bit
-//; Sync Size                 = 4-byte
+//; Sync Size                 = 4-uint8_t
 //; Sync Value                = 2466992606
 //; Sync Tolerance            = None
 //; Sync Manchester           = Disable
@@ -95,7 +95,7 @@ word ResetTime;
 //; RSSI Offset               = 0
 //; RSSI Offset Sign          = 0		
 
-byte CMT_Bank[12] = {
+uint8_t g_cmt2300aCmtBank[12] = {
 0x00,
 0x66,
 0xEC,
@@ -111,7 +111,7 @@ byte CMT_Bank[12] = {
 };
 
 //[System Bank]
-byte System_Bank[12] = {
+uint8_t g_cmt2300aSystemBank[12] = {
 0xAE,
 0xE0,
 0x35,
@@ -127,7 +127,7 @@ byte System_Bank[12] = {
 };
 
 //[Frequency Bank]
-byte Frequency_Bank[8] = {
+uint8_t g_cmt2300aFrequencyBank[8] = {
 0x42,
 0xCF,
 0xA7,
@@ -139,7 +139,7 @@ byte Frequency_Bank[8] = {
 };
 
 //[Data Rate Bank]
-byte Data_Rate_Bank[24] = {
+uint8_t g_cmt2300aDataRateBank[24] = {
 0x1F,
 0xF8,
 0x21,
@@ -167,7 +167,7 @@ byte Data_Rate_Bank[24] = {
 };
 
 //[Baseband Bank]
-byte Baseband_Bank[29] = {
+uint8_t g_cmt2300aBasebandBank[29] = {
 0x12,
 0x08,
 0x00,
@@ -200,7 +200,7 @@ byte Baseband_Bank[29] = {
 };
 
 //[TX Bank]
-byte TX_Bank[11] = {
+uint8_t g_cmt2300aTxBank[11] = {
 0x70,
 0xC0,
 0x0F,

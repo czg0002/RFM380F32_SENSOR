@@ -132,11 +132,6 @@ uint8_t i=0;
 		M0P_GPIO->P1PU=P1PU_Data;
 		M0P_GPIO->P2PU=P2PU_Data;
 		M0P_GPIO->P3PU=P3PU_Data;	
-		//GPIO输入初始化
-	//	Gpio_InitIOExt(2,3,GpioDirIn, TRUE,  FALSE,  FALSE, FALSE);  //输入上拉  学习按键
-		//将中断触发功能
-	//	Gpio_EnableIrq(2,3, GpioIrqFalling); //下降沿
-	//	EnableNvic(PORT2_IRQn, DDL_IRQ_LEVEL_DEFAULT, TRUE);
 }	
 
 /******************************

@@ -67,7 +67,7 @@ PxOD:开漏输出配置寄存器		1=使能		0=禁止(默认)
 	#define	GPIO2	0x10  //				1				0				0				0			0			0			0
   #define	SDIO	0x08	//此处修改为P2.3做sido，之前是P2.4
 	
-	
+/*	Demo
 #define	P0DIR_Data	0x00000006//   0110---P01 P02输输入  P00 P03输出
 #define	P1DIR_Data	0x00000000 //
 #define	P2DIR_Data	0x00000000//0x00000008   
@@ -82,7 +82,29 @@ PxOD:开漏输出配置寄存器		1=使能		0=禁止(默认)
 #define	P1PU_Data		0x00000000
 #define	P2PU_Data		0x00000000
 #define	P3PU_Data		0x00000000
+*/
+//P01 GPIO similating SDA2
+//P02 GPIO similating SCL2
+//P25 SDA
+//P26 SCL
+//P33 PCON: front sensor power control
+//P35 GPIO similating SDA1
+//P36 GPIO similating SCL1
+//P
+#define	P0DIR_Data	0x00000006//   0110---P01 P02输输入  P00 P03输出
+#define	P1DIR_Data	0x00000000 //
+#define	P2DIR_Data	0x00000000//0x00000008   
+#define	P3DIR_Data	0x00000010  //P3.4 设置为输入
 
+#define	P0OUT_Data	0x00000008 // P03输出高 其他输出低
+#define	P1OUT_Data	0x00000000  
+#define	P2OUT_Data	0x00000000 //P2.3CSB输出高 其他输低
+#define	P3OUT_Data	0x00000004  //P3.2 FCSB输出高其他输出低
+
+#define	P0PU_Data		0x00000000
+#define	P1PU_Data		0x00000000
+#define	P2PU_Data		0x00000000
+#define	P3PU_Data		0x00000000
 
 /*hm380*/
 

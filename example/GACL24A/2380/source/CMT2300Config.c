@@ -1,9 +1,10 @@
 #include "CMT2380F32_Demo.h"
 #include "cmt2300a_params.h"
-void CMT2300A_ConfigGpio(byte nGpioSel)
-{
-    SPI_Write(CMT2300A_CUS_IO_SEL,nGpioSel);  //配置GPIO
-}
+#include "cmt2300a.h"
+//void CMT2300A_ConfigGpio(byte nGpioSel)
+//{
+//    SPI_Write(CMT2300A_CUS_IO_SEL,nGpioSel);  //配置GPIO
+//}
 /*! ********************************************************
 * @name    SetPayloadLength
 * @desc    Set payload length.
@@ -42,25 +43,25 @@ void EnableFifoMerge(byte bEnable)
 * @name    CMT2300A_EnableReadFifo
 * @desc    Enable SPI to read the FIFO.
 * *********************************************************/
-void CMT2300A_EnableReadFifo(void)
-{
-    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
-    tmp &= ~CMT2300A_MASK_SPI_FIFO_RD_WR_SEL; 
-    tmp &= ~CMT2300A_MASK_FIFO_RX_TX_SEL;
-    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
-}
+//void CMT2300A_EnableReadFifo(void)
+//{
+//    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
+//    tmp &= ~CMT2300A_MASK_SPI_FIFO_RD_WR_SEL; 
+//    tmp &= ~CMT2300A_MASK_FIFO_RX_TX_SEL;
+//    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
+//}
 
-/*! ********************************************************
-* @name    CMT2300A_EnableWriteFifo
-* @desc    Enable SPI to write the FIFO.
-* *********************************************************/
-void CMT2300A_EnableWriteFifo(void)
-{
-    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
-    tmp |= CMT2300A_MASK_SPI_FIFO_RD_WR_SEL;
-    tmp |= CMT2300A_MASK_FIFO_RX_TX_SEL;
-    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
-}
+///*! ********************************************************
+//* @name    CMT2300A_EnableWriteFifo
+//* @desc    Enable SPI to write the FIFO.
+//* *********************************************************/
+//void CMT2300A_EnableWriteFifo(void)
+//{
+//    byte tmp = SPI_Read(CMT2300A_CUS_FIFO_CTL);
+//    tmp |= CMT2300A_MASK_SPI_FIFO_RD_WR_SEL;
+//    tmp |= CMT2300A_MASK_FIFO_RX_TX_SEL;
+//    SPI_Write(CMT2300A_CUS_FIFO_CTL, tmp);
+//}
 
 /*! ********************************************************
 * @name    CMT2300A_EnableLfosc
@@ -68,31 +69,32 @@ void CMT2300A_EnableWriteFifo(void)
 * @param   bEnable(TRUE): Enable it(default)
 *          bEnable(FALSE): Disable it
 * *********************************************************/
-void CMT2300A_EnableLfosc(byte bEnable)
-{
-    byte tmp = SPI_Read(CMT2300A_CUS_SYS2);
-    
-    if(bEnable) {
-        tmp |= CMT2300A_MASK_LFOSC_RECAL_EN;
-        tmp |= CMT2300A_MASK_LFOSC_CAL1_EN;
-        tmp |= CMT2300A_MASK_LFOSC_CAL2_EN;
-    }
-    else {
-        tmp &= ~CMT2300A_MASK_LFOSC_RECAL_EN;
-        tmp &= ~CMT2300A_MASK_LFOSC_CAL1_EN;
-        tmp &= ~CMT2300A_MASK_LFOSC_CAL2_EN;
-    }
-    
-    SPI_Write(CMT2300A_CUS_SYS2, tmp);
-}
+//void CMT2300A_EnableLfosc(byte bEnable)
+//{
+//    byte tmp = SPI_Read(CMT2300A_CUS_SYS2);
+//    
+//    if(bEnable) {
+//        tmp |= CMT2300A_MASK_LFOSC_RECAL_EN;
+//        tmp |= CMT2300A_MASK_LFOSC_CAL1_EN;
+//        tmp |= CMT2300A_MASK_LFOSC_CAL2_EN;
+//    }
+//    else {
+//        tmp &= ~CMT2300A_MASK_LFOSC_RECAL_EN;
+//        tmp &= ~CMT2300A_MASK_LFOSC_CAL1_EN;
+//        tmp &= ~CMT2300A_MASK_LFOSC_CAL2_EN;
+//    }
+//    
+//    SPI_Write(CMT2300A_CUS_SYS2, tmp);
+//}
 /***********************************
 **名字:CMT2300A_Init
 **功能:2300初始化
 **入参:无
 **出参:无
 ************************************/
-void CMT2300A_Init(void)
-{
+//void CMT2300A_Init(void)
+//{
+	/*
 	byte i,tmp;
 	byte cnt;	
 	Reset();                       //软复位
@@ -127,7 +129,8 @@ void CMT2300A_Init(void)
 	CMT2300A_EnableReadFifo();
 	GO_SLEEP();        	    	                            		//进入睡眠
 	ResetTime=0;
-}
+	*/
+//}
 
 /*****************************************************************
 **名字: Send_Pack					

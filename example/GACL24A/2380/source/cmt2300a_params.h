@@ -20,11 +20,11 @@
 #define  __CMT2300A_PARAMS
 
 #include "CMT2380F32_Demo.h"	//TODO: to be removed
-extern byte CMT_Bank[12];
-extern byte System_Bank[12];
-extern byte Frequency_Bank[8];
-extern byte Data_Rate_Bank[24];
-extern byte Baseband_Bank[29];
-extern byte TX_Bank[11];
+extern uint8_t g_cmt2300aCmtBank[12];
+extern uint8_t g_cmt2300aSystemBank[12];
+extern uint8_t g_cmt2300aFrequencyBank[8];
+extern uint8_t g_cmt2300aDataRateBank[24];
+extern uint8_t g_cmt2300aBasebandBank[29];
+extern uint8_t g_cmt2300aTxBank[11];
 
 #endif

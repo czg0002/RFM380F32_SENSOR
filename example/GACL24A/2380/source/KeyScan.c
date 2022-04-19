@@ -104,10 +104,10 @@ byte ReadKey(void)
 ***************************************/
 void RxOKDelay(void)
 {	
-		TX_Buf[0]=KeyCode[0];
-		TX_Buf[1]=KeyCode[1];
-		TX_Buf[2]=KeyCode[2];
-		TX_Buf[3]=0x80;//KeyCode[3];
-    Send_Pack(TX_Buf,4,0);     //回传         
+//		TX_Buf[0]=KeyCode[0];
+//		TX_Buf[1]=KeyCode[1];
+//		TX_Buf[2]=KeyCode[2];
+//		TX_Buf[3]=0x80;//KeyCode[3];
+//    Send_Pack(TX_Buf,4,0);     //回传         
     GO_RX();  
 }
