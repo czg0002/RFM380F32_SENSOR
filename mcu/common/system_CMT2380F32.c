@@ -21,8 +21,6 @@
  ** System Clock Frequency (Core Clock) Variable according CMSIS
  ******************************************************************************/
 uint32_t SystemCoreClock = 4000000;
-
-
 //add clock source.
 void SystemCoreClockUpdate (void) // Update SystemCoreClock variable
 {
@@ -47,11 +45,12 @@ void SystemInit(void)
 		Clk_Enable(ClkXTH, TRUE);	
     //Clk_SetRCHFreq(ClkFreq16Mhz);                                            
     SystemCoreClockUpdate();
-
+	
     DDL_ZERO_STRUCT(stcCfg);
     stcCfg.bNoRef = TRUE;
     stcCfg.u32LoadVal = 0xFFFFFF;
     Clk_SysTickConfig(&stcCfg);
+		
 }
 
 
