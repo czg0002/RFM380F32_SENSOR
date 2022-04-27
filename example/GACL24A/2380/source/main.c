@@ -1,21 +1,18 @@
 /******************************************************************************/
 /** \file main.c
  **
- ** A detailed description is available at
- ** @link Sample Group Some description @endlink
- **
- **   - 2017-05-28     First Version
- **
  ******************************************************************************/
 
 /******************************************************************************
  * Include files
  ******************************************************************************/
-#include "adc.h"
 #include "gpio.h"
 #include "ddl.h"
 #include "uart.h"
+#include "lpt.h"
+#include "lpm.h"
 #include "CMT2380F32_Demo.h"
+#include "cmt2300a.h"
 /******************************************************************************
  * Local pre-processor symbols/macros ('#define')                            
  ******************************************************************************/
@@ -24,7 +21,7 @@
 /******************************************************************************
  * Global variable definitions (declared in header file with 'extern')
  ******************************************************************************/
-
+uint32_t u32LptTestFlag = 0x00;
 /******************************************************************************
  * Local type definitions ('typedef')                                         
  ******************************************************************************/
@@ -32,111 +29,23 @@
 /******************************************************************************
  * Local function prototypes ('static')
  ******************************************************************************/
-
+void LptInt(void)
+{
+    if (TRUE == Lpt_GetIntFlag())
+    {
+        Lpt_ClearIntFlag();
+        u32LptTestFlag = 0x01;
+    }
+}
 /******************************************************************************
  * Local variable definitions ('static')                                      *
  ******************************************************************************/
  uint8_t CheckFlg=0,CoutNum=0,Uartlen=10;
  
- #define MAX_UART 100 //´®¿Ú½ÓÊÕ»º´æ
+ #define MAX_UART 100 //ï¿½ï¿½ï¿½Ú½ï¿½ï¿½Õ»ï¿½ï¿½ï¿½
  uint8_t u8RxData[MAX_UART]={0xAA,0x55,0x11,0x22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
  uint8_t u8RxFlg=0;
 
-void RxIntCallback(void)  //´®¿Ú½ÓÊÕÊØ»¤³ÌĞò ¸ù¾İ½áÊø·ûºÏ0x0D 0x0aÀ´ÅĞ¶ÏÒ»°üÍêÕûÊı¾İ
-{
-	u8RxData[CoutNum]=M0P_UART1->SBUF; //½«ÊÕµ½µÄÊı¾İ£¬´æÈëu8RxDataÊı×é
-	if(CoutNum>=2)
-	{
-		if((u8RxData[CoutNum-1]==0x0d)&&(u8RxData[CoutNum]==0x0a))
-		{
-			u8RxFlg=1;
-		}
-  }
-
-	 if(CoutNum>=MAX_UART)
-	 {
-		u8RxFlg=1;
-	 } 
-	 else{
-	 CoutNum++;		
-	 }		 
-}
-
-
-void ErrIntCallback(void)
-{  	  byte i=0;
-	
-	    Uart_DisableIrq(UARTCH1,UartRxIrq);//µ±³É¹¦ÊÕµ½Ò»°üÊı¾İºó£¬Ê×ÏÈ¹Øµô´®¿ÚÖĞ¶Ï·şÎñ³ÌĞò£¬
-	    u8RxFlg=0;
-	    CoutNum=0;										    //·ÀÖ¹Ó¦ÓÃ³ÌĞòÔÙ´¦Àí·¢ÉäºÍ´òÓ¡ÈÎÎñµÄÊ±ºò£¬´®¿Ú»¹ÔÚ½ÓÊÕ³ö´
-      for(i=0;i<MAX_UART;i++)
-			{
-				u8RxData[i]=0;
-			}
-	    /*µ±´¦ÀíÍê·¢ÉäºÍ´òÓ¡ÈÎÎñµÄÊ±ºò£¬´®¿ÚÖĞ¶ÏÔÙ´Î´ò¿ªÈ¥½ÓÊÕÊı¾İ*/				
-				Uart_EnableIrq(UARTCH1,UartRxIrq); //UARTÍ¨ĞÅÖĞ¶ÏÊ¹ÄÜº¯ÊıÉèÖÃ
-				Uart_ClrStatus(UARTCH1,UartRxFull); //UARTÍ¨µÀÍ¨ĞÅ×´Ì¬Çå³ı
-				Uart_EnableFunc(UARTCH1,UartRx);  //UARTÍ¨µÀ·¢ËÍ»ò½ÓÊÕÊ¹ÄÜÉèÖÃ	
-}
-
-void UartP3536Int(void)
-{
-
-		uint16_t timer=0;
-		uint32_t pclk=0;
-		
-		stc_uart_config_t  stcConfig;
-		stc_uart_irq_cb_t stcUartIrqCb;
-		stc_uart_multimode_t stcMulti;
-		stc_uart_baud_config_t stcBaud;
-		stc_bt_config_t stcBtConfig;
-		
-		DDL_ZERO_STRUCT(stcUartIrqCb);
-		DDL_ZERO_STRUCT(stcMulti);
-		DDL_ZERO_STRUCT(stcBaud);
-		DDL_ZERO_STRUCT(stcBtConfig);  	
-
-    Gpio_InitIOExt(3,5,GpioDirOut,TRUE,FALSE,FALSE,FALSE);   
-    Gpio_InitIOExt(3,6,GpioDirOut,TRUE,FALSE,FALSE,FALSE); 
-    
-    //Í¨µÀ¶Ë¿ÚÅäÖÃ
-    Gpio_SetFunc_UART1TX_P35();
-    Gpio_SetFunc_UART1RX_P36();
-
-		
-		//ÍâÉèÊ±ÖÓÊ¹ÄÜ
-		Clk_SetPeripheralGate(ClkPeripheralBt,TRUE);//Ä£Ê½0/2¿ÉÒÔ²»Ê¹ÄÜ
-		Clk_SetPeripheralGate(ClkPeripheralUart1,TRUE);    	
-		
-		stcUartIrqCb.pfnRxIrqCb = RxIntCallback;//Ñ­»·µÈ´ı´®¿ÚµÄÊäÈë
-		stcUartIrqCb.pfnTxIrqCb = NULL;
-		stcUartIrqCb.pfnRxErrIrqCb = ErrIntCallback;
-		
-		stcConfig.pstcIrqCb = &stcUartIrqCb;
-		stcConfig.bTouchNvic = TRUE;      	
-		stcConfig.enRunMode = UartMode3;//²âÊÔÏî£¬¸ü¸Ä´Ë´¦À´×ª»»4ÖÖÄ£Ê½²âÊÔ         	
-		stcMulti.enMulti_mode = UartNormal;//²âÊÔÏî£¬¸ü¸Ä´Ë´¦À´×ª»»¶àÖ÷»úÄ£Ê½£¬mode2/3²ÅÓĞ¶àÖ÷»úÄ£Ê½  	
-		stcConfig.pstcMultiMode = &stcMulti; 		
-		
-		stcBaud.bDbaud = 0u;//Ë«±¶²¨ÌØÂÊ¹¦ÄÜ
-		stcBaud.u32Baud = 19200;//¸üĞÂ²¨ÌØÂÊÎ»ÖÃ
-		stcBaud.u8Mode = UartMode3; //¼ÆËã²¨ÌØÂÊĞèÒªÄ£Ê½²ÎÊı
-		pclk = Clk_GetPClkFreq();
-		timer=Uart_SetBaudRate(UARTCH1,pclk,&stcBaud);
-		
-		stcBtConfig.enMD = BtMode2;
-		stcBtConfig.enCT = BtTimer;
-		Bt_Init(TIM1, &stcBtConfig);//µ÷ÓÃbasetimer1ÉèÖÃº¯Êı²úÉú²¨ÌØÂÊ
-		Bt_ARRSet(TIM1,timer);
-		Bt_Cnt16Set(TIM1,timer);
-		Bt_Run(TIM1);
-		
-		Uart_Init(UARTCH1, &stcConfig);
-		Uart_EnableIrq(UARTCH1,UartRxIrq); //UARTÍ¨ĞÅÖĞ¶ÏÊ¹ÄÜº¯ÊıÉèÖÃ
-		Uart_ClrStatus(UARTCH1,UartRxFull); //UARTÍ¨µÀÍ¨ĞÅ×´Ì¬Çå³ı
-		Uart_EnableFunc(UARTCH1,UartRx);  //UARTÍ¨µÀ·¢ËÍ»ò½ÓÊÕÊ¹ÄÜÉèÖÃ
-	
-}
 /*****************************************************************************
  * Function implementation - global ('extern') and local ('static')
  ******************************************************************************/
@@ -151,19 +60,99 @@ void UartP3536Int(void)
  **
  ******************************************************************************/
 int32_t main(void)
-{  
+{
+	int i;	
 	MCU_Init(); 
-  CMT2300A_Init();
-
-//  UartP3536Int();	//³õÊ¼»¯´®¿Ú 19200 MODE3 evenĞ£Ñé
+	SystemCoreClockUpdate();
+	CMT2300A_Init();
+	CMT2300A_GoSleep();
+	for (i = 0; i < 500; i++)
+	{
+		delay1ms(10);
+		Gpio_SetIO(3,3,1);
+		delay1ms(10);
+		Gpio_SetIO(3,3,0);
+	}
+//	Clk_Enable(ClkXTL, TRUE);
+//	Clk_SwitchTo(ClkXTL);
+//	for (i = 0; i < 1000; i++)
+//	{
+//		delay1ms(10);
+//		Gpio_SetIO(3,3,0);
+//		delay1ms(10);
+//		Gpio_SetIO(3,3,1);
+//	}
 	
+	//test low power
+	//ä½¿èƒ½RCL
+    Clk_Enable(ClkRCL, TRUE);
+    //ä½¿èƒ½Lptã€GPIOå¤–è®¾æ—¶é’Ÿ
+    Clk_SetPeripheralGate(ClkPeripheralLpTim, TRUE);
+    Clk_SetPeripheralGate(ClkPeripheralGpio, TRUE);
+		{
+		stc_lpt_config_t stcConfig;
+    en_result_t      enResult = Error;
+    uint16_t         u16ArrData = 0;
+		stc_lpm_config_t stcLpmCfg;
+    
+    
+    stcConfig.enGateP  = LptPositive; 
+    stcConfig.enGate   = LptGateDisable;
+    stcConfig.enTckSel = LptIRC32K;
+    stcConfig.enTog    = LptTogDisable;
+    stcConfig.enCT     = LptTimer;
+    stcConfig.enMD     = LptMode2;
+    
+    stcConfig.pfnLpTimCb = LptInt;
+    
+    if (Ok != Lpt_Init(&stcConfig))
+    {
+        enResult = Error;
+    }
+    
+    //Lpm Cfg
+    stcLpmCfg.enSEVONPEND   = SevPndDisable;
+    stcLpmCfg.enSLEEPDEEP   = SlpDpEnable;
+    stcLpmCfg.enSLEEPONEXIT = SlpExtDisable;
+    Lpm_Config(&stcLpmCfg);
+    
+    //Lpt ä¸­æ–­ä½¿èƒ½
+    Lpt_ClearIntFlag();
+    Lpt_EnableIrq();
+    EnableNvic(LPTIM_IRQn, 3, TRUE);
+    
+    
+    //è®¾ç½®é‡è½½å€¼ï¼Œè®¡æ•°åˆå€¼ï¼Œå¯åŠ¨è®¡æ•°
+    Lpt_ARRSet(u16ArrData);
+    Lpt_Run();
+    
+    
+    //è¿›å…¥ä½åŠŸè€—æ¨¡å¼â€¦â€¦
+    Lpm_GotoLpmMode();
+ 
+    //ä½åŠŸè€—æ¨¡å¼ä¸‹ï¼Œç»§ç»­è®¡æ•°ï¼Œç›´åˆ°æº¢å‡ºäº§ç”Ÿä¸­æ–­ï¼Œé€€å‡ºä½åŠŸè€—æ¨¡å¼ã€‚
+    while(1)
+    {
+        if (0x01 == u32LptTestFlag)
+        {
+            u32LptTestFlag = 0;
+            Lpt_Stop();
+            enResult = Ok;
+            break;
+        }
+    }
+		}
+	//
 	#if RF_STATUS  
 	GO_STBY();	  
 	CMT2300A_EnableReadFifo();
-	Clr_INT(); //Çå³ıÖĞ¶Ï
-	Clr_FIFO(); //Çå³ıFIFO	
+	Clr_INT(); //ï¿½ï¿½ï¿½ï¿½Ğ¶ï¿½
+	Clr_FIFO(); //ï¿½ï¿½ï¿½FIFO	
 	GO_RX();
 	#else 
+	
+	
+	
 	while(1)
 		Send_Pack(u8RxData,8,0);
 	#endif	

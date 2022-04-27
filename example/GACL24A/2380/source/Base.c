@@ -36,119 +36,100 @@ void Gpio_IRQHandler(uint8_t u8Param)
 }
 
 /************************************
-**Ãû³Æ£ºBaseTime0_Init  1MS
-**¹¦ÄÜ£º³õÊ¼»¯»ù´¡¶¨Ê±Æ÷0
-**Èë²Î£ºÎÞ
-**³ö²Î£ºÎÞ
+**ï¿½ï¿½ï¿½Æ£ï¿½BaseTime0_Init  1MS
+**ï¿½ï¿½ï¿½Ü£ï¿½ï¿½ï¿½Ê¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½0
+**ï¿½ï¿½Î£ï¿½ï¿½ï¿½
+**ï¿½ï¿½ï¿½Î£ï¿½ï¿½ï¿½
 ************************************/
 void BaseTime0_Init(void)
 {
 	stc_bt_config_t BaseTime0Buf;
-  //Clk_SetPeripheralGate(ClkPeripheralBt,TRUE);	//¿ªÆôÊ±ÖÓ	
+  //Clk_SetPeripheralGate(ClkPeripheralBt,TRUE);	//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½	
 	BaseTime0Buf.enGateP=BtPositive;		
-	BaseTime0Buf.enGate=BtGateDisable;	//½ûÖ¹ÃÅ¿Ø
-	BaseTime0Buf.enPRS=BtPCLKDiv1;		//²»·ÖÆµ
+	BaseTime0Buf.enGate=BtGateDisable;	//ï¿½ï¿½Ö¹ï¿½Å¿ï¿½
+	BaseTime0Buf.enPRS=BtPCLKDiv1;		//ï¿½ï¿½ï¿½ï¿½Æµ
 	BaseTime0Buf.enTog=BtTogDisable;	  //
-	BaseTime0Buf.enCT=BtTimer;			//¶¨Ê±Æ÷¹¦ÄÜ
-	BaseTime0Buf.enMD=BtMode2;			//16Î»×Ô¶¯ÖØÔØ¶¨Ê±
+	BaseTime0Buf.enCT=BtTimer;			//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	BaseTime0Buf.enMD=BtMode2;			//16Î»ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½Ê±
 	BaseTime0Buf.pfnTim0Cb=Time0_Irq;		
 	Bt_Init(TIM0,&BaseTime0Buf);
 
-	Bt_Cnt16Set(TIM0,(65536-15957));	//³õÖµ
-	Bt_ARRSet(TIM0,(65536-15957));		//ÖØÔØÖµ
-	Bt_ClearIntFlag(TIM0);				//Çå±êÖ¾
-	Bt_EnableIrq(TIM0);					//¿ªÆôÖÐ¶Ï
+	Bt_Cnt16Set(TIM0,(65536-15957));	//ï¿½ï¿½Öµ
+	Bt_ARRSet(TIM0,(65536-15957));		//ï¿½ï¿½ï¿½ï¿½Öµ
+	Bt_ClearIntFlag(TIM0);				//ï¿½ï¿½ï¿½Ö¾
+	Bt_EnableIrq(TIM0);					//ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
 	EnableNvic(TIM0_IRQn,3,TRUE);
-	Bt_Run(TIM0);						//Æô¶¯
+	Bt_Run(TIM0);						//ï¿½ï¿½ï¿½ï¿½
 		
 }
-/******************************
-**Ãû×Ö:MCU_Init
-**¹¦ÄÜ:³õÊ¼»¯,MCUÅäÖÃ
-**Èë²Î:ÎÞ
-**³ö²Î:ÎÞ
-********************************/
-void MCU_Init(void)
-{
-    MCU_Config();               //16M
-    IO_Init();                  //IO
-   BaseTime0_Init();           //T0   
-   //  BaseTime1_Init();           //T0   
-}
 
 
-
+//void MCU_Init(void)
+//{
+//    MCU_Config();               //16M
+//    IO_Init();                  //IO
+//}
 
 
 void BaseTime1_Init(void)
 {
 	stc_bt_config_t BaseTime1Buf;
-  //Clk_SetPeripheralGate(ClkPeripheralBt,TRUE);	//¿ªÆôÊ±ÖÓ	
+  //Clk_SetPeripheralGate(ClkPeripheralBt,TRUE);	//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½	
 	BaseTime1Buf.enGateP=BtPositive;		
-	BaseTime1Buf.enGate=BtGateDisable;	//½ûÖ¹ÃÅ¿Ø
-	BaseTime1Buf.enPRS=BtPCLKDiv1;		//²»·ÖÆµ
+	BaseTime1Buf.enGate=BtGateDisable;	//ï¿½ï¿½Ö¹ï¿½Å¿ï¿½
+	BaseTime1Buf.enPRS=BtPCLKDiv1;		//ï¿½ï¿½ï¿½ï¿½Æµ
 	BaseTime1Buf.enTog=BtTogDisable;	  //
-	BaseTime1Buf.enCT=BtTimer;			//¶¨Ê±Æ÷¹¦ÄÜ
-	BaseTime1Buf.enMD=BtMode2;			//16Î»×Ô¶¯ÖØÔØ¶¨Ê±
+	BaseTime1Buf.enCT=BtTimer;			//ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
+	BaseTime1Buf.enMD=BtMode2;			//16Î»ï¿½Ô¶ï¿½ï¿½ï¿½ï¿½Ø¶ï¿½Ê±
 	BaseTime1Buf.pfnTim1Cb=Time1_Irq;		
 	Bt_Init(TIM1,&BaseTime1Buf);
 
-	Bt_Cnt16Set(TIM1,(65536-15957));	//³õÖµ
-	Bt_ARRSet(TIM1,(65536-15957));		//ÖØÔØÖµ
-	Bt_ClearIntFlag(TIM1);				//Çå±êÖ¾
-	Bt_EnableIrq(TIM1);					//¿ªÆôÖÐ¶Ï
+	Bt_Cnt16Set(TIM1,(65536-15957));	//ï¿½ï¿½Öµ
+	Bt_ARRSet(TIM1,(65536-15957));		//ï¿½ï¿½ï¿½ï¿½Öµ
+	Bt_ClearIntFlag(TIM1);				//ï¿½ï¿½ï¿½Ö¾
+	Bt_EnableIrq(TIM1);					//ï¿½ï¿½ï¿½ï¿½ï¿½Ð¶ï¿½
 	EnableNvic(TIM1_IRQn,4,TRUE);
-	Bt_Run(TIM1);						//Æô¶¯
+	Bt_Run(TIM1);						//ï¿½ï¿½ï¿½ï¿½
 		
 }
 
 
-/******************************
-**Ãû×Ö:IO_Init
-**¹¦ÄÜ:³õÊ¼»¯MCU IO
-**Èë²Î:ÎÞ
-**³ö²Î:ÎÞ
-********************************/
-void IO_Init(void)
-{
-uint8_t i=0;	
-	
-		Clk_SetPeripheralGate(ClkPeripheralGpio,TRUE);	//¿ªÆôGPIOÊ±ÖÓ	
-	  Clk_SetPeripheralGate(ClkPeripheralUart0,TRUE);//¿ªÆô´®¿Ú0Ê±ÖÓ
-    Clk_SetPeripheralGate(ClkPeripheralBt, TRUE);//¿ªÆô»ù´¡Ê±ÖÓ
+
+//void IO_Init(void)
+//{
+//uint8_t i=0;	
+//	
+//		Clk_SetPeripheralGate(ClkPeripheralGpio,TRUE);
+//	  Clk_SetPeripheralGate(ClkPeripheralUart0,TRUE);
+//    Clk_SetPeripheralGate(ClkPeripheralBt, TRUE);
 
 
-		M0P_GPIO->P0DIR=P0DIR_Data;//¶Ë¿ÚP0 P1 P2 P3ÅäÖÃ³ÉÊäÈëÊä³öÅäÖÃ¼Ä´æÆ÷
-		M0P_GPIO->P1DIR=P1DIR_Data;
-		M0P_GPIO->P2DIR=P2DIR_Data;
-		M0P_GPIO->P3DIR=P3DIR_Data;
-	
-		M0P_GPIO->P0OUT=P0OUT_Data;//¶Ë¿ÚP0 P1 P2 P3ÅäÖÃ³ÉÊä³öÖµÅäÖÃ¼Ä´æÆ÷
-		M0P_GPIO->P1OUT=P1OUT_Data;
-		M0P_GPIO->P2OUT=P2OUT_Data;
-		M0P_GPIO->P3OUT=P3OUT_Data;
-	
-		M0P_GPIO->P0PU=P0PU_Data;//¶Ë¿Úp0 p1 p2 p3 ÅäÖÃ³ÉÉÏÀ­Ê¹ÄÜÅäÖÃ¼Ä´æÆ÷
-		M0P_GPIO->P1PU=P1PU_Data;
-		M0P_GPIO->P2PU=P2PU_Data;
-		M0P_GPIO->P3PU=P3PU_Data;	
-}	
-
-/******************************
-**Ãû×Ö:MCU_Config
-**¹¦ÄÜ:³õÊ¼»¯ÅäÖÃMCU 16M
-**Èë²Î:ÎÞ
-**³ö²Î:ÎÞ
-********************************/
-void MCU_Config(void)
-{
-//	Clk_SetRCHFreq(ClkFreq16Mhz);//(ClkFreq16Mhz);	//16M
-	Clk_SetHClkDiv(ClkDiv1);			//CPUÊ±ÖÓ
-	Clk_SetPClkDiv(ClkDiv1);			//ÍâÉèÊ±ÖÓ
-}
+//		M0P_GPIO->P0DIR=P0DIR_Data;
+//		M0P_GPIO->P1DIR=P1DIR_Data;
+//		M0P_GPIO->P2DIR=P2DIR_Data;
+//		M0P_GPIO->P3DIR=P3DIR_Data;
+//	
+//		M0P_GPIO->P0OUT=P0OUT_Data;
+//		M0P_GPIO->P1OUT=P1OUT_Data;
+//		M0P_GPIO->P2OUT=P2OUT_Data;
+//		M0P_GPIO->P3OUT=P3OUT_Data;
+//	
+//		M0P_GPIO->P0PU=P0PU_Data;
+//		M0P_GPIO->P1PU=P1PU_Data;
+//		M0P_GPIO->P2PU=P2PU_Data;
+//		M0P_GPIO->P3PU=P3PU_Data;	
+//}	
 
 
-//´ÖÂÔÑÓÊ±
+//void MCU_Config(void)
+//{
+////	Clk_SetRCHFreq(ClkFreq16Mhz);//(ClkFreq16Mhz);	//16M
+//	Clk_SetHClkDiv(ClkDiv1);			//CPUÊ±ï¿½ï¿½
+//	Clk_SetPClkDiv(ClkDiv1);			//ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½
+//}
+
+
+//ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±
 void Delay(word Cont)
 {
 	for(;Cont!=0;Cont--);
