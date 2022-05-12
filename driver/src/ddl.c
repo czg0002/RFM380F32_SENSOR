@@ -219,7 +219,10 @@ int __backspace(void)
  * \retval  void
  */
 void delay1ms(uint32_t u32Cnt)
+	//if use RCL as systick
+	//max delay time is : 0x1000000 / 38400 = 436s clkXTL
 {
+#if 0
     uint32_t u32end;
     while(u32Cnt-- > 0)
     {
@@ -231,6 +234,23 @@ void delay1ms(uint32_t u32Cnt)
             ;
         }
     }
+#endif
+		volatile uint32_t tick_val;
+		uint32_t end;
+		SysTick->VAL = 0;
+		end = 0x1000000 - u32Cnt * CLK_RCL_VAL / 1053/*1000*/;	//calibrated to approximate 1ms
+//		SysTick->VAL = 0xffffff;
+//		end = 0xffffff - u32Cnt * CLK_RCL_VAL / 1000;
+//		while( SysTick->VAL > end || SysTick->VAL == 0)
+//		{
+//				;
+//		}
+		while (1)
+		{
+			tick_val = SysTick->VAL;
+			if (tick_val <= end && tick_val != 0)
+				break;
+		}
 }
 
 /**

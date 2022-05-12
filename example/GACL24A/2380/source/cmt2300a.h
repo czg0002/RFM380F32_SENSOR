@@ -57,6 +57,7 @@ void CMT2300A_ConfigGpio(uint8_t nGpioSel);
 void CMT2300A_ConfigInterrupt(uint8_t nInt1Sel, uint8_t nInt2Sel);
 void CMT2300A_SetInterruptPolar(BOOL bActiveHigh);
 void CMT2300A_SetFifoThreshold(uint8_t nFifoThreshold);
+void CMT2300A_SetFifoAutoResEn(uint8_t AutoResEn);
 void CMT2300A_EnableAntennaSwitch(uint8_t nMode);
 void CMT2300A_EnableInterrupt(uint8_t nEnable);
 void CMT2300A_EnableRxFifoAutoClear(BOOL bEnable);

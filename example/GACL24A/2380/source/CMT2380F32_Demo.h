@@ -4,7 +4,7 @@
 #include "ddl.h"
 #include "cmt2300a_defs.h"
 //#include "cmt2300a_params.h"
-#define  RF_STATUS   0//1为接收，0为发射
+#define  RF_STATUS   1//1为接收，0为发射
 
 typedef unsigned char byte;
 typedef unsigned int  word;

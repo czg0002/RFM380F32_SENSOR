@@ -13,43 +13,40 @@
 #include "lpm.h"
 #include "CMT2380F32_Demo.h"
 #include "cmt2300a.h"
+#include "gpio_setting.h"
+#include "radio.h"
+#include "syssleep.h"
+#include "rfCmdProc.h"
 /******************************************************************************
- * Local pre-processor symbols/macros ('#define')                            
+ * Local pre-processor symbols/macros ('#define')
  ******************************************************************************/
 //#define DEBUG_PRINT
 
 /******************************************************************************
  * Global variable definitions (declared in header file with 'extern')
  ******************************************************************************/
-uint32_t u32LptTestFlag = 0x00;
 /******************************************************************************
- * Local type definitions ('typedef')                                         
+ * Local type definitions ('typedef')
  ******************************************************************************/
 
 /******************************************************************************
  * Local function prototypes ('static')
  ******************************************************************************/
-void LptInt(void)
-{
-    if (TRUE == Lpt_GetIntFlag())
-    {
-        Lpt_ClearIntFlag();
-        u32LptTestFlag = 0x01;
-    }
-}
 /******************************************************************************
  * Local variable definitions ('static')                                      *
  ******************************************************************************/
- uint8_t CheckFlg=0,CoutNum=0,Uartlen=10;
- 
- #define MAX_UART 100 //���ڽ��ջ���
- uint8_t u8RxData[MAX_UART]={0xAA,0x55,0x11,0x22,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,};
- uint8_t u8RxFlg=0;
+//uint8_t CheckFlg = 0, CoutNum = 0, Uartlen = 10;
+
+#define PACKET_MAX_LEN 32
+SysState_e sysState = sysStateSleep;
+uint8_t gRxPacket[PACKET_MAX_LEN] = { 0x02,	0xAA, 0x55};
+uint8_t gTxPacket[PACKET_MAX_LEN] = { 0xAA, 0x55, 22, 0x7f, 7, 0, 89, 0xc2, 1, 0, 0, 0};
+//uint8_t u8RxFlg = 0;
 
 /*****************************************************************************
  * Function implementation - global ('extern') and local ('static')
  ******************************************************************************/
- 
+
 /**
  ******************************************************************************
  ** \brief  Main function of project
@@ -61,28 +58,57 @@ void LptInt(void)
  ******************************************************************************/
 int32_t main(void)
 {
-	int i;	
-	MCU_Init(); 
+	uint32_t i;
+	EnumRFResult rxresult;
+	uint8_t rxlen;
+	MCU_Init();
+	syssleep_init();
 	SystemCoreClockUpdate();
+	Gpio_SetIO(3, 3, 0);	//power control
 	CMT2300A_Init();
 	CMT2300A_GoSleep();
-	for (i = 0; i < 500; i++)
-	{
-		delay1ms(10);
-		Gpio_SetIO(3,3,1);
-		delay1ms(10);
-		Gpio_SetIO(3,3,0);
-	}
-//	Clk_Enable(ClkXTL, TRUE);
-//	Clk_SwitchTo(ClkXTL);
-//	for (i = 0; i < 1000; i++)
+//	for (i = 0; i < 100; i++)
 //	{
 //		delay1ms(10);
-//		Gpio_SetIO(3,3,0);
+//		Gpio_SetIO(3, 3, 0);
 //		delay1ms(10);
-//		Gpio_SetIO(3,3,1);
+//		Gpio_SetIO(3, 3, 1);
 //	}
-	
+//	Gpio_SetIO(3, 3, 0);
+	rxresult = RF_RxValidPacket(gRxPacket, &rxlen, 10000);
+	if (rxresult == RF_RX_DONE)	//into wakeup state
+	{
+//		rfCmdProc_processCmd();
+		RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
+		sysState = sysStateWakeup;
+	}
+	else //sleep state
+	{
+		sysState = sysStateSleep;
+	}
+	while (1)
+	{
+
+		if (sysState == sysStateSleep)
+		{
+			syssleep_start(5);
+			rxresult = RF_RxWakeupPacket(gRxPacket, &rxlen, 10);
+			if (rxresult == RF_RX_DONE)
+			{
+				sysState = sysStateWakeup;
+			}
+		}
+		else	//wakup state
+		{
+			rxresult = RF_RxValidPacket(gRxPacket, &rxlen, 10000);
+			if (rxresult == RF_RX_DONE)	//into wakeup state
+			{
+				//		rfCmdProc_processCmd();
+				RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
+			}
+		}
+	}
+#if 0	
 	//test low power
 	//使能RCL
     Clk_Enable(ClkRCL, TRUE);
@@ -143,30 +169,105 @@ int32_t main(void)
     }
 		}
 	//
-	#if RF_STATUS  
-	GO_STBY();	  
+#endif
+#if RF_STATUS
+#if 0
+	GO_STBY();
 	CMT2300A_EnableReadFifo();
-	Clr_INT(); //����ж�
-	Clr_FIFO(); //���FIFO	
+	Clr_INT();	//����ж�
+	Clr_FIFO(); //���FIFO
 	GO_RX();
-	#else 
-	
-	
-	
+	while (1)
+	{
+		unsigned char i = 0;
+		uint32_t u32Data = 0, length = 0;
+		uint8_t len;
+		if (Test_GPIO2())
+		{
+			GO_STBY();
+			gRxPacket[0] = Read_FIFO();
+			length = gRxPacket[0];
+			if (length >= 100 || length <= 0)
+			{
+				Gpio_SetIO(3, 3, 0);
+			}
+			else
+			{
+				for (i = 0; i < length; i++)
+				{
+					gRxPacket[1 + i] = Read_FIFO();
+				}
+				Gpio_SetIO(3, 3, 1);
+			}
+			GO_SLEEP();
+			GO_STBY();
+			Clr_INT();
+			Clr_FIFO();
+			GO_RX();
+		}
+	}
+#endif
+#if 0
+	CMT2300A_GoStby();
+	CMT2300A_EnableReadFifo();
+	CMT2300A_EnableReadFifo();
+	CMT2300A_ClearRxFifo();
+	CMT2300A_GoRx();
+	while (1)
+	{
+		unsigned char i = 0;
+		uint32_t u32Data = 0, length = 0;
+		uint8_t len;
+		if (Test_GPIO2())
+		{
+			CMT2300A_GoStby();
+			gRxPacket[0] = Read_FIFO();
+			length = gRxPacket[0];
+			if (length >= 100 || length <= 0)
+			{
+			}
+			else
+			{
+				for (i = 0; i < length; i++)
+				{
+					gRxPacket[1 + i] = Read_FIFO();
+				}
+			}
+			GO_SLEEP();
+			GO_STBY();
+			Clr_INT();
+			Clr_FIFO();
+			GO_RX();
+		}
+	}
+#endif
+//#if 0
 	while(1)
-		Send_Pack(u8RxData,8,0);
-	#endif	
-	while(1)
-	 {		 
-		 	#if RF_STATUS  	
-			KeyScan_Rx();  
-			#else 	
-			 #endif	
-	  }
+	{
+		rxresult = RF_RxPacket(gRxPacket, &rxlen, 5000);
+		
+		if (rxresult == RF_RX_DONE)
+		{
+			Gpio_SetIO(3, 3, 1);
+		}
+		else
+		{
+			Gpio_SetIO(3, 3, 0);
+		}
+	}
+//#endif
+#else
+
+	while (1)
+	{
+		// Send_Pack(gTxPacket, 8, 0);
+		RF_TxPacket(gTxPacket, 8, 10);
+		gTxPacket[2] += 1;
+		delay1ms(1000);
+	}
+#endif
 }
 
 /******************************************************************************
  * EOF (not truncated)
  ******************************************************************************/
-
-

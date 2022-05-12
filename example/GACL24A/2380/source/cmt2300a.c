@@ -275,6 +275,21 @@ void CMT2300A_SetFifoThreshold(uint8_t nFifoThreshold)
 }
 
 /*! ********************************************************
+* @name    CMT2300A_SetFifoThreshold
+* @desc    Set FIFO threshold.
+* @param   nFifoThreshold
+* *********************************************************/
+void CMT2300A_SetFifoAutoResEn(uint8_t AutoResEn)
+{ 
+    uint8_t tmp = CMT2300A_ReadReg(CMT2300A_CUS_PKT29);
+    
+    tmp &= ~CMT2300A_MASK_FIFO_AUTO_RES_EN;
+    tmp |= AutoResEn << 7;
+    
+    CMT2300A_WriteReg(CMT2300A_CUS_PKT29, tmp);
+}
+
+/*! ********************************************************
 * @name    CMT2300A_EnableAntennaSwitch
 * @desc    Enable antenna switch, output TX_ACTIVE/RX_ACTIVE
 *          via GPIO1/GPIO2.
@@ -747,8 +762,11 @@ void CMT2300A_Init(void)
     CMT2300A_ConfigRegBank(CMT2300A_DATA_RATE_BANK_ADDR , g_cmt2300aDataRateBank  , CMT2300A_DATA_RATE_BANK_SIZE );
     CMT2300A_ConfigRegBank(CMT2300A_BASEBAND_BANK_ADDR  , g_cmt2300aBasebandBank  , CMT2300A_BASEBAND_BANK_SIZE  );
     CMT2300A_ConfigRegBank(CMT2300A_TX_BANK_ADDR        , g_cmt2300aTxBank        , CMT2300A_TX_BANK_SIZE        );
-    
-	CMT2300A_ConfigGpio((CMT2300A_GPIO3_SEL_DOUT|CMT2300A_GPIO2_SEL_INT1|CMT2300A_GPIO1_SEL_INT2));	//GPIO2 map to int1
+
+//	CMT2300A_ConfigGpio((CMT2300A_GPIO3_SEL_DOUT|CMT2300A_GPIO2_SEL_INT1|CMT2300A_GPIO1_SEL_INT2));
+//	CMT2300A_ConfigGpio((CMT2300A_GPIO3_SEL_DOUT|CMT2300A_GPIO2_SEL_INT1|CMT2300A_GPIO2_SEL_INT2));	//GPIO2 map to both int1 and int2
+//	CMT2300A_ConfigGpio(CMT2300A_GPIO2_SEL_INT1);	//for tx
+	CMT2300A_ConfigGpio(CMT2300A_GPIO2_SEL_INT2);	//for rx
 	CMT2300A_EnableInterrupt(CMT2300A_MASK_PKT_DONE_EN|CMT2300A_MASK_TX_DONE_EN|CMT2300A_MASK_CRC_OK_EN);
 	CMT2300A_ConfigInterrupt(CMT2300A_INT_SEL_TX_DONE, CMT2300A_INT_SEL_PKT_DONE);
 
