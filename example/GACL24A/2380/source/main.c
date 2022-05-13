@@ -37,10 +37,7 @@
  ******************************************************************************/
 //uint8_t CheckFlg = 0, CoutNum = 0, Uartlen = 10;
 
-#define PACKET_MAX_LEN 32
 SysState_e sysState = sysStateSleep;
-uint8_t gRxPacket[PACKET_MAX_LEN] = { 0x02,	0xAA, 0x55};
-uint8_t gTxPacket[PACKET_MAX_LEN] = { 0xAA, 0x55, 22, 0x7f, 7, 0, 89, 0xc2, 1, 0, 0, 0};
 //uint8_t u8RxFlg = 0;
 
 /*****************************************************************************
@@ -75,11 +72,11 @@ int32_t main(void)
 //		Gpio_SetIO(3, 3, 1);
 //	}
 //	Gpio_SetIO(3, 3, 0);
-	rxresult = RF_RxValidPacket(gRxPacket, &rxlen, 10000);
+	rxresult = RF_RxValidPacket(10000);
 	if (rxresult == RF_RX_DONE)	//into wakeup state
 	{
 //		rfCmdProc_processCmd();
-		RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
+//		RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
 		sysState = sysStateWakeup;
 	}
 	else //sleep state
@@ -92,7 +89,7 @@ int32_t main(void)
 		if (sysState == sysStateSleep)
 		{
 			syssleep_start(5);
-			rxresult = RF_RxWakeupPacket(gRxPacket, &rxlen, 10);
+			rxresult = RF_RxWakeupPacket(10);
 			if (rxresult == RF_RX_DONE)
 			{
 				sysState = sysStateWakeup;
@@ -100,11 +97,11 @@ int32_t main(void)
 		}
 		else	//wakup state
 		{
-			rxresult = RF_RxValidPacket(gRxPacket, &rxlen, 10000);
+			rxresult = RF_RxValidPacket(20000);
 			if (rxresult == RF_RX_DONE)	//into wakeup state
 			{
 				//		rfCmdProc_processCmd();
-				RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
+//				RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
 			}
 		}
 	}
@@ -242,19 +239,19 @@ int32_t main(void)
 	}
 #endif
 //#if 0
-	while(1)
-	{
-		rxresult = RF_RxPacket(gRxPacket, &rxlen, 5000);
-		
-		if (rxresult == RF_RX_DONE)
-		{
-			Gpio_SetIO(3, 3, 1);
-		}
-		else
-		{
-			Gpio_SetIO(3, 3, 0);
-		}
-	}
+//	while(1)
+//	{
+//		rxresult = RF_RxPacket(gRxPacket, &rxlen, 5000);
+//		
+//		if (rxresult == RF_RX_DONE)
+//		{
+//			Gpio_SetIO(3, 3, 1);
+//		}
+//		else
+//		{
+//			Gpio_SetIO(3, 3, 0);
+//		}
+//	}
 //#endif
 #else
 
