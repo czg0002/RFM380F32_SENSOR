@@ -24,7 +24,7 @@
 #include "flashData.h"
 
 #define RF_REC_MAX_DATA_LEN 20
-#define RF_CMD_INDEX	5	//SysCmd_e;
+#define RF_CMD_INDEX	7	//include header 0xAA 0x55;
 
 typedef enum {
 	RF_WRITE_CMD_SUCCESS,

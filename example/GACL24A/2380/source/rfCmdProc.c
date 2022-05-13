@@ -18,14 +18,14 @@
 
 /* rx packet payload[6] is cmd len, payload[7] is the first valid data*/
 #include <stdbool.h>
+#include "ddl.h"
 #include "radio.h"
+#include "version.h"
 #include "rfCmdProc.h"
 #define crc_mul 0x1021 
 
 static uint16_t frame_count = 1;
 
-static bool isOwnAddr(void);
-static bool isBroadcastAddr(void);
 static uint16_t cal_crc(unsigned char *ptr, unsigned char len);
 static void replyRfWriteCmdStatus(RFCmdStatus_e cmd_status);
 static void replyRfReadCmd(int tail_index);
@@ -68,21 +68,21 @@ static bool rfCmd_locationDataReadAll(void)
 	int i;
 	SensorLocationInfo_s sensor_location_history[gDataOperationParameter.sensorLocationDataNum];
 	flashData_extractAllLocationData(sensor_location_history);
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gDataOperationParameter.sensorLocationDataNum;
-	gTxPacket.payload[8] = gRxPacket.rssi;
-	gTxPacket.payload[9] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gDataOperationParameter.sensorLocationDataNum;
+	gTxPayload[8] = gRxPacket.rssi;
+	gTxPayload[9] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 
-	gTxPacket.payload[6] = 0x1e;
+	gTxPayload[6] = 0x1e;
 	for (i = 0; i < gDataOperationParameter.sensorLocationDataNum; i++)
 	{
 		usleep(50000);
-		gTxPacket.payload[7] = i + 1;
-		memcpy(&(gTxPacket.payload[8]), &sensor_location_history[i], sizeof(SensorLocationInfo_s) - 3);
-		gTxPacket.payload[37] = gRxPacket.rssi;
-		gTxPacket.payload[38] = 0;
+		gTxPayload[7] = i + 1;
+		memcpy(&(gTxPayload[8]), &sensor_location_history[i], sizeof(SensorLocationInfo_s) - 3);
+		gTxPayload[37] = gRxPacket.rssi;
+		gTxPayload[38] = 0;
 		gTxPacket.len = 39;
 		EasyLink_transmit(&gTxPacket);
 	}
@@ -123,8 +123,8 @@ static bool rfCmd_onceSample(void)
 	Record_s tmpRecord;
 //	uint16_t crc;
 
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 //	adcFunc_getTHPConverted(&temperature, &humidity, &pressure);
@@ -176,17 +176,17 @@ static bool rfCmd_readADC(void)
 return true;
 
 	gTxPacket.len = 17;
-	gTxPacket.payload[6] = 10;
-	gTxPacket.payload[7] = temperature & 0xff;
-	gTxPacket.payload[8] = (temperature >> 8) & 0xff;
-	gTxPacket.payload[9] = humidity & 0xff;
-	gTxPacket.payload[10] = (humidity >> 8) & 0xff;
-	gTxPacket.payload[11] = pressure & 0xff;
-	gTxPacket.payload[12] = (pressure >> 8) & 0xff;
-	gTxPacket.payload[13] = dc_scan & 0xff;
-	gTxPacket.payload[14] = (dc_scan  >> 8) & 0xff;
-	gTxPacket.payload[15] = battery & 0xff;
-	gTxPacket.payload[16] = (battery  >> 8) & 0xff;
+	gTxPayload[6] = 10;
+	gTxPayload[7] = temperature & 0xff;
+	gTxPayload[8] = (temperature >> 8) & 0xff;
+	gTxPayload[9] = humidity & 0xff;
+	gTxPayload[10] = (humidity >> 8) & 0xff;
+	gTxPayload[11] = pressure & 0xff;
+	gTxPayload[12] = (pressure >> 8) & 0xff;
+	gTxPayload[13] = dc_scan & 0xff;
+	gTxPayload[14] = (dc_scan  >> 8) & 0xff;
+	gTxPayload[15] = battery & 0xff;
+	gTxPayload[16] = (battery  >> 8) & 0xff;
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
@@ -241,10 +241,10 @@ static bool rfCmd_readDB(void)
 	if (num != 0) //
 	{
 		//reply msg with number of record
-		gTxPacket.payload[6] = 1;
-		gTxPacket.payload[7] = num & 0xff;
-		gTxPacket.payload[8] = (num >> 8) & 0xff;
-		gTxPacket.payload[9] = gRxPacket.rssi;
+		gTxPayload[6] = 1;
+		gTxPayload[7] = num & 0xff;
+		gTxPayload[8] = (num >> 8) & 0xff;
+		gTxPayload[9] = gRxPacket.rssi;
 		gTxPacket.len = 10;
 		EasyLink_transmit(&gTxPacket);
 		usleep(40000);
@@ -257,11 +257,11 @@ static bool rfCmd_readDB(void)
 	}
 
 	//reply end of msg
-	gTxPacket.payload[5] = 0xA5;
-	gTxPacket.payload[6] = 2;
-	gTxPacket.payload[7] = 0;
-	gTxPacket.payload[8] = 0;
-	gTxPacket.payload[9] = gRxPacket.rssi;
+	gTxPayload[5] = 0xA5;
+	gTxPayload[6] = 2;
+	gTxPayload[7] = 0;
+	gTxPayload[8] = 0;
+	gTxPayload[9] = gRxPacket.rssi;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -319,7 +319,7 @@ return true;
 	memcpy(&(gFactoryCfg.manufacturerSer), &(gRxPacket.payload[7]), sizeof(ProductSerial_s));
 	flashData_savegFactoryCfg();
 	//updata default tx id
-    memcpy(&(gTxPacket.payload[0]), &(gFactoryCfg.manufacturerSer), sizeof(gFactoryCfg.manufacturerSer));
+    memcpy(&(gTxPayload[0]), &(gFactoryCfg.manufacturerSer), sizeof(gFactoryCfg.manufacturerSer));
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	return true;
 #endif
@@ -375,13 +375,13 @@ return true;
 static bool rfCmd_readSendPeriod(void)
 {
 #if 0
-	gTxPacket.payload[6] = 4;
-	gTxPacket.payload[7] = gCustomerCfg.sendingPeriod & 0xff;
-	gTxPacket.payload[8] = (gCustomerCfg.sendingPeriod >> 8) & 0xff;
-	gTxPacket.payload[9] = (gCustomerCfg.sendingPeriod >> 16) & 0xff;
-	gTxPacket.payload[10] = (gCustomerCfg.sendingPeriod >> 24) & 0xff;
-	gTxPacket.payload[11] = gRxPacket.rssi;
-	gTxPacket.payload[12] = 0;
+	gTxPayload[6] = 4;
+	gTxPayload[7] = gCustomerCfg.sendingPeriod & 0xff;
+	gTxPayload[8] = (gCustomerCfg.sendingPeriod >> 8) & 0xff;
+	gTxPayload[9] = (gCustomerCfg.sendingPeriod >> 16) & 0xff;
+	gTxPayload[10] = (gCustomerCfg.sendingPeriod >> 24) & 0xff;
+	gTxPayload[11] = gRxPacket.rssi;
+	gTxPayload[12] = 0;
 	gTxPacket.len = 13;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -410,13 +410,13 @@ return true;
 static bool rfCmd_readSavePeriod(void)
 {
 #if 0
-	gTxPacket.payload[6] = 4;
-	gTxPacket.payload[7] = gCustomerCfg.savingPeriod & 0xff;
-	gTxPacket.payload[8] = (gCustomerCfg.savingPeriod >> 8) & 0xff;
-	gTxPacket.payload[9] = (gCustomerCfg.savingPeriod >> 16) & 0xff;
-	gTxPacket.payload[10] = (gCustomerCfg.savingPeriod >> 24) & 0xff;
-	gTxPacket.payload[11] = gRxPacket.rssi;
-	gTxPacket.payload[12] = 0;
+	gTxPayload[6] = 4;
+	gTxPayload[7] = gCustomerCfg.savingPeriod & 0xff;
+	gTxPayload[8] = (gCustomerCfg.savingPeriod >> 8) & 0xff;
+	gTxPayload[9] = (gCustomerCfg.savingPeriod >> 16) & 0xff;
+	gTxPayload[10] = (gCustomerCfg.savingPeriod >> 24) & 0xff;
+	gTxPayload[11] = gRxPacket.rssi;
+	gTxPayload[12] = 0;
 	gTxPacket.len = 13;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -438,10 +438,10 @@ return true;
 static bool rfCmd_readState(void)
 {
 #if 0
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gCustomerCfg.workingMode;
-	gTxPacket.payload[8] = 0;
-	gTxPacket.payload[9] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gCustomerCfg.workingMode;
+	gTxPayload[8] = 0;
+	gTxPayload[9] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -490,10 +490,6 @@ return true;
 static bool rfCmd_sysCall(void)	//reply to 
 {
 #if 0
-#ifdef UART_DEBUG_DISPLAY
-	Display_printf(displayHandle, 0, 0, "sysCall.\r\n");
-#endif
-return true;
 	if (gCustomerCfg.customerSer.year == defaultCustomerCfg.customerSer.year
 		&&gCustomerCfg.customerSer.flag[0] == defaultCustomerCfg.customerSer.flag[0]
 		&&gCustomerCfg.customerSer.flag[1] == defaultCustomerCfg.customerSer.flag[1]
@@ -503,16 +499,16 @@ return true;
 		replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	else
 	{
-		gTxPacket.payload[6] = 5;
-		memcpy(&(gTxPacket.payload[7]), &(gCustomerCfg.customerSer), sizeof(ProductSerial_s));
-		gTxPacket.payload[12] = gRxPacket.rssi;
-		gTxPacket.payload[13] = 0;
+		gTxPayload[6] = 5;
+		memcpy(&(gTxPayload[7]), &(gCustomerCfg.customerSer), sizeof(ProductSerial_s));
+		gTxPayload[12] = gRxPacket.rssi;
+		gTxPayload[13] = 0;
 		gTxPacket.len = 14;
 		EasyLink_transmit(&gTxPacket);
 	}
-	return true;
 #endif
-return true;
+	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
+	return true;
 }
 
 static bool rfCmd_caliTemp(void)
@@ -551,16 +547,16 @@ static bool rfCmd_getCaliTempPara(void)
 	int32_t k_t, y_t;
 	k_t = (int32_t)(gFactoryCfg.calibration.temperature_k * 1.0e8);
 	y_t = (int32_t)(gFactoryCfg.calibration.temperature_y * 1.0e4);
-	gTxPacket.payload[6] = 8;
-	gTxPacket.payload[7] = BYTE0_OF(k_t);
-	gTxPacket.payload[8] = BYTE1_OF(k_t);
-	gTxPacket.payload[9] = BYTE2_OF(k_t);
-	gTxPacket.payload[10] = BYTE3_OF(k_t);
-	gTxPacket.payload[11] = BYTE0_OF(y_t);
-	gTxPacket.payload[12] = BYTE1_OF(y_t);
-	gTxPacket.payload[13] = BYTE2_OF(y_t);
-	gTxPacket.payload[14] = BYTE3_OF(y_t);
-	gTxPacket.payload[15] = gRxPacket.rssi;
+	gTxPayload[6] = 8;
+	gTxPayload[7] = BYTE0_OF(k_t);
+	gTxPayload[8] = BYTE1_OF(k_t);
+	gTxPayload[9] = BYTE2_OF(k_t);
+	gTxPayload[10] = BYTE3_OF(k_t);
+	gTxPayload[11] = BYTE0_OF(y_t);
+	gTxPayload[12] = BYTE1_OF(y_t);
+	gTxPayload[13] = BYTE2_OF(y_t);
+	gTxPayload[14] = BYTE3_OF(y_t);
+	gTxPayload[15] = gRxPacket.rssi;
 	gTxPacket.len = 16;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -612,26 +608,26 @@ return true;
 static bool rfCmd_getCaliTemp4T(void)
 {
 #if 0
-	gTxPacket.payload[6] = 16;
+	gTxPayload[6] = 16;
 	//TODO: plus 10000
-	gTxPacket.payload[7] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureM40);
-	gTxPacket.payload[8] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureM40);
-	gTxPacket.payload[9] = BYTE0_OF(gFactoryCfg.calibration.temperature1);
-	gTxPacket.payload[10] = BYTE1_OF(gFactoryCfg.calibration.temperature1);
-	gTxPacket.payload[12] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureM10);
-	gTxPacket.payload[13] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureM10);
-	gTxPacket.payload[14] = BYTE0_OF(gFactoryCfg.calibration.temperature2);
-	gTxPacket.payload[15] = BYTE1_OF(gFactoryCfg.calibration.temperature2);
-	gTxPacket.payload[16] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureP25);
-	gTxPacket.payload[17] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureP25);
-	gTxPacket.payload[18] = BYTE0_OF(gFactoryCfg.calibration.temperature3);
-	gTxPacket.payload[19] = BYTE1_OF(gFactoryCfg.calibration.temperature3);
-	gTxPacket.payload[20] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureP60);
-	gTxPacket.payload[21] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureP60);
-	gTxPacket.payload[22] = BYTE0_OF(gFactoryCfg.calibration.temperature4);
-	gTxPacket.payload[23] = BYTE1_OF(gFactoryCfg.calibration.temperature4);
-	gTxPacket.payload[24] = gRxPacket.rssi;
-	gTxPacket.payload[25] = 0;
+	gTxPayload[7] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureM40);
+	gTxPayload[8] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureM40);
+	gTxPayload[9] = BYTE0_OF(gFactoryCfg.calibration.temperature1);
+	gTxPayload[10] = BYTE1_OF(gFactoryCfg.calibration.temperature1);
+	gTxPayload[12] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureM10);
+	gTxPayload[13] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureM10);
+	gTxPayload[14] = BYTE0_OF(gFactoryCfg.calibration.temperature2);
+	gTxPayload[15] = BYTE1_OF(gFactoryCfg.calibration.temperature2);
+	gTxPayload[16] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureP25);
+	gTxPayload[17] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureP25);
+	gTxPayload[18] = BYTE0_OF(gFactoryCfg.calibration.temperature3);
+	gTxPayload[19] = BYTE1_OF(gFactoryCfg.calibration.temperature3);
+	gTxPayload[20] = BYTE0_OF(gFactoryCfg.calibration.adcTemperatureP60);
+	gTxPayload[21] = BYTE1_OF(gFactoryCfg.calibration.adcTemperatureP60);
+	gTxPayload[22] = BYTE0_OF(gFactoryCfg.calibration.temperature4);
+	gTxPayload[23] = BYTE1_OF(gFactoryCfg.calibration.temperature4);
+	gTxPayload[24] = gRxPacket.rssi;
+	gTxPayload[25] = 0;
 	gTxPacket.len = 26;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -651,10 +647,10 @@ return true;
 static bool rfCmd_getTempCaliMethod(void)
 {
 #if 0
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gFactoryCfg.calibration.temperatureConvertingMethod;
-	gTxPacket.payload[8] = gRxPacket.rssi;
-	gTxPacket.payload[9] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gFactoryCfg.calibration.temperatureConvertingMethod;
+	gTxPayload[8] = gRxPacket.rssi;
+	gTxPayload[9] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -764,11 +760,11 @@ static bool rfCmd_getCaliHumiPara(void)
 	int16_t a_shift, b_shift;
 	a_shift = (int16_t)(gFactoryCfg.calibration.humidity_a_shift * 1.0e5);
 	b_shift = (int16_t)(gFactoryCfg.calibration.humidity_b_shift * 1.0e6);
-	gTxPacket.payload[6] = 4;
-	gTxPacket.payload[7] = BYTE0_OF(a_shift);
-	gTxPacket.payload[8] = BYTE1_OF(a_shift);
-	gTxPacket.payload[9] =  BYTE0_OF(b_shift);
-	gTxPacket.payload[10] = BYTE1_OF(b_shift);
+	gTxPayload[6] = 4;
+	gTxPayload[7] = BYTE0_OF(a_shift);
+	gTxPayload[8] = BYTE1_OF(a_shift);
+	gTxPayload[9] =  BYTE0_OF(b_shift);
+	gTxPayload[10] = BYTE1_OF(b_shift);
 	gTxPacket.len = 11;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -812,17 +808,17 @@ static bool rfCmd_getCaliPresPara(void)
 	int32_t k_t, y_t;
 	k_t = (int32_t)(gFactoryCfg.calibration.pressure_k * 1.0e8);
 	y_t = (int32_t)(gFactoryCfg.calibration.pressure_y * 1.0e4);
-	gTxPacket.payload[6] = 8;
-	gTxPacket.payload[7] = BYTE0_OF(k_t);
-	gTxPacket.payload[8] = BYTE1_OF(k_t);
-	gTxPacket.payload[9] = BYTE2_OF(k_t);
-	gTxPacket.payload[10] = BYTE3_OF(k_t);
-	gTxPacket.payload[11] = BYTE0_OF(y_t);
-	gTxPacket.payload[12] = BYTE1_OF(y_t);
-	gTxPacket.payload[13] = BYTE2_OF(y_t);
-	gTxPacket.payload[14] = BYTE3_OF(y_t);
-	gTxPacket.payload[15] = gRxPacket.rssi;
-	gTxPacket.payload[16] = 0;
+	gTxPayload[6] = 8;
+	gTxPayload[7] = BYTE0_OF(k_t);
+	gTxPayload[8] = BYTE1_OF(k_t);
+	gTxPayload[9] = BYTE2_OF(k_t);
+	gTxPayload[10] = BYTE3_OF(k_t);
+	gTxPayload[11] = BYTE0_OF(y_t);
+	gTxPayload[12] = BYTE1_OF(y_t);
+	gTxPayload[13] = BYTE2_OF(y_t);
+	gTxPayload[14] = BYTE3_OF(y_t);
+	gTxPayload[15] = gRxPacket.rssi;
+	gTxPayload[16] = 0;
 	gTxPacket.len = 17;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -845,10 +841,10 @@ return true;
 static bool rfCmd_getCalipressureMethod(void)
 {
 #if 0
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gFactoryCfg.calibration.pressConvertingMethod;
-	gTxPacket.payload[8] = gRxPacket.rssi;
-	gTxPacket.payload[9] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gFactoryCfg.calibration.pressConvertingMethod;
+	gTxPayload[8] = gRxPacket.rssi;
+	gTxPayload[9] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -936,18 +932,18 @@ static bool rfCmd_getPressureCaliParaWithTemperature(void)
 			y_t = (int32_t)(gFactoryCfg.calibration.pressure_y_P50 * 1.0e4);
 			break;
 	}
-	gTxPacket.payload[6] = 9;
-	gTxPacket.payload[7] = index;
+	gTxPayload[6] = 9;
+	gTxPayload[7] = index;
 
-	gTxPacket.payload[8] = BYTE0_OF(k_t);
-	gTxPacket.payload[9] = BYTE1_OF(k_t);
-	gTxPacket.payload[10] = BYTE2_OF(k_t);
-	gTxPacket.payload[11] = BYTE3_OF(k_t);
-	gTxPacket.payload[12] = BYTE0_OF(y_t);
-	gTxPacket.payload[13] = BYTE1_OF(y_t);
-	gTxPacket.payload[14] = BYTE2_OF(y_t);
-	gTxPacket.payload[15] = BYTE3_OF(y_t);
-	gTxPacket.payload[16] = gRxPacket.rssi;
+	gTxPayload[8] = BYTE0_OF(k_t);
+	gTxPayload[9] = BYTE1_OF(k_t);
+	gTxPayload[10] = BYTE2_OF(k_t);
+	gTxPayload[11] = BYTE3_OF(k_t);
+	gTxPayload[12] = BYTE0_OF(y_t);
+	gTxPayload[13] = BYTE1_OF(y_t);
+	gTxPayload[14] = BYTE2_OF(y_t);
+	gTxPayload[15] = BYTE3_OF(y_t);
+	gTxPayload[16] = gRxPacket.rssi;
 	gTxPacket.len = 17;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -983,10 +979,10 @@ return true;
 static bool rfCmd_getDebugMode(void)
 {
 #if 0
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gFactoryCfg.debugMode;
-	gTxPacket.payload[8] = gRxPacket.rssi;
-	gTxPacket.payload[9] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gFactoryCfg.debugMode;
+	gTxPayload[8] = gRxPacket.rssi;
+	gTxPayload[9] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 	
@@ -1027,10 +1023,10 @@ static bool rfCmd_getSniffingInterval(void)
 	Display_printf(displayHandle, 0, 0, "get sniffing %d\r\n", gCustomerCfg.sniffingPeriod);
 #endif
 return true;
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gCustomerCfg.sniffingPeriod;
-	gTxPacket.payload[8] = gRxPacket.rssi;
-	gTxPacket.payload[9] = 0;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gCustomerCfg.sniffingPeriod;
+	gTxPayload[8] = gRxPacket.rssi;
+	gTxPayload[9] = 0;
 	gTxPacket.len = 10;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -1063,15 +1059,15 @@ static bool rfCmd_getFlashIndex(void)
 	Display_printf(displayHandle, 0, 0, "set Index save: %d, send: %d\r\n", gDataOperationParameter.saveIndex, gDataOperationParameter.sendIndex);
 #endif
 return true;
-	gTxPacket.payload[6] = 8;
-	gTxPacket.payload[7] = BYTE0_OF(gDataOperationParameter.saveIndex);
-	gTxPacket.payload[8] = BYTE1_OF(gDataOperationParameter.saveIndex);
-	gTxPacket.payload[9] = BYTE2_OF(gDataOperationParameter.saveIndex);
-	gTxPacket.payload[10] = BYTE3_OF(gDataOperationParameter.saveIndex);
-	gTxPacket.payload[11] = BYTE0_OF(gDataOperationParameter.sendIndex);
-	gTxPacket.payload[12] = BYTE1_OF(gDataOperationParameter.sendIndex);
-	gTxPacket.payload[13] = BYTE2_OF(gDataOperationParameter.sendIndex);
-	gTxPacket.payload[14] = BYTE3_OF(gDataOperationParameter.sendIndex);
+	gTxPayload[6] = 8;
+	gTxPayload[7] = BYTE0_OF(gDataOperationParameter.saveIndex);
+	gTxPayload[8] = BYTE1_OF(gDataOperationParameter.saveIndex);
+	gTxPayload[9] = BYTE2_OF(gDataOperationParameter.saveIndex);
+	gTxPayload[10] = BYTE3_OF(gDataOperationParameter.saveIndex);
+	gTxPayload[11] = BYTE0_OF(gDataOperationParameter.sendIndex);
+	gTxPayload[12] = BYTE1_OF(gDataOperationParameter.sendIndex);
+	gTxPayload[13] = BYTE2_OF(gDataOperationParameter.sendIndex);
+	gTxPayload[14] = BYTE3_OF(gDataOperationParameter.sendIndex);
 	gTxPacket.len = 15;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -1110,8 +1106,8 @@ return true;
 static bool rfCmd_getIdleTimeout(void)
 {
 #if 0
-	gTxPacket.payload[6] = 1;
-	gTxPacket.payload[7] = gFactoryCfg.idleTimeout;
+	gTxPayload[6] = 1;
+	gTxPayload[7] = gFactoryCfg.idleTimeout;
 	gTxPacket.len = 8;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -1123,21 +1119,21 @@ static bool rfCmd_getAccelerometer(void)
 {
 #if 0
 	ADXL355_dataScan();
-	gTxPacket.payload[6] = 12;
-	gTxPacket.payload[7 ] = BYTE0_OF(i32SensorX);
-	gTxPacket.payload[8 ] = BYTE1_OF(i32SensorX);
-	gTxPacket.payload[9 ] = BYTE2_OF(i32SensorX);
-	gTxPacket.payload[10] = BYTE3_OF(i32SensorX);
-	gTxPacket.payload[11] = BYTE0_OF(i32SensorY);
-	gTxPacket.payload[12] = BYTE1_OF(i32SensorY);
-	gTxPacket.payload[13] = BYTE2_OF(i32SensorY);
-	gTxPacket.payload[14] = BYTE3_OF(i32SensorY);
-	gTxPacket.payload[15] = BYTE0_OF(i32SensorZ);
-	gTxPacket.payload[16] = BYTE1_OF(i32SensorZ);
-	gTxPacket.payload[17] = BYTE2_OF(i32SensorZ);
-	gTxPacket.payload[18] = BYTE3_OF(i32SensorZ);
-	gTxPacket.payload[19] = gRxPacket.rssi;
-	gTxPacket.payload[20] = 0;
+	gTxPayload[6] = 12;
+	gTxPayload[7 ] = BYTE0_OF(i32SensorX);
+	gTxPayload[8 ] = BYTE1_OF(i32SensorX);
+	gTxPayload[9 ] = BYTE2_OF(i32SensorX);
+	gTxPayload[10] = BYTE3_OF(i32SensorX);
+	gTxPayload[11] = BYTE0_OF(i32SensorY);
+	gTxPayload[12] = BYTE1_OF(i32SensorY);
+	gTxPayload[13] = BYTE2_OF(i32SensorY);
+	gTxPayload[14] = BYTE3_OF(i32SensorY);
+	gTxPayload[15] = BYTE0_OF(i32SensorZ);
+	gTxPayload[16] = BYTE1_OF(i32SensorZ);
+	gTxPayload[17] = BYTE2_OF(i32SensorZ);
+	gTxPayload[18] = BYTE3_OF(i32SensorZ);
+	gTxPayload[19] = gRxPacket.rssi;
+	gTxPayload[20] = 0;
 	gTxPacket.len = 21;
 	EasyLink_transmit(&gTxPacket);
 	return true;
@@ -1148,33 +1144,31 @@ return true;
 
 static bool rfCmd_version(void)
 {
-#if 0
-	gTxPacket.payload[6] = 3;
-	gTxPacket.payload[7] = VER_MAJOR;
-	gTxPacket.payload[8] = VER_MINOR;
-	gTxPacket.payload[9] = VER_PATCH;
-	gTxPacket.payload[10] = gRxPacket.rssi;
-	gTxPacket.payload[11] = 0;
-	gTxPacket.len = 12;
-	EasyLink_transmit(&gTxPacket);
+	uint8_t len;
+	gTxPayload[RF_CMD_INDEX + 1] = 3;
+	gTxPayload[RF_CMD_INDEX + 2] = VER_MAJOR;
+	gTxPayload[RF_CMD_INDEX + 3] = VER_MINOR;
+	gTxPayload[RF_CMD_INDEX + 4] = VER_PATCH;
+	gTxPayload[RF_CMD_INDEX + 5] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 6] = 0;
+	len = RF_CMD_INDEX + 7;
+	RF_TxPacket(gTxPayload, len, 20);
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_testRf(void)
 {
 #if 0
-	gTxPacket.payload[6] = 3;
-	gTxPacket.payload[7] = 1;
-	gTxPacket.payload[8] = gRxPacket.payload[8];
-	gTxPacket.payload[9] = gRxPacket.payload[9];
-	gTxPacket.payload[10] = gRxPacket.rssi;
-	gTxPacket.payload[11] = 0;
+	gTxPayload[6] = 3;
+	gTxPayload[7] = 1;
+	gTxPayload[8] = gRxPacket.payload[8];
+	gTxPayload[9] = gRxPacket.payload[9];
+	gTxPayload[10] = gRxPacket.rssi;
+	gTxPayload[11] = 0;
 	gTxPacket.len = 12;
 	EasyLink_transmit(&gTxPacket);
 #ifdef UART_DEBUG_DISPLAY
-	Display_printf(displayHandle, 0, 0, "test %d, %d\r\n", gTxPacket.payload[8], gTxPacket.payload[9]);
+	Display_printf(displayHandle, 0, 0, "test %d, %d\r\n", gTxPayload[8], gTxPayload[9]);
 #endif
 return true;
 	return true;
@@ -1226,12 +1220,13 @@ return true;
 CmdDict_s cmdDict [] = 
 {
 //	sysGlobalWKUPCmd,	rfCmd_wakeup,
+	sysCallCmd,			rfCmd_sysCall,	//syscall move to the formost for faster response
 	sysGlobalSleepCmd,	rfCmd_sleep,
 	sysGlobalReadDBCmd,	rfCmd_readDB,
 
-   sysLocationDataSet,		rfCmd_locationDataSet,
-   sysLocationDataReadAll,	rfCmd_locationDataReadAll,
-   sysLocationDataDeleteAll, rfCmd_locationDataDeleteAll,
+//   sysLocationDataSet,		rfCmd_locationDataSet,
+//   sysLocationDataReadAll,	rfCmd_locationDataReadAll,
+//   sysLocationDataDeleteAll, rfCmd_locationDataDeleteAll,
 
 //	sysWKUPCmd,			rfCmd_wakeup,
 	sysOnceSampleCmd,	rfCmd_onceSample,
@@ -1254,7 +1249,6 @@ CmdDict_s cmdDict [] =
 	sysGetCustomerSer,	rfCmd_getCustomerSer,
 
 	sysCallStatusCmd,	rfCmd_callStatus,
-	sysCallCmd,			rfCmd_sysCall,
 
 	sysCaliTempCmd,     rfCmd_caliTemp,
 	sysGetCaliTempParaCmd, rfCmd_getCaliTempPara, 
@@ -1294,36 +1288,12 @@ CmdDict_s cmdDict [] =
 /* ---------------pulic functions---------------- */
 void rfCmdProc_processCmd()
 {
-#if 0
 	int i;
-#ifdef UART_DEBUG_DISPLAY
-//	Display_printf(displayHandle, 0, 0, "payload[4-5]: %02x %02x", gRxPacket.payload[4], gRxPacket.payload[5]);
-#endif
-
-	if (isOwnAddr())
-	{
-		cmdType = CMDTYPE_SINGLE;
-	}
-	else if (isBroadcastAddr())
-	{
-		cmdType = CMDTYPE_BROADCAST;
-	}
-	else
-	{
-		cmdType = CMDTYPE_NONE;
-	    return ;    //do nothing
-	}
-
-
-	if (gSensorState == sysStateSleep)
-	{
-		//only accept wakeup command.
-		if (gRxPacket.payload[RF_CMD_INDEX] == sysGlobalWKUPCmd ||
+	//do nothing when receive wakeup command in wakeup state;
+	if (gRxPacket.payload[RF_CMD_INDEX] == sysGlobalWKUPCmd ||
 			gRxPacket.payload[RF_CMD_INDEX] == sysWKUPCmd)
-		{
-			rfCmd_wakeup();
-			Event_post(stateEvent, STATEEVENT_WAKEUP);
-		}
+	{
+		return ;
 	}
 	else
 	{
@@ -1331,14 +1301,12 @@ void rfCmdProc_processCmd()
 		{
 			if (gRxPacket.payload[RF_CMD_INDEX] == cmdDict[i].cmd)
 			{
-				gTxPacket.payload[RF_CMD_INDEX] = gRxPacket.payload[RF_CMD_INDEX];
+				gTxPayload[RF_CMD_INDEX] = gRxPacket.payload[RF_CMD_INDEX];
 				cmdDict[i].pFunc();
-				Event_post(stateEvent, STATEEVENT_VALID_COMMAND_RECEIVED);
 				break;
 			}
 		}
 	}
-#endif
 }
 
 void rfCmdProc_sendOneRecord(Record_s record)
@@ -1349,20 +1317,20 @@ void rfCmdProc_sendOneRecord(Record_s record)
 
 	gTxPacket.len = 24;
 
-	gTxPacket.payload[5] = 16;//TODO: the definition of data len
-	memcpy(&gTxPacket.payload[6], (void *)&record, sizeof(SensorData_s));
-	gTxPacket.payload[14] = record.rtcTime.year;
-	gTxPacket.payload[15] = record.rtcTime.month;
-	gTxPacket.payload[16] = record.rtcTime.date;
-	gTxPacket.payload[17] = record.rtcTime.hour;
-	gTxPacket.payload[18] = record.rtcTime.minute;
-	gTxPacket.payload[19] = record.rtcTime.second;
-	gTxPacket.payload[20] = frame_count & 0xff;
-	gTxPacket.payload[21] = (frame_count >> 8) & 0xff;
+	gTxPayload[5] = 16;//TODO: the definition of data len
+	memcpy(&gTxPayload[6], (void *)&record, sizeof(SensorData_s));
+	gTxPayload[14] = record.rtcTime.year;
+	gTxPayload[15] = record.rtcTime.month;
+	gTxPayload[16] = record.rtcTime.date;
+	gTxPayload[17] = record.rtcTime.hour;
+	gTxPayload[18] = record.rtcTime.minute;
+	gTxPayload[19] = record.rtcTime.second;
+	gTxPayload[20] = frame_count & 0xff;
+	gTxPayload[21] = (frame_count >> 8) & 0xff;
 	frame_count++;
 //	crc = cal_crc
-	gTxPacket.payload[22] = 0;
-	gTxPacket.payload[23] = 0;
+	gTxPayload[22] = 0;
+	gTxPayload[23] = 0;
 	EasyLink_transmit(&gTxPacket);
 
 	//switch tx addr back
@@ -1379,93 +1347,27 @@ void rfCmdProc_activeSendRecord(Record_s record)
 
 	gTxPacket.len = 24;
 
-	gTxPacket.payload[5] = 16;//TODO: the definition of data len
-//	memcpy(&gTxPacket.payload[6], (void *)&record, sizeof(Record_s));
-	memcpy(&gTxPacket.payload[6], (void *)&record, sizeof(SensorData_s));
-	gTxPacket.payload[14] = record.rtcTime.year;
-	gTxPacket.payload[15] = record.rtcTime.month;
-	gTxPacket.payload[16] = record.rtcTime.date;
-	gTxPacket.payload[17] = record.rtcTime.hour;
-	gTxPacket.payload[18] = record.rtcTime.minute;
-	gTxPacket.payload[19] = record.rtcTime.second;
-	gTxPacket.payload[20] = 0xff;		//TODO, for period sending, frame count always 0xffff 
-	gTxPacket.payload[21] = 0xff;
+	gTxPayload[5] = 16;//TODO: the definition of data len
+//	memcpy(&gTxPayload[6], (void *)&record, sizeof(Record_s));
+	memcpy(&gTxPayload[6], (void *)&record, sizeof(SensorData_s));
+	gTxPayload[14] = record.rtcTime.year;
+	gTxPayload[15] = record.rtcTime.month;
+	gTxPayload[16] = record.rtcTime.date;
+	gTxPayload[17] = record.rtcTime.hour;
+	gTxPayload[18] = record.rtcTime.minute;
+	gTxPayload[19] = record.rtcTime.second;
+	gTxPayload[20] = 0xff;		//TODO, for period sending, frame count always 0xffff 
+	gTxPayload[21] = 0xff;
 	frame_count++;
 //	crc = cal_crc
-	gTxPacket.payload[22] = 0;
-	gTxPacket.payload[23] = 0;
+	gTxPayload[22] = 0;
+	gTxPayload[23] = 0;
 	Event_post(rfEvent, RFEVENT_TRANSFER);
 
 	//TODO, add handshake protocol to confirm successful sending.
 #endif
 }
 /* --------------------end fo public function------------------------- */
-
-bool isOwnAddr(void)
-{
-#if 0
-	//for backward compatibility, just check payload[4]: number
-//	return (gRxPacket.payload[4] == gFactoryCfg.manufacturerSer.number);
-	return ((gRxPacket.payload[0] == 0)
-		&& (gRxPacket.payload[1] == 0)
-		&& (gRxPacket.payload[2] == 0)
-		&& (gRxPacket.payload[4] == gFactoryCfg.manufacturerSer.number))
-		|| ((gRxPacket.payload[0] == gFactoryCfg.manufacturerSer.year)
-		&& (gRxPacket.payload[1] == gFactoryCfg.manufacturerSer.flag[0])
-		&& (gRxPacket.payload[2] == gFactoryCfg.manufacturerSer.flag[1])
-		&& (gRxPacket.payload[3] == gFactoryCfg.manufacturerSer.batch)
-		&& (gRxPacket.payload[4] == gFactoryCfg.manufacturerSer.number));
-//		|| ((gRxPacket.payload[0] == gCustomerCfg.customerSer.year)
-//		&& (gRxPacket.payload[1] == gCustomerCfg.customerSer.flag[0])
-//		&& (gRxPacket.payload[2] == gCustomerCfg.customerSer.flag[1])
-//		&& (gRxPacket.payload[3] == gCustomerCfg.customerSer.batch)
-//		&& (gRxPacket.payload[4] == gCustomerCfg.customerSer.number));
-#endif
-}
-bool isBroadcastAddr(void)
-{
-#if 0
-//	return (gRxPacket.payload[0] == 0x00 && gRxPacket.payload[1] == 0x00 && gRxPacket.payload[2] == 0x00 && gRxPacket.payload[3] == 0x00 && gRxPacket.payload[4] == 0x00);
-	if (gRxPacket.payload[0] == 0x00 && gRxPacket.payload[1] == 0x00 && gRxPacket.payload[2] == 0x00 && gRxPacket.payload[3] == 0x00 && gRxPacket.payload[4] == 0x00)
-	{
-		return true;
-	}
-	else if (gFactoryCfg.manufacturerSer.flag[0] > 0 && gFactoryCfg.manufacturerSer.flag[1] == 0)	//8359 id
-	{
-		return (gRxPacket.payload[0] == 0x00) && (gRxPacket.payload[1] == 0x01) && (gRxPacket.payload[2] == 0x00) && (gRxPacket.payload[3] == 0x00) && (gRxPacket.payload[4] == 0x00);
-	}
-	else if (gFactoryCfg.manufacturerSer.flag[0] >= 'A' && gFactoryCfg.manufacturerSer.flag[1] > 0) //206 id
-	{
-		return (gRxPacket.payload[0] == 0x00) && (gRxPacket.payload[1] >= 0x41) && (gRxPacket.payload[2] == 0x00) && (gRxPacket.payload[3] == 0x00) && (gRxPacket.payload[4] == 0x00);
-	}
-	else
-		return false;
-#endif
-}
-
-bool isBatchAddr(void)
-{
-#if 0
-	if (gFactoryCfg.manufacturerSer.flag[0] > 0 && gFactoryCfg.manufacturerSer.flag[1] == 0)	//8359 id
-	{
-		return (gRxPacket.payload[0] == gFactoryCfg.manufacturerSer.year)
-			&& (gRxPacket.payload[1] == gFactoryCfg.manufacturerSer.flag[0])
-			&& (gRxPacket.payload[2] == 0)
-			&& (gRxPacket.payload[3] == 0)
-			&& (gRxPacket.payload[4] == 0);
-	}
-	else if (gFactoryCfg.manufacturerSer.flag[0] >= 'A' && gFactoryCfg.manufacturerSer.flag[1] > 0) //206 id
-	{
-		return (gRxPacket.payload[0] == gFactoryCfg.manufacturerSer.year)
-			&& (gRxPacket.payload[1] == gFactoryCfg.manufacturerSer.flag[0])
-			&& (gRxPacket.payload[2] == gFactoryCfg.manufacturerSer.flag[1])
-			&& (gRxPacket.payload[3] == 0)
-			&& (gRxPacket.payload[4] == 0);
-	}
-	else
-		return false;
-#endif
-}
 
 uint16_t cal_crc(unsigned char *ptr, unsigned char len)
 {
@@ -1496,16 +1398,21 @@ uint16_t cal_crc(unsigned char *ptr, unsigned char len)
 
 static void replyRfWriteCmdStatus(RFCmdStatus_e cmd_status)
 {
-#if 0
-	gTxPacket.payload[6] = 0x01;
-	gTxPacket.payload[7] = (uint8_t) cmd_status;
-	//TODO: the last two byte originally used as CRC, change to rssi later.
-	gTxPacket.payload[8] = gRxPacket.rssi;
-	gTxPacket.payload[9] = 0;
-	gTxPacket.len = 10;
-	EasyLink_transmit(&gTxPacket);
-	//TODO: for broadcast command, replay with TDMA
-#endif
+	uint8_t len;
+	gTxPayload[RF_CMD_INDEX + 1] = 0x01;
+	gTxPayload[RF_CMD_INDEX + 2] = (uint8_t) cmd_status;
+	gTxPayload[RF_CMD_INDEX + 3] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 4] = 0;
+	len = RF_CMD_INDEX + 5;
+	if (gRxPacket.cmdType == CMDTYPE_SINGLE)
+		RF_TxPacket(gTxPayload, len, 20);
+	else if (gRxPacket.cmdType == CMDTYPE_BROADCAST)	//delay short id time
+	{
+		delay1ms(10);
+		RF_TxPacket(gTxPayload, len, 20);
+	}
+//	gTxPacket.len = 10;
+//	EasyLink_transmit(&gTxPacket);
 }
 
 /* finish rf read command and then send via rf
@@ -1513,8 +1420,8 @@ static void replyRfWriteCmdStatus(RFCmdStatus_e cmd_status)
 static void replyRfReadCmd(int tail_index)
 {
 #if 0
-	gTxPacket.payload[tail_index] = gRxPacket.rssi;
-	gTxPacket.payload[tail_index + 1] = 0;
+	gTxPayload[tail_index] = gRxPacket.rssi;
+	gTxPayload[tail_index + 1] = 0;
 	gTxPacket.len = tail_index + 2;
 	EasyLink_transmit(&gTxPacket);
 #endif

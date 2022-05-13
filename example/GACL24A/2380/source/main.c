@@ -75,7 +75,7 @@ int32_t main(void)
 	rxresult = RF_RxValidPacket(10000);
 	if (rxresult == RF_RX_DONE)	//into wakeup state
 	{
-//		rfCmdProc_processCmd();
+		rfCmdProc_processCmd();
 //		RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
 		sysState = sysStateWakeup;
 	}
@@ -100,7 +100,7 @@ int32_t main(void)
 			rxresult = RF_RxValidPacket(20000);
 			if (rxresult == RF_RX_DONE)	//into wakeup state
 			{
-				//		rfCmdProc_processCmd();
+				rfCmdProc_processCmd();
 //				RF_TxPacket(gTxPacket, 12, 10);	//just test call cmd
 			}
 		}

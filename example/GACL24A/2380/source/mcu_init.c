@@ -31,7 +31,7 @@ CLK_Init(void)
 {
 	stc_clk_systickcfg_t stcCfg;
 	int i;
-	Clk_SetRCHFreq(ClkFreq16Mhz);
+	Clk_SetRCHFreq(ClkFreq24Mhz);
 
 	Clk_SetHClkDiv(ClkDiv1);
 	Clk_SetPClkDiv(ClkDiv1);
