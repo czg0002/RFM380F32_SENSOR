@@ -16,9 +16,12 @@
  * =====================================================================================
  */
 #include <stdint.h>
-#include "mcu_init.h"
 #include "gpio.h"
+#include "clk.h"
+#include "i2c.h"
+#include "rtc.h"
 #include "gpio_setting.h"
+#include "mcu_init.h"
 
 /*
  * ===  FUNCTION  ======================================================================

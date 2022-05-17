@@ -88,7 +88,7 @@ typedef struct stc_i2c_config
  //字节写函数
  en_result_t I2C_WriteByte(uint8_t u8Data);
  //主接收函数
- en_result_t I2C_MasterReadData(uint8_t u8DevAddr,uint8_t *pu8Data,uint8_t u8Addr,uint32_t u32Len);
+ en_result_t I2C_MasterReadData(uint8_t u8DevAddr, uint8_t u8Addr, uint8_t *pu8Data, uint32_t u32Len);
  en_result_t I2C_MasterReadEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
 
   //主接收函数

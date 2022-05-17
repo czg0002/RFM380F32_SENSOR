@@ -426,7 +426,7 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
  ** \retval 读数据是否成功
  **
  ******************************************************************************/
- en_result_t I2C_MasterReadData(uint8_t u8DevAddr,uint8_t *pu8Data,uint8_t u8Addr,uint32_t u32Len)
+ en_result_t I2C_MasterReadData(uint8_t u8DevAddr, uint8_t u8Addr, uint8_t *pu8Data, uint32_t u32Len)
 {
     en_result_t enRet = Error;
     uint8_t u8i=0,u8State;
