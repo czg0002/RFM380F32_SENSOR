@@ -59,90 +59,6 @@ uint8_t u8Senddata[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00};
 uint8_t u8Recdata[10]={0x00};
 uint8_t u8DevAddr = 0x50;	//7 bit addr, left shit 1 in function para
 
- void FlashInt(void)
- {
-    if (TRUE == Flash_GetIntFlag(flash_int0))
-    {
-        Flash_ClearIntFlag(flash_int0);
-        Flash_DisableIrq(flash_int0);
-    }
-    if (TRUE == Flash_GetIntFlag(flash_int1))
-    {
-        Flash_ClearIntFlag(flash_int1);
-        Flash_DisableIrq(flash_int1);
-    }
-      
- }
-
-en_result_t FlashWriteTest(void)
-{
-    en_result_t       enResult = Error;
-    uint32_t          u32Addr  = 0x7e00;
-    uint8_t           u8Data   = 0x5a;
-    uint16_t          u16Data  = 0x5a5a;
-    uint32_t          u32Data  = 0x5a5a5a5a;
-
-    Flash_Init(FlashInt, 0);
-    
-    Flash_SectorErase(u32Addr);
-    
-    enResult = Flash_WriteByte(u32Addr, u8Data);
-    if (Ok == enResult)
-    {
-        if(*((volatile uint8_t*)u32Addr) == u8Data)
-        {
-            enResult = Ok;
-        }
-        else
-        {
-            return enResult;
-        }
-    }
-    else
-    {
-        enResult = Error;
-        return enResult;
-    }  
-
-    u32Addr += 2;
-    enResult = Flash_WriteHalfWord(u32Addr, u16Data);
-    if (Ok == enResult)
-    {
-        if(*((volatile uint16_t*)u32Addr) == u16Data)
-        {
-            enResult = Ok;
-        }
-        else
-        {
-            return enResult;
-        }
-    }
-    else
-    {
-        return enResult;
-    }
-
-    u32Addr += 2;
-    enResult = Flash_WriteWord(u32Addr, u32Data);
-    if (Ok == enResult)
-    {
-        if(*((volatile uint32_t*)u32Addr) == u32Data)
-        {
-            enResult = Ok;
-        }
-        else
-        {
-            return enResult;
-        }
-    }
-    else
-    {
-        return enResult;
-    }  
-    
-    return enResult;
-}
-
 int32_t main(void)
 {
 	uint32_t i;
@@ -153,19 +69,10 @@ int32_t main(void)
 	MCU_Init();
 	syssleep_init();
 	SystemCoreClockUpdate();
-	Gpio_SetIO(3, 3, 1);	//power control
+	Gpio_SetIO(3, 3, 0);	//power control
 	CMT2300A_Init();
 	CMT2300A_GoSleep();
 
-//	//test flash data
-//	{
-//		volatile uint8_t u8TestFlag = 0;
-//		
-//		if(Ok != FlashWriteTest())
-//		{
-//			u8TestFlag |= 0x01;
-//		}   
-//	}
 #if 0
 	//test i2c function
 	{
@@ -205,7 +112,6 @@ int32_t main(void)
 	}
 	while (1)
 	{
-
 		if (sysState == sysStateSleep)
 		{
 			syssleep_start(5);

@@ -37,6 +37,9 @@ typedef struct {
 	uint8_t FactorySerial[8];
 	uint8_t CustomerSerial[8];
 	uint8_t debugMode;
+	uint8_t sleepIntervalSeconds;	
+	uint8_t sniffingTimeMs;
+	uint8_t idleTimeoutMin;
 	Calibration_s caliPara;
 	uint8_t checksum;
 }FactoryCfg_s;
