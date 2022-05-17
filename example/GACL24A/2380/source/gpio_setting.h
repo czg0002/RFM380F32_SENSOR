@@ -53,4 +53,7 @@
 #define	P2PU_Data		0x00000000
 #define	P3PU_Data		0x00000000
 
+#define GPIO_EXTPOWER_ON() Gpio_SetIO(3, 3, 1)
+#define GPIO_EXTPOWER_OFF() Gpio_SetIO(3, 3, 0)
+
 #endif   /* ----- #ifndef gpio_setting_INC  ----- */

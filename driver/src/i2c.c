@@ -1,14 +1,4 @@
 /******************************************************************************/
-/** \file I2C.c
- **
- ** WDT function driver API.
- ** @link SampleGroup Some description @endlink
- **
- **   - 2017-06-13  1.0   First version for Device Driver Library of Module.
- **
- ******************************************************************************/
-
-/******************************************************************************/
 /* Include files                                                              */
 /******************************************************************************/
 #include "i2c.h"
@@ -170,11 +160,11 @@ uint8_t I2C_GetState(void)
  ** \retval I2C写成功与否状态
  **
  ******************************************************************************/
- en_result_t I2C_WriteSlaveAddr(stc_i2c_addr_t stcSlaveAddr)
+ en_result_t I2C_WriteSlaveAddr(stc_i2c_addr_t *pstcSlaveAddr)
 {
     en_result_t enRet = Error;
-    M0P_I2C->ADDR_f.I2CADR = stcSlaveAddr.Addr;
-    M0P_I2C->ADDR_f.GC = stcSlaveAddr.Gc;
+    M0P_I2C->ADDR_f.I2CADR = pstcSlaveAddr->Addr;
+    M0P_I2C->ADDR_f.GC = pstcSlaveAddr->Gc;
     enRet = Ok;
     return enRet;     
 }
@@ -218,20 +208,80 @@ uint8_t I2C_ReadByte(void)
  ** \retval 写数据是否成功
  **
  ******************************************************************************/
-en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
+en_result_t I2C_MasterWriteData(uint8_t u8DevAddr,uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
+{
+    en_result_t enRet = Error;
+    uint8_t u8i=0,u8State;
+    
+    I2C_SetFunc(I2cStart_En);
+	while(1)
+	{
+		while(0 == I2C_GetIrq())
+		{}
+		u8State = I2C_GetState();
+		switch(u8State)
+		{
+			case 0x08:
+				I2C_ClearFunc(I2cStart_En);
+				I2C_WriteByte(u8DevAddr);//从设备地址发送
+				break;
+			case 0x18:
+				I2C_WriteByte(u8Addr);//从设备内存地址发送
+				break;
+			case 0x28:	
+				I2C_WriteByte(pu8Data[u8i++]);
+				break;
+			case 0x20:
+			case 0x38:
+				I2C_SetFunc(I2cStart_En);
+				break;
+			case 0x30:
+				I2C_SetFunc(I2cStop_En);
+				break;
+			default:
+				break;
+		}			
+		if(u8i>u32Len)
+		{
+			I2C_SetFunc(I2cStop_En);//此顺序不能调换，出停止条件
+			I2C_ClearIrq();
+			break;
+		}
+		I2C_ClearIrq();			
+	}
+    enRet = Ok;
+    return enRet;
+}
+
+ /**
+ ******************************************************************************
+ ** \brief  主机发送函数
+ **
+ ** \param u16Addr从机内存地址，pu8Data写数据，u32Len写数据长度
+ ** note: u16Addr + u32len不能超过64byte边界
+ **
+ ** \retval 写数据是否成功
+ **
+ ******************************************************************************/
+ en_result_t I2C_MasterWriteEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len)
 {
     en_result_t enRet = Error;
     uint8_t u8i,u8State;
+	int i = 0, j = 0;
     
     I2C_SetFunc(I2cStart_En);
     
-    while(0 == I2C_GetIrq())
-    {}
-    u8State = I2C_GetState();
-    while(0x08 != u8State)//起始信号发送成功
-    {}
+	while(0 == I2C_GetIrq())	//TODO, add timeout counter
+	{
+		i++;
+	}
+	u8State = I2C_GetState();
+	while(0x08 != u8State)//起始信号发送成功
+	{
+		j++;
+	}
     I2C_ClearFunc(I2cStart_En);
-    I2C_WriteByte(I2c_SlaveWt);//从机地址发送OK
+    I2C_WriteByte(u8DevAddr);//从机地址发送OK
     I2C_ClearIrq();
     
     while(0 == I2C_GetIrq())
@@ -239,7 +289,7 @@ en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
     u8State = I2C_GetState();
     while(0x18 != u8State)
     {}
-    I2C_WriteByte(u8Addr);
+    I2C_WriteByte((u16Addr >> 8) & 0xff);
     I2C_ClearIrq();
     
     while(0 == I2C_GetIrq())
@@ -247,6 +297,16 @@ en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
     u8State = I2C_GetState();
     while(0x28 != u8State)
     {}
+
+    I2C_WriteByte(u16Addr >> 0xff);
+    I2C_ClearIrq();
+    
+    while(0 == I2C_GetIrq())
+    {}
+    u8State = I2C_GetState();
+    while(0x28 != u8State)
+    {}
+
     for(u8i = 0;u8i<u32Len;u8i++)
     {
         I2C_WriteByte(pu8Data[u8i]);
@@ -265,6 +325,7 @@ en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
     }
     enRet = Ok;
     return enRet;
+
 }
  /**
  ******************************************************************************
@@ -291,24 +352,21 @@ en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
             case 0xA8:
             case 0xB0:
                 I2C_WriteByte(pu8Data[u8i++]);
-                I2C_ClearIrq();
                 break;
             case 0xB8: 
             case 0xC8:               
-                I2C_WriteByte(pu8Data[u8i++]);
-                I2C_ClearIrq();                 
+                I2C_WriteByte(pu8Data[u8i++]);                
                 break;
-            
-            case 0xF8:
-                I2C_ClearIrq();
-                *u32Len = u8i;
-                break;
-             //case 0xC0:   
-            default:
-                I2C_ClearIrq();
+			case 0xC0://发送数据，接收非ACK
+				break;
+            default:               
                 return ErrorInvalidParameter; 
         }
-        u8State = I2C_GetState();
+		I2C_ClearIrq();
+		if(0xC0 == u8State)
+        {
+          return Ok;
+        }
     } 
  }
  /**
@@ -322,7 +380,6 @@ en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len)
  ******************************************************************************/
 en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
 {
-#if 1
     //en_result_t enRet = Error;
     uint8_t u8i=0,u8State;
     while(0 == I2C_GetIrq())
@@ -335,32 +392,29 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
         switch(u8State)
         {
             case 0x60:
-            case 0x68:
-            case 0x70:
+            case 0x68:    
             case 0x78:
-              I2C_ClearIrq();
-              break;
+            case 0x70:
+				break;
+			
             case 0x80:
-            case 0x90:               
-                pu8Data[u8i++] = I2C_ReadByte();
-                I2C_ClearIrq();                 
+            case 0x88://只读取一个字节情况:
+            case 0x90: 
+            case 0x98:
+                pu8Data[u8i++] = I2C_ReadByte();                
                 break;
-            //case 0x88:
-            //case 0x98:
-                //return Error;
             case 0xA0:
-                I2C_ClearIrq();
                 *pu32Len = u8i;
                 break;
-            default:
+            default:				
                 return ErrorInvalidParameter; 
         }
+		I2C_ClearIrq();
         if(0xA0 == u8State)
         {
           return Ok;
         }
    }
-#endif
 } 
 
 /**
@@ -372,7 +426,81 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
  ** \retval 读数据是否成功
  **
  ******************************************************************************/
- en_result_t I2C_MasterReadData(uint8_t *pu8Data,uint8_t u8Addr,uint32_t u32Len)
+ en_result_t I2C_MasterReadData(uint8_t u8DevAddr,uint8_t *pu8Data,uint8_t u8Addr,uint32_t u32Len)
+{
+    en_result_t enRet = Error;
+    uint8_t u8i=0,u8State;
+    
+    I2C_SetFunc(I2cStart_En);
+    
+	while(1)
+	{
+		while(0 == I2C_GetIrq())
+        {}
+		u8State = I2C_GetState();
+		switch(u8State)
+		{
+			case 0x08:
+				I2C_ClearFunc(I2cStart_En);
+				I2C_WriteByte(u8DevAddr);
+				break;
+			case 0x18:
+				I2C_WriteByte(u8Addr);
+				break;
+			case 0x28:
+				I2C_SetFunc(I2cStart_En);
+				break;
+			case 0x10:
+				I2C_ClearFunc(I2cStart_En);
+				I2C_WriteByte(u8DevAddr|0x01);//从机地址发送OK
+				break;
+			case 0x40:
+				if(u32Len>1)
+				{
+					I2C_SetFunc(I2cAck_En);
+				}
+				break;
+			case 0x50:
+				pu8Data[u8i++] = I2C_ReadByte();
+				if(u8i==u32Len-1)//倒数第二字节ACK清掉，最后字节不反馈ACK
+				{
+					I2C_ClearFunc(I2cAck_En);
+				}
+				break;
+			case 0x58:
+				pu8Data[u8i++] = I2C_ReadByte();
+				I2C_SetFunc(I2cStop_En);
+				break;	
+			case 0x38:
+				I2C_SetFunc(I2cStart_En);
+				break;
+			case 0x48:
+				I2C_SetFunc(I2cStop_En);
+				I2C_SetFunc(I2cStart_En);
+				break;
+			default:
+				I2C_SetFunc(I2cStart_En);//其他错误状态，重新发送起始条件
+				break;
+		}
+		I2C_ClearIrq();
+		if(u8i==u32Len)
+		{
+			break;
+		}
+	}
+	enRet = Ok;
+	return enRet;
+}
+/**
+ ******************************************************************************
+ ** \brief  主机接收函数
+ **
+ ** \param u16Addr从机内存地址，pu8Data读数据存放缓存，u32Len读数据长度
+ **
+ ** \retval 读数据是否成功
+ **
+ ******************************************************************************/
+ en_result_t I2C_MasterReadEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len)
 {
     en_result_t enRet = Error;
     uint8_t u8i,u8State;
@@ -386,8 +514,7 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
     {}
     I2C_ClearFunc(I2cStart_En);
     
-#if 1 //根据从机端是E2还是MCU模拟I2C来进行处理
-    I2C_WriteByte(I2c_SlaveWt);//从机地址发送OK
+    I2C_WriteByte(u8DevAddr);//从机地址发送OK
     I2C_ClearIrq();
 
     while(0 == I2C_GetIrq())
@@ -395,7 +522,7 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
     u8State = I2C_GetState();
     while(0x18 != u8State)
     {}
-    I2C_WriteByte(u8Addr);
+    I2C_WriteByte((u16Addr>>8) & 0xff);
     I2C_ClearIrq();
     
     while(0 == I2C_GetIrq())
@@ -403,6 +530,16 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
     u8State = I2C_GetState();
     while(0x28 != u8State)
     {}
+
+    I2C_WriteByte(u16Addr & 0xff);
+    I2C_ClearIrq();
+    
+    while(0 == I2C_GetIrq())
+    {}
+    u8State = I2C_GetState();
+    while(0x28 != u8State)
+    {}
+
     I2C_SetFunc(I2cStart_En);
     I2C_ClearIrq();
  
@@ -413,8 +550,8 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
     {}
 
     I2C_ClearFunc(I2cStart_En);
-#endif
-    I2C_WriteByte(I2c_SlaveRd);//从机地址发送OK
+
+    I2C_WriteByte(u8DevAddr | 1);//从机地址发送OK
     I2C_ClearIrq();
     
     while(0 == I2C_GetIrq())
@@ -447,19 +584,22 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
  ******************************************************************************
  ** \brief  I2C模块初始化
  **
- ** \param stcI2CCfg初始化配置结构体
+ ** \param stcI2CCfg初始化配置结构体指针
  **
  ** \retval 初始化是否成功
  **
  ******************************************************************************/
-en_result_t I2C_Init(stc_i2c_config_t stcI2CCfg)
+en_result_t I2C_Init(stc_i2c_config_t* pstcI2CCfg)
 {
    en_result_t enRet = Error;
-   enRet = I2C_SetFunc(stcI2CCfg.enFunc);
-   enRet = I2C_SetBaud(stcI2CCfg.u8Tm);
-   enRet = I2C_WriteSlaveAddr(stcI2CCfg.stcSlaveAddr);
-   pfnI2ctCallback = stcI2CCfg.pfnI2cCb;
-   if(TRUE == stcI2CCfg.bTouchNvic)
+   enRet = I2C_SetFunc(pstcI2CCfg->enFunc);
+   enRet = I2C_SetBaud(pstcI2CCfg->u8Tm);
+   enRet = I2C_WriteSlaveAddr(&pstcI2CCfg->stcSlaveAddr);
+   if(NULL != pstcI2CCfg->pfnI2cCb)
+   {  
+		pfnI2ctCallback = pstcI2CCfg->pfnI2cCb;
+   }
+   if(TRUE == pstcI2CCfg->bTouchNvic)
    {
         EnableNvic(I2C_IRQn,DDL_IRQ_LEVEL_DEFAULT,TRUE);
    }  

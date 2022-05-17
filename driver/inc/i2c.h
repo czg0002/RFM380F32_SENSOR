@@ -1,14 +1,3 @@
-/*****************************************************************************/
-/** \file i2c.h
- **
- ** Headerfile for I2C functions
- **  
- **
- ** History:
- **   - 2017-06-13       First Version
- **
- *****************************************************************************/
-
 #ifndef __I2C_H__
 #define __I2C_H__
 
@@ -26,9 +15,7 @@
 /******************************************************************************/
 /* Global pre-processor symbols/macros ('#define')                            */
 /******************************************************************************/
-//#define I2c_SlaveAddr    0xA0
-#define I2c_SlaveWt        0x40///<0xA0//此处从机地址根据需要进行配置
-#define I2c_SlaveRd        0x41///<0xA1
+
 /******************************************************************************
  * Global type definitions
  ******************************************************************************/
@@ -76,7 +63,7 @@ typedef struct stc_i2c_config
  * Global function prototypes (definition in C source)
  *****************************************************************************/
  //I2C初始化函数
- en_result_t I2C_Init(stc_i2c_config_t stcI2CCfg);
+ en_result_t I2C_Init(stc_i2c_config_t* pstcI2CCfg);
   //I2C模块关闭函数
  en_result_t I2C_DeInit(void);
  //设置波特率配置寄存器
@@ -92,15 +79,18 @@ typedef struct stc_i2c_config
  //获取状态
  uint8_t I2C_GetState(void);
  //写从机地址函数
- en_result_t I2C_WriteSlaveAddr(stc_i2c_addr_t stcSlaveAddr);
+ en_result_t I2C_WriteSlaveAddr(stc_i2c_addr_t *pstcSlaveAddr);
  //主发送函数
- en_result_t I2C_MasterWriteData(uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len);
+ en_result_t I2C_MasterWriteData(uint8_t u8DevAddr,uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len);
+ en_result_t I2C_MasterWriteEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
   //从发送函数
  en_result_t I2C_SlaveWriteData(uint8_t *pu8Data,uint32_t *u32Len);
  //字节写函数
  en_result_t I2C_WriteByte(uint8_t u8Data);
  //主接收函数
- en_result_t I2C_MasterReadData(uint8_t *pu8Data,uint8_t u8Addr,uint32_t u32Len);
+ en_result_t I2C_MasterReadData(uint8_t u8DevAddr,uint8_t *pu8Data,uint8_t u8Addr,uint32_t u32Len);
+ en_result_t I2C_MasterReadEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
+
   //主接收函数
  en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len);
   //字节读函数
