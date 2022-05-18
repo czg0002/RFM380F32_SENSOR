@@ -38,9 +38,8 @@
 /******************************************************************************
  * Local variable definitions ('static')                                      *
  ******************************************************************************/
-//uint8_t CheckFlg = 0, CoutNum = 0, Uartlen = 10;
+extern boolean_t rtcCycled;
 SysState_e sysState = sysStateSleep;
-//uint8_t u8RxFlg = 0;
 
 /*****************************************************************************
  * Function implementation - global ('extern') and local ('static')
@@ -100,7 +99,7 @@ int32_t main(void)
     I2C_MasterReadEepromData((u8DevAddr<<1),0x00,&u8Recdata[0],rlen);
 	}
 #endif
-	rxresult = RF_RxValidPacket(40000);
+	rxresult = RF_RxValidPacket(15000);
 	if (rxresult == RF_RX_DONE)	//into wakeup state
 	{
 		rfCmdProc_processCmd();
@@ -115,6 +114,7 @@ int32_t main(void)
 		if (sysState == sysStateSleep)
 		{
 			syssleep_start(5);
+			RF_TxPacket(gTxPayload, 12, 20);
 			rxresult = RF_RxWakeupPacket(10);
 			if (rxresult == RF_RX_DONE)
 			{
@@ -128,6 +128,17 @@ int32_t main(void)
 			{
 				rfCmdProc_processCmd();
 			}
+			//test rtc function.
+			/*
+			while (1)
+			{
+				if (rtcCycled == TRUE)
+				{
+					RF_TxPacket(gTxPayload, 12, 20);
+					rtcCycled = FALSE;
+				}
+			}
+			*/
 		}
 	}
 }

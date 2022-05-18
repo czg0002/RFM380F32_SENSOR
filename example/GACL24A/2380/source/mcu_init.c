@@ -23,6 +23,12 @@
 #include "gpio_setting.h"
 #include "mcu_init.h"
 
+boolean_t rtcCycled;
+static void RtcCycCb(void)
+{
+	rtcCycled = TRUE;
+}
+
 /*
  * ===  FUNCTION  ======================================================================
  *         Name:  CLK_Init
@@ -94,6 +100,68 @@ IO_Init(void)
 	M0P_GPIO->P3PU = P3PU_Data;
 	return;
 } /* -----  end of static function IO_Init  ----- */
+
+/* 
+ * ===  FUNCTION  ======================================================================
+ *         Name:  SystemRtc_Init
+ *  Description:  配置RTC为24小时工作制，并启用周期中断。
+ *				 TODO:  利用周期中断来进行睡眠定时，周期需要
+ * =====================================================================================
+ */
+static void SystemRtc_Init ( void )
+{
+	stc_rtc_config_t 	stcRtcConfig; 
+    stc_rtc_irq_cb_t 	stcIrqCb;
+    stc_rtc_time_t  	stcTime;
+    stc_rtc_alarmset_t 	stcAlarm;
+    stc_rtc_cyc_sel_t   stcCycSel;
+    
+    DDL_ZERO_STRUCT(stcRtcConfig);
+    DDL_ZERO_STRUCT(stcIrqCb);
+    DDL_ZERO_STRUCT(stcAlarm);
+    DDL_ZERO_STRUCT(stcTime);
+    DDL_ZERO_STRUCT(stcCycSel);
+    
+//    Clk_Enable(ClkXTL, TRUE);							//enabled in CLK_Init
+    Clk_SetPeripheralGate(ClkPeripheralRtc,TRUE);		//Ê¹ÄÜrtcÊ±ÖÓ
+    
+    stcRtcConfig.enClkSel = RtcClk32768;				//RtcClkHxt1024;//RtcClk32;//
+    stcRtcConfig.enAmpmSel = Rtc24h;					//Rtc12h;//
+   
+    stcCycSel.enCyc_sel = RtcPradx;
+    stcCycSel.u8Prdx = 9;			//default 5s period
+
+    stcRtcConfig.pstcCycSel = &stcCycSel;
+
+    Rtc_DisableFunc(RtcCount);
+    stcAlarm.u8Minute 	= 0x99;	//非法值，关闭闹钟
+    stcAlarm.u8Hour 	= 0x99;
+    stcAlarm.u8Week 	= 0x99;
+    Rtc_DisableFunc(RtcAlarmEn);
+    Rtc_EnAlarmIrq(Rtc_AlarmInt_Enable);
+    Rtc_SetAlarmTime(&stcAlarm);
+    Rtc_EnableFunc(RtcAlarmEn);
+
+    stcTime.u8Year 	= 0x17;
+    stcTime.u8Month = 0x06;
+    stcTime.u8Day 	= 0x07;
+    stcTime.u8Hour 	= 0x12;
+    stcTime.u8Minute = 0x58;
+    stcTime.u8Second = 0x55;
+    stcTime.u8DayOfWeek = Rtc_CalWeek(&stcTime.u8Day);
+    stcRtcConfig.pstcTimeDate = &stcTime;
+    
+//    stcIrqCb.pfnAlarmIrqCb = RtcAlarmCb;
+    stcIrqCb.pfnTimerIrqCb = RtcCycCb;
+    stcRtcConfig.pstcIrqCb = &stcIrqCb;
+    stcRtcConfig.bTouchNvic = TRUE;
+    
+    Rtc_DisableFunc(RtcCount);
+    Rtc_Init(&stcRtcConfig); 
+    
+    Rtc_EnableFunc(RtcCount);
+	return ;
+}		/* -----  end of static function RTC_Init  ----- */
   /*
    * ===  FUNCTION  ======================================================================
    *         Name:  MCU_Init
@@ -104,5 +172,6 @@ void MCU_Init(void)
 {
 	CLK_Init();
 	IO_Init();
+	SystemRtc_Init();
 	return;
 } /* -----  end of function MCU_Init  ----- */
