@@ -111,6 +111,7 @@ en_result_t I2C_SetFunc(en_i2c_func_t enFunc)
  **
  ** \param 无
  **
+ 
  ** \retval bIrq中断标记
  **
  ******************************************************************************/
@@ -263,7 +264,7 @@ en_result_t I2C_MasterWriteData(uint8_t u8DevAddr,uint8_t u8Addr,uint8_t *pu8Dat
  ** \retval 写数据是否成功
  **
  ******************************************************************************/
- en_result_t I2C_MasterWriteEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len)
+ en_result_t I2C_MasterWriteU16addrData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len)
 {
     en_result_t enRet = Error;
     uint8_t u8i,u8State;
@@ -298,7 +299,7 @@ en_result_t I2C_MasterWriteData(uint8_t u8DevAddr,uint8_t u8Addr,uint8_t *pu8Dat
     while(0x28 != u8State)
     {}
 
-    I2C_WriteByte(u16Addr >> 0xff);
+    I2C_WriteByte(u16Addr & 0xff);
     I2C_ClearIrq();
     
     while(0 == I2C_GetIrq())
@@ -499,8 +500,9 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
  **
  ** \retval 读数据是否成功
  **
+ ** TODO: add timeout
  ******************************************************************************/
- en_result_t I2C_MasterReadEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len)
+ en_result_t I2C_MasterReadU16addrData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len)
 {
     en_result_t enRet = Error;
     uint8_t u8i,u8State;
@@ -557,12 +559,13 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
     while(0 == I2C_GetIrq())
     {}
     u8State = I2C_GetState();
-    while(0x40 != u8State)
+    while(0x40 != u8State)	//SLA+R send, and acked
     {}
     
+	/*
     I2C_SetFunc(I2cAck_En);
-    
     I2C_ClearIrq();
+
     while(0 == I2C_GetIrq())
     {}
     for(u8i=0;u8i<u32Len;u8i++)
@@ -577,6 +580,43 @@ en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len)
     }
     I2C_ClearFunc(I2cAck_En);
     I2C_SetFunc(I2cStop_En);
+	*/
+	//--------try fix here
+	if (u32Len > 1)
+	{
+		I2C_SetFunc(I2cAck_En);
+	}
+	for(u8i=0;u8i<u32Len - 1;u8i++)
+	{
+		I2C_ClearIrq();
+		while(0 == I2C_GetIrq())
+		{}
+		u8State = I2C_GetState();
+		if (u8State == 0x50)
+		{
+			pu8Data[u8i] = I2C_ReadByte();
+		}
+		else	//return error state
+		{
+		}
+	}
+
+	I2C_ClearFunc(I2cAck_En);//倒数第二字节ACK清掉，最后字节不反馈ACK
+	I2C_ClearIrq();
+	while(0 == I2C_GetIrq())
+	{}
+	u8State = I2C_GetState();
+	if (u8State == 0x58)
+	{
+		pu8Data[u8i] = I2C_ReadByte();
+	}
+	else	//return error state
+	{
+	}
+    I2C_SetFunc(I2cStop_En);
+	I2C_ClearIrq();
+	//--------end of fix try
+
     enRet = Ok;
     return enRet;
 }

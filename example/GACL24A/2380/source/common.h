@@ -29,6 +29,14 @@
 #define FALSE 0
 #endif
 
+#define BYTE0_OF(x)	(x & 0xff)
+#define BYTE1_OF(x)	((x >> 8) & 0xff)
+#define BYTE2_OF(x)	((x >> 16) & 0xff)
+#define BYTE3_OF(x)	((x >> 24) & 0xff)
+
+#define JOINT_TO_UINT16(array, start) (array[start] + (array[start + 1] << 8))
+#define JOINT_TO_UINT32(array, start) (array[start] + (array[start + 1] << 8) + (array[start + 2] << 16) + (array[start + 3] << 24))
+
 void Delay(uint32_t Count);
 
 #endif

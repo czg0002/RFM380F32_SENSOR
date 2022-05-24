@@ -20,6 +20,7 @@
 #include "radio.h"
 #include "syssleep.h"
 #include "rfCmdProc.h"
+#include "rtc.h"
 /******************************************************************************
  * Local pre-processor symbols/macros ('#define')
  ******************************************************************************/
@@ -40,7 +41,7 @@
  ******************************************************************************/
 extern boolean_t rtcCycled;
 SysState_e sysState = sysStateSleep;
-
+stc_rtc_time_t  stcReadTime;
 /*****************************************************************************
  * Function implementation - global ('extern') and local ('static')
  ******************************************************************************/
@@ -56,7 +57,7 @@ SysState_e sysState = sysStateSleep;
  ******************************************************************************/
 uint8_t u8Senddata[10] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88,0x99,0x00};
 uint8_t u8Recdata[10]={0x00};
-uint8_t u8DevAddr = 0x50;	//7 bit addr, left shit 1 in function para
+//uint8_t u8DevAddr = 0x50;	//7 bit addr, left shit 1 in function para
 
 int32_t main(void)
 {
@@ -65,22 +66,24 @@ int32_t main(void)
 	uint32_t rlen;
 	EnumRFResult rxresult;
 	uint8_t rxlen;
+	//--------MCU_Init very important, may damage mcu, offline download cannot rescure-----
 	MCU_Init();
+	//---------------------
 	syssleep_init();
 	SystemCoreClockUpdate();
-	Gpio_SetIO(3, 3, 0);	//power control
+//	Gpio_SetIO(3, 3, 0);	//power control
+	GPIO_EXTPOWER_OFF();
 	CMT2300A_Init();
 	CMT2300A_GoSleep();
-
-#if 0
+#if 1
 	//test i2c function
 	{
 		stc_i2c_config_t stcI2cCfg;
 		DDL_ZERO_STRUCT(stcI2cCfg);
-		Gpio_InitIOExt(2,5,GpioDirOut,FALSE,FALSE,TRUE,FALSE);   
-    Gpio_InitIOExt(2,6,GpioDirOut,FALSE,FALSE,TRUE,FALSE);
-		Gpio_SetFunc_I2CDAT_P25(); 
-    Gpio_SetFunc_I2CCLK_P26();
+		Gpio_InitIOExt(3,5,GpioDirOut,FALSE,FALSE,TRUE,FALSE);  //P2.5, P2.6 for eeprom, P3.5, P3.6 for GHXT1 and 2862, P0.1 P0.2 for GHXT2 and GHXT3
+    Gpio_InitIOExt(3,6,GpioDirOut,FALSE,FALSE,TRUE,FALSE);
+		Gpio_SetFunc_I2CDAT_P35(); 
+    Gpio_SetFunc_I2CCLK_P36();
     Clk_SetPeripheralGate(ClkPeripheralI2c,TRUE);
 		
 		stcI2cCfg.enFunc = I2cBaud_En;
@@ -92,14 +95,14 @@ int32_t main(void)
     I2C_Init(&stcI2cCfg);
     I2C_SetFunc(I2cHlm_En);
     I2C_SetFunc(I2cMode_En);
-		wlen = 3;
-		rlen = 3;
-		I2C_MasterWriteEepromData((u8DevAddr<<1),0x00,&u8Senddata[0],wlen);
-    delay1ms(100);
-    I2C_MasterReadEepromData((u8DevAddr<<1),0x00,&u8Recdata[0],rlen);
+//		wlen = 3;
+//		rlen = 3;
+//		I2C_MasterWriteEepromData((u8DevAddr<<1),0x00,&u8Senddata[0],wlen);
+//    delay1ms(100);
+//    I2C_MasterReadEepromData((u8DevAddr<<1),0x00,&u8Recdata[0],rlen);
 	}
 #endif
-	rxresult = RF_RxValidPacket(15000);
+	rxresult = RF_RxValidPacket(10000);
 	if (rxresult == RF_RX_DONE)	//into wakeup state
 	{
 		rfCmdProc_processCmd();
@@ -109,12 +112,13 @@ int32_t main(void)
 	{
 		sysState = sysStateSleep;
 	}
+	sysState = sysStateWakeup;	//TO BE REMOVED, just for test
 	while (1)
 	{
 		if (sysState == sysStateSleep)
 		{
 			syssleep_start(5);
-			RF_TxPacket(gTxPayload, 12, 20);
+//			RF_TxPacket(gTxPayload, 12, 20);
 			rxresult = RF_RxWakeupPacket(10);
 			if (rxresult == RF_RX_DONE)
 			{
@@ -128,17 +132,17 @@ int32_t main(void)
 			{
 				rfCmdProc_processCmd();
 			}
+
 			//test rtc function.
-			/*
-			while (1)
-			{
-				if (rtcCycled == TRUE)
-				{
-					RF_TxPacket(gTxPayload, 12, 20);
-					rtcCycled = FALSE;
-				}
-			}
-			*/
+//			while (1)
+//			{
+//				Rtc_ReadDateTime(&stcReadTime);
+//				if (rtcCycled == TRUE)
+//				{
+//					RF_TxPacket(gTxPayload, 12, 20);
+//					rtcCycled = FALSE;
+//				}
+//			}
 		}
 	}
 }

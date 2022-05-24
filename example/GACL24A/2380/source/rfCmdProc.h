@@ -135,7 +135,6 @@ typedef struct {
 void rfCmdProc_processCmd(void);
 void rfCmdProc_sendOneRecord(Record_s record);
 
-
 //active send command, send semaphore  to EasyLink  task.
 void rfCmdProc_activeSendBatteryVoltage(void);
 void rfCmdProc_activeSendRecord(Record_s record);

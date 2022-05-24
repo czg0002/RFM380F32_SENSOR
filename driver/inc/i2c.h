@@ -82,14 +82,14 @@ typedef struct stc_i2c_config
  en_result_t I2C_WriteSlaveAddr(stc_i2c_addr_t *pstcSlaveAddr);
  //主发送函数
  en_result_t I2C_MasterWriteData(uint8_t u8DevAddr,uint8_t u8Addr,uint8_t *pu8Data,uint32_t u32Len);
- en_result_t I2C_MasterWriteEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
+ en_result_t I2C_MasterWriteU16addrData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
   //从发送函数
  en_result_t I2C_SlaveWriteData(uint8_t *pu8Data,uint32_t *u32Len);
  //字节写函数
  en_result_t I2C_WriteByte(uint8_t u8Data);
  //主接收函数
  en_result_t I2C_MasterReadData(uint8_t u8DevAddr, uint8_t u8Addr, uint8_t *pu8Data, uint32_t u32Len);
- en_result_t I2C_MasterReadEepromData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
+ en_result_t I2C_MasterReadU16addrData(uint8_t u8DevAddr, uint16_t u16Addr, uint8_t *pu8Data, uint32_t u32Len);
 
   //主接收函数
  en_result_t I2C_SlaveReadData(uint8_t *pu8Data,uint32_t *pu32Len);

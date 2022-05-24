@@ -20,7 +20,10 @@
 #include <stdbool.h>
 #include "ddl.h"
 #include "radio.h"
+#include "common.h"
 #include "version.h"
+#include "gpio_setting.h"
+#include "sht3x.h"
 #include "rfCmdProc.h"
 #define crc_mul 0x1021 
 
@@ -190,7 +193,27 @@ return true;
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
-return true;
+	uint16_t temp_raw, humi_raw,  pres_raw;
+	int8_t result;
+	uint8_t len;
+	GPIO_EXTPOWER_ON();
+	delay1ms(300);
+//	result = GXHT3x_MeasureHM( HUMIDITY, &humi_raw);
+//	result |= GXHT3x_MeasureHM( TEMP, &temp_raw);
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw, &humi_raw);
+	gTxPayload[RF_CMD_INDEX + 1] = 5;
+	gTxPayload[RF_CMD_INDEX + 2] = result;
+	gTxPayload[RF_CMD_INDEX + 3] = BYTE0_OF(temp_raw);
+	gTxPayload[RF_CMD_INDEX + 4] = BYTE1_OF(temp_raw);
+	gTxPayload[RF_CMD_INDEX + 5] = BYTE0_OF(humi_raw);
+	gTxPayload[RF_CMD_INDEX + 6] = BYTE1_OF(humi_raw);
+	gTxPayload[RF_CMD_INDEX + 7] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 8] = 0;
+	len = RF_CMD_INDEX + 9;
+	RF_TxPacket(gTxPayload, len, 20);
+//	GPIO_EXTPOWER_OFF();
+
+	return true;
 }
 
 static bool rfCmd_readDB(void)
@@ -266,7 +289,7 @@ static bool rfCmd_readDB(void)
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
-return true;
+	return true;
 }
 
 static bool rfCmd_sleep(void)
