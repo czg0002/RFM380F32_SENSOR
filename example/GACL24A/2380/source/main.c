@@ -82,8 +82,12 @@ int32_t main(void)
 		DDL_ZERO_STRUCT(stcI2cCfg);
 		Gpio_InitIOExt(3,5,GpioDirOut,FALSE,FALSE,TRUE,FALSE);  //P2.5, P2.6 for eeprom, P3.5, P3.6 for GHXT1 and 2862, P0.1 P0.2 for GHXT2 and GHXT3
     Gpio_InitIOExt(3,6,GpioDirOut,FALSE,FALSE,TRUE,FALSE);
-		Gpio_SetFunc_I2CDAT_P35(); 
-    Gpio_SetFunc_I2CCLK_P36();
+//		Gpio_InitIOExt(3,5,GpioDirOut,FALSE,FALSE,TRUE,FALSE);  //P2.5, P2.6 for eeprom, P3.5, P3.6 for GHXT1 and 2862, P0.1 P0.2 for GHXT2 and GHXT3
+//    Gpio_InitIOExt(3,6,GpioDirOut,FALSE,FALSE,TRUE,FALSE);
+		Gpio_InitIOExt(0,1,GpioDirOut,FALSE,FALSE,TRUE,FALSE);  //P2.5, P2.6 for eeprom, P3.5, P3.6 for GHXT1 and 2862, P0.1 P0.2 for GHXT2 and GHXT3
+    Gpio_InitIOExt(0,2,GpioDirOut,FALSE,FALSE,TRUE,FALSE);
+//		Gpio_SetFunc_I2CDAT_P35(); 
+//    Gpio_SetFunc_I2CCLK_P36();
     Clk_SetPeripheralGate(ClkPeripheralI2c,TRUE);
 		
 		stcI2cCfg.enFunc = I2cBaud_En;
@@ -93,8 +97,9 @@ int32_t main(void)
     
 		I2C_DeInit();  
     I2C_Init(&stcI2cCfg);
-    I2C_SetFunc(I2cHlm_En);
-    I2C_SetFunc(I2cMode_En);
+//    I2C_SetFunc(I2cHlm_En);
+//    I2C_SetFunc(I2cMode_En);
+		
 //		wlen = 3;
 //		rlen = 3;
 //		I2C_MasterWriteEepromData((u8DevAddr<<1),0x00,&u8Senddata[0],wlen);

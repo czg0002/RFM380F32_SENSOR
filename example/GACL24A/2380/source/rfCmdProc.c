@@ -19,6 +19,7 @@
 /* rx packet payload[6] is cmd len, payload[7] is the first valid data*/
 #include <stdbool.h>
 #include "ddl.h"
+#include "i2c.h"
 #include "radio.h"
 #include "common.h"
 #include "version.h"
@@ -193,25 +194,34 @@ return true;
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
-	uint16_t temp_raw, humi_raw,  pres_raw;
+	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
 	int8_t result;
 	uint8_t len;
+
+  I2C_SetFunc(I2cHlm_En);
+  I2C_SetFunc(I2cMode_En);
+	Gpio_SetFunc_I2CDAT_P35(); 
+  Gpio_SetFunc_I2CCLK_P36();
+	
 	GPIO_EXTPOWER_ON();
-	delay1ms(300);
-//	result = GXHT3x_MeasureHM( HUMIDITY, &humi_raw);
-//	result |= GXHT3x_MeasureHM( TEMP, &temp_raw);
-	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw, &humi_raw);
-	gTxPayload[RF_CMD_INDEX + 1] = 5;
-	gTxPayload[RF_CMD_INDEX + 2] = result;
-	gTxPayload[RF_CMD_INDEX + 3] = BYTE0_OF(temp_raw);
-	gTxPayload[RF_CMD_INDEX + 4] = BYTE1_OF(temp_raw);
-	gTxPayload[RF_CMD_INDEX + 5] = BYTE0_OF(humi_raw);
-	gTxPayload[RF_CMD_INDEX + 6] = BYTE1_OF(humi_raw);
-	gTxPayload[RF_CMD_INDEX + 7] = gRxPacket.rssi;
-	gTxPayload[RF_CMD_INDEX + 8] = 0;
-	len = RF_CMD_INDEX + 9;
+	
+	delay1ms(600);
+	
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw1, &humi_raw1);
+	//switch to bus 2
+	gTxPayload[RF_CMD_INDEX + 1] = 6;
+	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp_raw1);
+	gTxPayload[RF_CMD_INDEX + 3] = BYTE1_OF(temp_raw1);
+	gTxPayload[RF_CMD_INDEX + 4] = BYTE0_OF(humi_raw1);
+	gTxPayload[RF_CMD_INDEX + 5] = BYTE1_OF(humi_raw1);
+	gTxPayload[RF_CMD_INDEX + 6] = 0;	//reserve for pres_raw
+	gTxPayload[RF_CMD_INDEX + 7] = 0;
+	gTxPayload[RF_CMD_INDEX + 8] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 9] = 0;
+	len = RF_CMD_INDEX + 10;
 	RF_TxPacket(gTxPayload, len, 20);
-//	GPIO_EXTPOWER_OFF();
+	I2C_DeInit();  
+	GPIO_EXTPOWER_OFF();
 
 	return true;
 }
