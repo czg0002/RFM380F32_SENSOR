@@ -48,6 +48,9 @@ typedef struct {
 
 extern uint8_t gTxPayload[PACKET_MAX_LEN];
 extern CmdRxPacket_s gRxPacket;
+extern uint8_t singleWakeupCmd[10];
+extern uint8_t sensorAddr[7];
+extern uint8_t shortSensorAddr[7];
 
 #define Test_GPIO2() (M0P_GPIO->P3IN&GPIO2)
 

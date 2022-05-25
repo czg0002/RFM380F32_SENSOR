@@ -189,7 +189,7 @@ static void SystemRtc_Init ( void )
 //    Gpio_SetIO(T1_PORT,T1_PIN,1);
 //    Gpio_InitIO(3,3,GpioDirIn);
     
-//    Clk_Enable(ClkXTL, TRUE);											//NOTE: 重复打开ClkXTL可能会导致片子损坏
+//    Clk_Enable(ClkXTL, TRUE);											//NOTE: 重复打开ClkXTL是否有问题？
     Clk_SetPeripheralGate(ClkPeripheralRtc,TRUE);		//Ê¹ÄÜrtcÊ±ÖÓ
     
     stcRtcConfig.enClkSel = RtcClk32768;				//RtcClkHxt1024;//RtcClk32;//

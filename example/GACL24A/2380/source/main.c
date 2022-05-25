@@ -13,7 +13,7 @@
 #include "lpm.h"
 #include "i2c.h"
 //#include "CMT2380F32_Demo.h"
-#include "flash.h"
+#include "flashData.h"
 #include "cmt2300a.h"
 #include "gpio_setting.h"
 #include "mcu_init.h"
@@ -69,6 +69,7 @@ int32_t main(void)
 	//--------MCU_Init very important, may damage mcu, offline download cannot rescure-----
 	MCU_Init();
 	//---------------------
+	flashData_Init();
 	syssleep_init();
 	SystemCoreClockUpdate();
 //	Gpio_SetIO(3, 3, 0);	//power control

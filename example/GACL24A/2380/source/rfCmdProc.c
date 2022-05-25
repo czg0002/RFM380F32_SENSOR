@@ -198,10 +198,10 @@ return true;
 	int8_t result;
 	uint8_t len;
 
-  I2C_SetFunc(I2cHlm_En);
-  I2C_SetFunc(I2cMode_En);
+	I2C_SetFunc(I2cHlm_En);
+	I2C_SetFunc(I2cMode_En);
 	Gpio_SetFunc_I2CDAT_P35(); 
-  Gpio_SetFunc_I2CCLK_P36();
+	Gpio_SetFunc_I2CCLK_P36();
 	
 	GPIO_EXTPOWER_ON();
 	
@@ -209,17 +209,36 @@ return true;
 	
 	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw1, &humi_raw1);
 	//switch to bus 2
-	gTxPayload[RF_CMD_INDEX + 1] = 6;
+	M0P_GPIO->P35_SEL_f.SEL = 0;
+	M0P_GPIO->P36_SEL_f.SEL = 0;
+	Gpio_SetFunc_I2CDAT_P01(); 
+	Gpio_SetFunc_I2CCLK_P02();
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw2, &humi_raw2);
+	result = sht3x_measure_blocking_read_adc(0x45, &temp_raw3, &humi_raw3);
+	
+	gTxPayload[RF_CMD_INDEX + 1] = 14;
 	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp_raw1);
 	gTxPayload[RF_CMD_INDEX + 3] = BYTE1_OF(temp_raw1);
 	gTxPayload[RF_CMD_INDEX + 4] = BYTE0_OF(humi_raw1);
 	gTxPayload[RF_CMD_INDEX + 5] = BYTE1_OF(humi_raw1);
-	gTxPayload[RF_CMD_INDEX + 6] = 0;	//reserve for pres_raw
-	gTxPayload[RF_CMD_INDEX + 7] = 0;
-	gTxPayload[RF_CMD_INDEX + 8] = gRxPacket.rssi;
-	gTxPayload[RF_CMD_INDEX + 9] = 0;
-	len = RF_CMD_INDEX + 10;
+	gTxPayload[RF_CMD_INDEX + 6] = BYTE0_OF(temp_raw2);
+	gTxPayload[RF_CMD_INDEX + 7] = BYTE1_OF(temp_raw2);
+	gTxPayload[RF_CMD_INDEX + 8] = BYTE0_OF(humi_raw2);
+	gTxPayload[RF_CMD_INDEX + 9] = BYTE1_OF(humi_raw2);
+	gTxPayload[RF_CMD_INDEX + 10] = BYTE0_OF(temp_raw3);
+	gTxPayload[RF_CMD_INDEX + 11] = BYTE1_OF(temp_raw3);
+	gTxPayload[RF_CMD_INDEX + 12] = BYTE0_OF(humi_raw3);
+	gTxPayload[RF_CMD_INDEX + 13] = BYTE1_OF(humi_raw3);
+	gTxPayload[RF_CMD_INDEX + 14] = 0;	//reserve for pres_raw
+	gTxPayload[RF_CMD_INDEX + 15] = 0;
+	gTxPayload[RF_CMD_INDEX + 16] = 0;
+	gTxPayload[RF_CMD_INDEX + 17] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 18] = 0;
+	len = RF_CMD_INDEX + 19;
 	RF_TxPacket(gTxPayload, len, 20);
+	
+	M0P_GPIO->P01_SEL_f.SEL = 0;
+	M0P_GPIO->P02_SEL_f.SEL = 0;
 	I2C_DeInit();  
 	GPIO_EXTPOWER_OFF();
 

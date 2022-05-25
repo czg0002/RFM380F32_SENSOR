@@ -21,16 +21,15 @@
 #include <stdbool.h>
 
 typedef struct {
-    uint8_t  year; 
-    uint8_t  flag[2];
-    uint8_t  batch;
-    uint8_t  number;
-}ProductSerial_s;
-
-typedef struct {
-	uint32_t tempCali[4];
-	uint32_t humiCali[4];
-	uint32_t presCali[4];
+	uint16_t tempSensor1ADC[4];
+	uint16_t tempSensor2ADC[4];
+	uint16_t tempSensor3ADC[4];
+	int16_t  tempActual[4];
+	uint16_t humiSensor1ADC[6];	//6 humi cali point: 20, 40, 60%RH in temperature 25, 50 
+	uint16_t humiSensor2ADC[6];
+	uint16_t humiSensor3ADC[6];
+	int16_t  humiActual[6];
+	uint32_t presCali[16];
 }Calibration_s;
 
 typedef struct {
@@ -41,9 +40,10 @@ typedef struct {
 	uint8_t sniffingTimeMs;
 	uint8_t idleTimeoutMin;
 	Calibration_s caliPara;
-	uint8_t checksum;
+	uint32_t checksum;
 }FactoryCfg_s;
 
+#if 1	//TODO: move to eepromData.c
 typedef struct {
 	uint16_t pressure;
 	uint16_t temperature;
@@ -81,7 +81,7 @@ typedef struct
 //	uint16_t frameCount;	//may be change to CRC
 	uint8_t checksum;
 }Record_s;
-
+#endif
 /* global variable to  load from and save to flash*/
 extern FactoryCfg_s gFactoryCfg;
 extern FactoryCfg_s defaultFactoryCfg;
