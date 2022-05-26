@@ -64,6 +64,7 @@ int32_t main(void)
 	uint32_t i;
 	uint32_t wlen;
 	uint32_t rlen;
+	uint16_t count = 0;
 	EnumRFResult rxresult;
 	uint8_t rxlen;
 	//--------MCU_Init very important, may damage mcu, offline download cannot rescure-----
@@ -108,7 +109,7 @@ int32_t main(void)
 //    I2C_MasterReadEepromData((u8DevAddr<<1),0x00,&u8Recdata[0],rlen);
 	}
 #endif
-	rxresult = RF_RxValidPacket(10000);
+	rxresult = RF_RxValidPacket(15000);
 	if (rxresult == RF_RX_DONE)	//into wakeup state
 	{
 		rfCmdProc_processCmd();
@@ -118,18 +119,23 @@ int32_t main(void)
 	{
 		sysState = sysStateSleep;
 	}
-	sysState = sysStateWakeup;	//TO BE REMOVED, just for test
+//	sysState = sysStateWakeup;	//TO BE REMOVED, just for test
 	while (1)
 	{
 		if (sysState == sysStateSleep)
 		{
+			gTxPayload[8] = count & 0xff;
+			gTxPayload[9] = (count >> 8) & 0xff;
+			RF_TxPacket(gTxPayload, 12, 20);
+			count++;
+			
 			syssleep_start(5);
-//			RF_TxPacket(gTxPayload, 12, 20);
-			rxresult = RF_RxWakeupPacket(10);
-			if (rxresult == RF_RX_DONE)
-			{
-				sysState = sysStateWakeup;
-			}
+
+//			rxresult = RF_RxWakeupPacket(10);
+//			if (rxresult == RF_RX_DONE)
+//			{
+//				sysState = sysStateWakeup;
+//			}
 		}
 		else	//wakup state
 		{
