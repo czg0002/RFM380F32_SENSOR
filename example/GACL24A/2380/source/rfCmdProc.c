@@ -25,6 +25,7 @@
 #include "version.h"
 #include "gpio_setting.h"
 #include "sht3x.h"
+#include "flashData.h"
 #include "rfCmdProc.h"
 #define crc_mul 0x1021 
 
@@ -613,49 +614,72 @@ static bool rfCmd_getCaliTempPara(void)
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
+	//TODO: moved to adcFunc.h
+	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
+	int8_t result;
+	uint8_t len;
+
+	I2C_SetFunc(I2cHlm_En);
+	I2C_SetFunc(I2cMode_En);
+	Gpio_SetFunc_I2CDAT_P35(); 
+	Gpio_SetFunc_I2CCLK_P36();
+	
+	GPIO_EXTPOWER_ON();
+	
+	delay1ms(600);
+	
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw1, &humi_raw1);
+	//switch to bus 2
+	M0P_GPIO->P35_SEL_f.SEL = 0;
+	M0P_GPIO->P36_SEL_f.SEL = 0;
+	Gpio_SetFunc_I2CDAT_P01(); 
+	Gpio_SetFunc_I2CCLK_P02();
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw2, &humi_raw2);
+	result = sht3x_measure_blocking_read_adc(0x45, &temp_raw3, &humi_raw3);
+	
+	gTxPayload[RF_CMD_INDEX + 1] = 14;
+	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp_raw1);
+	gTxPayload[RF_CMD_INDEX + 3] = BYTE1_OF(temp_raw1);
+	gTxPayload[RF_CMD_INDEX + 4] = BYTE0_OF(humi_raw1);
+	gTxPayload[RF_CMD_INDEX + 5] = BYTE1_OF(humi_raw1);
+	gTxPayload[RF_CMD_INDEX + 6] = BYTE0_OF(temp_raw2);
+	gTxPayload[RF_CMD_INDEX + 7] = BYTE1_OF(temp_raw2);
+	gTxPayload[RF_CMD_INDEX + 8] = BYTE0_OF(humi_raw2);
+	gTxPayload[RF_CMD_INDEX + 9] = BYTE1_OF(humi_raw2);
+	gTxPayload[RF_CMD_INDEX + 10] = BYTE0_OF(temp_raw3);
+	gTxPayload[RF_CMD_INDEX + 11] = BYTE1_OF(temp_raw3);
+	gTxPayload[RF_CMD_INDEX + 12] = BYTE0_OF(humi_raw3);
+	gTxPayload[RF_CMD_INDEX + 13] = BYTE1_OF(humi_raw3);
+	gTxPayload[RF_CMD_INDEX + 14] = 0;	//reserve for pres_raw
+	gTxPayload[RF_CMD_INDEX + 15] = 0;
+	gTxPayload[RF_CMD_INDEX + 16] = 0;
+	gTxPayload[RF_CMD_INDEX + 17] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 18] = 0;
+	len = RF_CMD_INDEX + 19;
+	RF_TxPacket(gTxPayload, len, 20);
+	
+	M0P_GPIO->P01_SEL_f.SEL = 0;
+	M0P_GPIO->P02_SEL_f.SEL = 0;
+	I2C_DeInit();  
+	GPIO_EXTPOWER_OFF();
 return true;
 } 
 static bool rfCmd_setCaliTemp4T(void)
 {
-#if 0
-//	if (gFactoryCfg.debugMode != 0)	//only change calibrating parameter in debug mode
-//	{
-	//used payload[7] as temperature point status:
 	uint8_t index;
-	index = gRxPacket.payload[7];
-#ifdef UART_DEBUG_DISPLAY
-	Display_printf(displayHandle, 0, 0, "receive cali temp hex: %d, %d.\r\n", gRxPacket.payload[8] + (gRxPacket.payload[9] << 8), gRxPacket.payload[10] + (gRxPacket.payload[11] << 8));
-#endif
-return true;
-	switch (index)
+	index = gRxPacket.payload[RF_CMD_INDEX + 2];
+	if (index > 3)
 	{
-		case 0:
-			gFactoryCfg.calibration.adcTemperatureM40 = gRxPacket.payload[8] + (gRxPacket.payload[9] << 8);
-			gFactoryCfg.calibration.temperature1 = gRxPacket.payload[10] + (gRxPacket.payload[11] << 8) - 10000;
-			break;
-		case 1:
-			gFactoryCfg.calibration.adcTemperatureM10 = gRxPacket.payload[8] + (gRxPacket.payload[9] << 8);
-			gFactoryCfg.calibration.temperature2 = gRxPacket.payload[10] + (gRxPacket.payload[11] << 8) - 10000;
-			break;
-		case 2:
-			gFactoryCfg.calibration.adcTemperatureP25 = gRxPacket.payload[8] + (gRxPacket.payload[9] << 8);
-			gFactoryCfg.calibration.temperature3 = gRxPacket.payload[10] + (gRxPacket.payload[11] << 8) - 10000;
-			break;
-		case 3:
-			gFactoryCfg.calibration.adcTemperatureP60 = gRxPacket.payload[8] + (gRxPacket.payload[9] << 8);
-			gFactoryCfg.calibration.temperature4 = gRxPacket.payload[10] + (gRxPacket.payload[11] << 8) - 10000;
-			break;
+		replyRfWriteCmdStatus(RF_WRITE_CMD_FAIL);
+		return false;
 	}
+	gFactoryCfg.caliPara.tempSensor1ADC[index] = JOINT_TO_UINT16(gRxPacket.payload, RF_CMD_INDEX + 3);
+	gFactoryCfg.caliPara.tempSensor2ADC[index] = JOINT_TO_UINT16(gRxPacket.payload, RF_CMD_INDEX + 5);
+	gFactoryCfg.caliPara.tempSensor3ADC[index] = JOINT_TO_UINT16(gRxPacket.payload, RF_CMD_INDEX + 7);
+	gFactoryCfg.caliPara.tempActual[index] = JOINT_TO_UINT16(gRxPacket.payload, RF_CMD_INDEX + 9);
 	flashData_savegFactoryCfg();
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
-//	}
-//	else
-//	{
-//		replyRfWriteCmdStatus(RF_WRITE_CMD_FAIL);
-//	}
 	return true;
-#endif
-return true;
 }
 static bool rfCmd_getCaliTemp4T(void)
 {
