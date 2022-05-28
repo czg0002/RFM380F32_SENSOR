@@ -26,9 +26,10 @@
 #include "gpio_setting.h"
 #include "sht3x.h"
 #include "flashData.h"
+#include "syssleep.h"
 #include "rfCmdProc.h"
 #define crc_mul 0x1021 
-
+extern SysState_e sysState;	//define in main.c
 static uint16_t frame_count = 1;
 
 static uint16_t cal_crc(unsigned char *ptr, unsigned char len);
@@ -324,13 +325,9 @@ static bool rfCmd_readDB(void)
 
 static bool rfCmd_sleep(void)
 {
-#if 0
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
-	gSensorState = sysStateSleep;   //TODO: may move i2cRtc command to sysShutdown, if failed to set rtc, must send rf msg to pad
-	//sysShutdown();
+	sysState = sysStateSleep;   //TODO: may move i2cRtc command to sysShutdown, if failed to set rtc, must send rf msg to pad
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_globalSleep(void)
@@ -618,7 +615,9 @@ static bool rfCmd_getCaliTempPara(void)
 	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
 	int8_t result;
 	uint8_t len;
-
+	float t0_f, t1_f, t2_f, t3_f;
+	float temp1_f, temp2_f, temp3_f;
+	int16_t temp1_i, temp2_i, temp3_i;
 	I2C_SetFunc(I2cHlm_En);
 	I2C_SetFunc(I2cMode_En);
 	Gpio_SetFunc_I2CDAT_P35(); 
@@ -637,19 +636,71 @@ static bool rfCmd_getCaliTempPara(void)
 	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw2, &humi_raw2);
 	result = sht3x_measure_blocking_read_adc(0x45, &temp_raw3, &humi_raw3);
 	
-	gTxPayload[RF_CMD_INDEX + 1] = 14;
-	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp_raw1);
-	gTxPayload[RF_CMD_INDEX + 3] = BYTE1_OF(temp_raw1);
-	gTxPayload[RF_CMD_INDEX + 4] = BYTE0_OF(humi_raw1);
-	gTxPayload[RF_CMD_INDEX + 5] = BYTE1_OF(humi_raw1);
-	gTxPayload[RF_CMD_INDEX + 6] = BYTE0_OF(temp_raw2);
-	gTxPayload[RF_CMD_INDEX + 7] = BYTE1_OF(temp_raw2);
-	gTxPayload[RF_CMD_INDEX + 8] = BYTE0_OF(humi_raw2);
-	gTxPayload[RF_CMD_INDEX + 9] = BYTE1_OF(humi_raw2);
-	gTxPayload[RF_CMD_INDEX + 10] = BYTE0_OF(temp_raw3);
-	gTxPayload[RF_CMD_INDEX + 11] = BYTE1_OF(temp_raw3);
-	gTxPayload[RF_CMD_INDEX + 12] = BYTE0_OF(humi_raw3);
-	gTxPayload[RF_CMD_INDEX + 13] = BYTE1_OF(humi_raw3);
+	M0P_GPIO->P01_SEL_f.SEL = 0;
+	M0P_GPIO->P02_SEL_f.SEL = 0;
+	I2C_DeInit();  
+	GPIO_EXTPOWER_OFF();
+
+	t0_f = (float)(gFactoryCfg.caliPara.tempActual[0]) / 100;
+	t1_f = (float)(gFactoryCfg.caliPara.tempActual[1]) / 100;
+	t2_f = (float)(gFactoryCfg.caliPara.tempActual[2]) / 100;
+	t3_f = (float)(gFactoryCfg.caliPara.tempActual[3]) / 100;
+	if (temp_raw1 <= gFactoryCfg.caliPara.tempSensor1ADC[1])
+	{
+		temp1_f = (t1_f - t0_f) * (temp_raw1 - gFactoryCfg.caliPara.tempSensor1ADC[0]) / (gFactoryCfg.caliPara.tempSensor1ADC[1] - gFactoryCfg.caliPara.tempSensor1ADC[0])  + t0_f;
+	}
+	else if (gFactoryCfg.caliPara.tempSensor1ADC[1] < temp_raw1 && temp_raw1 <= gFactoryCfg.caliPara.tempSensor1ADC[2])
+	{
+		temp1_f = (t2_f - t1_f) * (temp_raw1 - gFactoryCfg.caliPara.tempSensor1ADC[1]) / (gFactoryCfg.caliPara.tempSensor1ADC[2] - gFactoryCfg.caliPara.tempSensor1ADC[1])  + t1_f;
+	}
+	else if (gFactoryCfg.caliPara.tempSensor1ADC[2] < temp_raw1)
+	{
+		temp1_f = (t3_f - t2_f) * (temp_raw1 - gFactoryCfg.caliPara.tempSensor1ADC[2]) / (gFactoryCfg.caliPara.tempSensor1ADC[3] - gFactoryCfg.caliPara.tempSensor1ADC[2])  + t2_f;
+	}
+
+	if (temp_raw2 <= gFactoryCfg.caliPara.tempSensor1ADC[1])
+	{
+		temp2_f = (t1_f - t0_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor1ADC[0]) / (gFactoryCfg.caliPara.tempSensor1ADC[1] - gFactoryCfg.caliPara.tempSensor1ADC[0])  + t0_f;
+	}
+	else if (gFactoryCfg.caliPara.tempSensor1ADC[1] < temp_raw2 && temp_raw2 <= gFactoryCfg.caliPara.tempSensor1ADC[2])
+	{
+		temp2_f = (t2_f - t1_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor1ADC[1]) / (gFactoryCfg.caliPara.tempSensor1ADC[2] - gFactoryCfg.caliPara.tempSensor1ADC[1])  + t1_f;
+	}
+	else if (gFactoryCfg.caliPara.tempSensor1ADC[2] < temp_raw2)
+	{
+		temp2_f = (t3_f - t2_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor1ADC[2]) / (gFactoryCfg.caliPara.tempSensor1ADC[3] - gFactoryCfg.caliPara.tempSensor1ADC[2])  + t2_f;
+	}
+
+	if (temp_raw3 <= gFactoryCfg.caliPara.tempSensor1ADC[1])
+	{
+		temp3_f = (t1_f - t0_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor1ADC[0]) / (gFactoryCfg.caliPara.tempSensor1ADC[1] - gFactoryCfg.caliPara.tempSensor1ADC[0])  + t0_f;
+	}
+	else if (gFactoryCfg.caliPara.tempSensor1ADC[1] < temp_raw3 && temp_raw3 <= gFactoryCfg.caliPara.tempSensor1ADC[2])
+	{
+		temp3_f = (t2_f - t1_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor1ADC[1]) / (gFactoryCfg.caliPara.tempSensor1ADC[2] - gFactoryCfg.caliPara.tempSensor1ADC[1])  + t1_f;
+	}
+	else if (gFactoryCfg.caliPara.tempSensor1ADC[2] < temp_raw3)
+	{
+		temp3_f = (t3_f - t2_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor1ADC[2]) / (gFactoryCfg.caliPara.tempSensor1ADC[3] - gFactoryCfg.caliPara.tempSensor1ADC[2])  + t2_f;
+	}
+
+	temp1_i =(int16_t) (temp1_f * 100);
+	temp2_i =(int16_t) (temp2_f * 100);
+	temp3_i =(int16_t) (temp3_f * 100);
+
+	gTxPayload[RF_CMD_INDEX + 1] = 15;
+	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp1_i);
+	gTxPayload[RF_CMD_INDEX + 3] = BYTE1_OF(temp1_i);
+	gTxPayload[RF_CMD_INDEX + 4] = BYTE0_OF(temp2_i);
+	gTxPayload[RF_CMD_INDEX + 5] = BYTE1_OF(temp2_i);
+	gTxPayload[RF_CMD_INDEX + 6] = BYTE0_OF(temp3_i);
+	gTxPayload[RF_CMD_INDEX + 7] = BYTE1_OF(temp3_i);
+	gTxPayload[RF_CMD_INDEX + 8] = 0;
+	gTxPayload[RF_CMD_INDEX + 9] = 0;
+	gTxPayload[RF_CMD_INDEX + 10] = 0;
+	gTxPayload[RF_CMD_INDEX + 11] = 0;
+	gTxPayload[RF_CMD_INDEX + 12] = 0;
+	gTxPayload[RF_CMD_INDEX + 13] = 0;
 	gTxPayload[RF_CMD_INDEX + 14] = 0;	//reserve for pres_raw
 	gTxPayload[RF_CMD_INDEX + 15] = 0;
 	gTxPayload[RF_CMD_INDEX + 16] = 0;
@@ -658,10 +709,6 @@ static bool rfCmd_getCaliTempPara(void)
 	len = RF_CMD_INDEX + 19;
 	RF_TxPacket(gTxPayload, len, 20);
 	
-	M0P_GPIO->P01_SEL_f.SEL = 0;
-	M0P_GPIO->P02_SEL_f.SEL = 0;
-	I2C_DeInit();  
-	GPIO_EXTPOWER_OFF();
 return true;
 } 
 static bool rfCmd_setCaliTemp4T(void)

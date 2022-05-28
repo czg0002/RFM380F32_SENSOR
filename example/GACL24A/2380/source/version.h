@@ -17,5 +17,5 @@
  */
 
 #define VER_MAJOR 0
-#define VER_MINOR 1
+#define VER_MINOR 2
 #define VER_PATCH 1    //8 for 8359
