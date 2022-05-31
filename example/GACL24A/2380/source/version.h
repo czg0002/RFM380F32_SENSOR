@@ -18,4 +18,4 @@
 
 #define VER_MAJOR 0
 #define VER_MINOR 2
-#define VER_PATCH 1    //8 for 8359
+#define VER_PATCH 0x0a//1    //8 for 8359

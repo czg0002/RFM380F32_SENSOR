@@ -157,45 +157,6 @@ return true;
 
 static bool rfCmd_readADC(void)
 {
-#if 0
-	uint16_t temperature, humidity, pressure, dc_scan, battery;
-
-	PIN_setOutputValue(pinHandle, PIN_5V_EN, 1);	//insure 5v enable
-	if (gFactoryCfg.debugMode != 0xff)	//when debug mode is 0xff, 5V is always on, no need to delay
-	{
-	//	CPUdelay(12000 * 60);   //60ms for voltage stable(TODO: use oscillarator to check for best time. 3000 for 250us, TODO: 3000~250us is 
-		usleep(250000);
-	}
-	temperature = adcFunc_getTemperatureRaw();
-	humidity = adcFunc_getHumidityRaw();
-	pressure = adcFunc_getPressureRaw();
-	dc_scan = adcFunc_getDCScanRaw();
-	if (gFactoryCfg.debugMode != 0xff)
-	{
-		PIN_setOutputValue(pinHandle, PIN_5V_EN, 0);
-	}
-	battery = AONBatMonBatteryVoltageGet();
-
-#ifdef UART_DEBUG_DISPLAY
-	Display_printf(displayHandle, 0, 0, "get adc value:.\r\ntemp: %d\r\nhumi: %d\r\npress: %d.\r\ndc_scan: %d.\r\nbattery: %d.\r\n", temperature, humidity, pressure, dc_scan, battery);
-#endif
-return true;
-
-	gTxPacket.len = 17;
-	gTxPayload[6] = 10;
-	gTxPayload[7] = temperature & 0xff;
-	gTxPayload[8] = (temperature >> 8) & 0xff;
-	gTxPayload[9] = humidity & 0xff;
-	gTxPayload[10] = (humidity >> 8) & 0xff;
-	gTxPayload[11] = pressure & 0xff;
-	gTxPayload[12] = (pressure >> 8) & 0xff;
-	gTxPayload[13] = dc_scan & 0xff;
-	gTxPayload[14] = (dc_scan  >> 8) & 0xff;
-	gTxPayload[15] = battery & 0xff;
-	gTxPayload[16] = (battery  >> 8) & 0xff;
-	EasyLink_transmit(&gTxPacket);
-	return true;
-#endif
 	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
 	int8_t result;
 	uint8_t len;
@@ -210,13 +171,24 @@ return true;
 	delay1ms(600);
 	
 	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw1, &humi_raw1);
+#if 1
 	//switch to bus 2
 	M0P_GPIO->P35_SEL_f.SEL = 0;
 	M0P_GPIO->P36_SEL_f.SEL = 0;
+	I2C_DeInit();  
+	delay1ms(10);
+	I2C_SetFunc(I2cHlm_En);
+	I2C_SetFunc(I2cMode_En);
 	Gpio_SetFunc_I2CDAT_P01(); 
 	Gpio_SetFunc_I2CCLK_P02();
+	// delay1ms(50);
 	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw2, &humi_raw2);
 	result = sht3x_measure_blocking_read_adc(0x45, &temp_raw3, &humi_raw3);
+	M0P_GPIO->P01_SEL_f.SEL = 0;
+	M0P_GPIO->P02_SEL_f.SEL = 0;
+#endif
+	I2C_DeInit();  
+	GPIO_EXTPOWER_OFF();
 	
 	gTxPayload[RF_CMD_INDEX + 1] = 14;
 	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp_raw1);
@@ -239,11 +211,6 @@ return true;
 	len = RF_CMD_INDEX + 19;
 	RF_TxPacket(gTxPayload, len, 20);
 	
-	M0P_GPIO->P01_SEL_f.SEL = 0;
-	M0P_GPIO->P02_SEL_f.SEL = 0;
-	I2C_DeInit();  
-	GPIO_EXTPOWER_OFF();
-
 	return true;
 }
 
@@ -611,7 +578,7 @@ static bool rfCmd_getCaliTempPara(void)
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
-	//TODO: moved to adcFunc.h
+	//TODO: rename this function. moved to adcFunc.h, use  gpio simulate i2c
 	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
 	int8_t result;
 	uint8_t len;
@@ -631,6 +598,10 @@ static bool rfCmd_getCaliTempPara(void)
 	//switch to bus 2
 	M0P_GPIO->P35_SEL_f.SEL = 0;
 	M0P_GPIO->P36_SEL_f.SEL = 0;
+	I2C_DeInit();  
+	delay1ms(10);
+	I2C_SetFunc(I2cHlm_En);
+	I2C_SetFunc(I2cMode_En);
 	Gpio_SetFunc_I2CDAT_P01(); 
 	Gpio_SetFunc_I2CCLK_P02();
 	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw2, &humi_raw2);
@@ -658,30 +629,30 @@ static bool rfCmd_getCaliTempPara(void)
 		temp1_f = (t3_f - t2_f) * (temp_raw1 - gFactoryCfg.caliPara.tempSensor1ADC[2]) / (gFactoryCfg.caliPara.tempSensor1ADC[3] - gFactoryCfg.caliPara.tempSensor1ADC[2])  + t2_f;
 	}
 
-	if (temp_raw2 <= gFactoryCfg.caliPara.tempSensor1ADC[1])
+	if (temp_raw2 <= gFactoryCfg.caliPara.tempSensor2ADC[1])
 	{
-		temp2_f = (t1_f - t0_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor1ADC[0]) / (gFactoryCfg.caliPara.tempSensor1ADC[1] - gFactoryCfg.caliPara.tempSensor1ADC[0])  + t0_f;
+		temp2_f = (t1_f - t0_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor2ADC[0]) / (gFactoryCfg.caliPara.tempSensor2ADC[1] - gFactoryCfg.caliPara.tempSensor2ADC[0])  + t0_f;
 	}
-	else if (gFactoryCfg.caliPara.tempSensor1ADC[1] < temp_raw2 && temp_raw2 <= gFactoryCfg.caliPara.tempSensor1ADC[2])
+	else if (gFactoryCfg.caliPara.tempSensor2ADC[1] < temp_raw2 && temp_raw2 <= gFactoryCfg.caliPara.tempSensor2ADC[2])
 	{
-		temp2_f = (t2_f - t1_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor1ADC[1]) / (gFactoryCfg.caliPara.tempSensor1ADC[2] - gFactoryCfg.caliPara.tempSensor1ADC[1])  + t1_f;
+		temp2_f = (t2_f - t1_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor2ADC[1]) / (gFactoryCfg.caliPara.tempSensor2ADC[2] - gFactoryCfg.caliPara.tempSensor2ADC[1])  + t1_f;
 	}
-	else if (gFactoryCfg.caliPara.tempSensor1ADC[2] < temp_raw2)
+	else if (gFactoryCfg.caliPara.tempSensor2ADC[2] < temp_raw2)
 	{
-		temp2_f = (t3_f - t2_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor1ADC[2]) / (gFactoryCfg.caliPara.tempSensor1ADC[3] - gFactoryCfg.caliPara.tempSensor1ADC[2])  + t2_f;
+		temp2_f = (t3_f - t2_f) * (temp_raw2 - gFactoryCfg.caliPara.tempSensor2ADC[2]) / (gFactoryCfg.caliPara.tempSensor2ADC[3] - gFactoryCfg.caliPara.tempSensor2ADC[2])  + t2_f;
 	}
 
-	if (temp_raw3 <= gFactoryCfg.caliPara.tempSensor1ADC[1])
+	if (temp_raw3 <= gFactoryCfg.caliPara.tempSensor3ADC[1])
 	{
-		temp3_f = (t1_f - t0_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor1ADC[0]) / (gFactoryCfg.caliPara.tempSensor1ADC[1] - gFactoryCfg.caliPara.tempSensor1ADC[0])  + t0_f;
+		temp3_f = (t1_f - t0_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor3ADC[0]) / (gFactoryCfg.caliPara.tempSensor3ADC[1] - gFactoryCfg.caliPara.tempSensor3ADC[0])  + t0_f;
 	}
-	else if (gFactoryCfg.caliPara.tempSensor1ADC[1] < temp_raw3 && temp_raw3 <= gFactoryCfg.caliPara.tempSensor1ADC[2])
+	else if (gFactoryCfg.caliPara.tempSensor3ADC[1] < temp_raw3 && temp_raw3 <= gFactoryCfg.caliPara.tempSensor3ADC[2])
 	{
-		temp3_f = (t2_f - t1_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor1ADC[1]) / (gFactoryCfg.caliPara.tempSensor1ADC[2] - gFactoryCfg.caliPara.tempSensor1ADC[1])  + t1_f;
+		temp3_f = (t2_f - t1_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor3ADC[1]) / (gFactoryCfg.caliPara.tempSensor3ADC[2] - gFactoryCfg.caliPara.tempSensor3ADC[1])  + t1_f;
 	}
-	else if (gFactoryCfg.caliPara.tempSensor1ADC[2] < temp_raw3)
+	else if (gFactoryCfg.caliPara.tempSensor3ADC[2] < temp_raw3)
 	{
-		temp3_f = (t3_f - t2_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor1ADC[2]) / (gFactoryCfg.caliPara.tempSensor1ADC[3] - gFactoryCfg.caliPara.tempSensor1ADC[2])  + t2_f;
+		temp3_f = (t3_f - t2_f) * (temp_raw3 - gFactoryCfg.caliPara.tempSensor3ADC[2]) / (gFactoryCfg.caliPara.tempSensor3ADC[3] - gFactoryCfg.caliPara.tempSensor3ADC[2])  + t2_f;
 	}
 
 	temp1_i =(int16_t) (temp1_f * 100);

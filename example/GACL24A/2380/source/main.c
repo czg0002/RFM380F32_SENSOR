@@ -77,7 +77,7 @@ int32_t main(void)
 	GPIO_EXTPOWER_OFF();
 	CMT2300A_Init();
 	CMT2300A_GoSleep();
-	for (i = 0; i < 50; i++)
+//	for (i = 0; i < 50; i++)
 		RF_TxPacket(gTxPayload, 12, 20);
 #if 1
 	//test i2c function
@@ -126,13 +126,14 @@ int32_t main(void)
 	{
 		if (sysState == sysStateSleep)
 		{
-#if 0	//Test period sending
+			syssleep_start(10);
+#if 1	//Test period sending
+			gTxPayload[7] = 0xc2;
 			gTxPayload[8] = count & 0xff;
 			gTxPayload[9] = (count >> 8) & 0xff;
 			RF_TxPacket(gTxPayload, 12, 20);
 			count++;
-#endif			
-			syssleep_start(5);
+#endif		
 #if 1
 			rxresult = RF_RxWakeupPacket(10);
 			if (rxresult == RF_RX_DONE)
@@ -143,11 +144,20 @@ int32_t main(void)
 		}
 		else	//wakup state
 		{
-			rxresult = RF_RxValidPacket(20000);
+			rxresult = RF_RxValidPacket(10000);
 			if (rxresult == RF_RX_DONE)	//into wakeup state
 			{
 				rfCmdProc_processCmd();
 			}
+			else
+			{
+				gTxPayload[7] = 0xaa;
+				gTxPayload[8] = count & 0xff;
+				gTxPayload[9] = (count >> 8) & 0xff;
+				RF_TxPacket(gTxPayload, 12, 20);
+				count++;
+			}
+				
 
 			//test rtc function.
 //			while (1)
