@@ -112,10 +112,10 @@ int32_t main(void)
 	}
 #endif
 	rxresult = RF_RxValidPacket(15000);
-	if (rxresult == RF_RX_DONE)	//into wakeup state
+	if (rxresult == RF_RX_DONE)	//into wakeup state, except sleep cmd
 	{
-		rfCmdProc_processCmd();
 		sysState = sysStateWakeup;
+		rfCmdProc_processCmd();		
 	}
 	else //sleep state
 	{
@@ -126,8 +126,8 @@ int32_t main(void)
 	{
 		if (sysState == sysStateSleep)
 		{
-			syssleep_start(10);
-#if 1	//Test period sending
+			syssleep_start(gFactoryCfg.sleepIntervalSeconds);
+#if 0	//Test period sending
 			gTxPayload[7] = 0xc2;
 			gTxPayload[8] = count & 0xff;
 			gTxPayload[9] = (count >> 8) & 0xff;
@@ -144,19 +144,19 @@ int32_t main(void)
 		}
 		else	//wakup state
 		{
-			rxresult = RF_RxValidPacket(10000);
+			rxresult = RF_RxValidPacket((uint32_t)gFactoryCfg.sleepIntervalSeconds * 1000);
 			if (rxresult == RF_RX_DONE)	//into wakeup state
 			{
 				rfCmdProc_processCmd();
 			}
-			else
-			{
-				gTxPayload[7] = 0xaa;
-				gTxPayload[8] = count & 0xff;
-				gTxPayload[9] = (count >> 8) & 0xff;
-				RF_TxPacket(gTxPayload, 12, 20);
-				count++;
-			}
+//			else
+//			{
+//				gTxPayload[7] = 0xaa;
+//				gTxPayload[8] = count & 0xff;
+//				gTxPayload[9] = (count >> 8) & 0xff;
+//				RF_TxPacket(gTxPayload, 12, 20);
+//				count++;
+//			}
 				
 
 			//test rtc function.

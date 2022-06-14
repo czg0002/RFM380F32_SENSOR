@@ -1107,7 +1107,10 @@ return true;
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	return true;
 #endif
-return true;
+	gFactoryCfg.sleepIntervalSeconds = gRxPacket.payload[RF_CMD_INDEX + 2];
+	flashData_savegFactoryCfg();
+	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
+	return true;
 }
 
 static bool rfCmd_getSniffingInterval(void)
@@ -1125,7 +1128,14 @@ return true;
 	EasyLink_transmit(&gTxPacket);
 	return true;
 #endif
-return true;
+	uint8_t len;
+	gTxPayload[RF_CMD_INDEX + 1] = 1;
+	gTxPayload[RF_CMD_INDEX + 2] = gFactoryCfg.sleepIntervalSeconds;
+	gTxPayload[RF_CMD_INDEX + 3] = gRxPacket.rssi;
+	gTxPayload[RF_CMD_INDEX + 4] = 0;
+	len = RF_CMD_INDEX + 5;
+	RF_TxPacket(gTxPayload, len, 20);
+	return true;
 }
 
 static bool rfCmd_setFlashIndex(void)

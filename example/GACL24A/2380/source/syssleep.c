@@ -71,6 +71,7 @@ void syssleep_start(uint32_t sec)
 		{
 			//进入低功耗模式……
 			Lpm_GotoLpmMode();
+			delay1ms(1);
 		}
 		Lpt_Stop();
 }
