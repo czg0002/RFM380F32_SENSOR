@@ -23,7 +23,7 @@
 #include "gpio_setting.h"
 #include "mcu_init.h"
 
-boolean_t rtcCycled;
+boolean_t rtcCycled = FALSE;
 static void RtcCycCb(void)
 {
 	rtcCycled = TRUE;
@@ -166,7 +166,7 @@ static void SystemRtc_Init ( void )
     
     Rtc_EnableFunc(RtcCount);
 	#endif
-#if 0
+#if 1
     stc_rtc_config_t 	stcRtcConfig; 
     stc_rtc_irq_cb_t 	stcIrqCb;
     stc_rtc_time_t  	stcTime;
@@ -197,7 +197,7 @@ static void SystemRtc_Init ( void )
    
 
     stcCycSel.enCyc_sel = RtcPradx;
-    stcCycSel.u8Prdx = 9u;
+    stcCycSel.u8Prdx = 9u;  //set period to 5s.
 
     stcRtcConfig.pstcCycSel = &stcCycSel;
 
@@ -217,9 +217,9 @@ static void SystemRtc_Init ( void )
     stcTime.u8Year 	= 0x17;
     stcTime.u8Month = 0x06;
     stcTime.u8Day 	= 0x07;
-    stcTime.u8Hour 	= 0x12;
-    stcTime.u8Minute = 0x58;
-    stcTime.u8Second = 0x55;
+    stcTime.u8Hour 	= 0x01;
+    stcTime.u8Minute = 0x05;
+    stcTime.u8Second = 0x05;
     stcTime.u8DayOfWeek = Rtc_CalWeek(&stcTime.u8Day);
     stcRtcConfig.pstcTimeDate = &stcTime;
     
@@ -245,6 +245,6 @@ void MCU_Init(void)
 {
 	CLK_Init();
 	IO_Init();
-//	SystemRtc_Init();
+	SystemRtc_Init();
 	return;
 } /* -----  end of function MCU_Init  ----- */

@@ -59,7 +59,7 @@ EnumRFResult RF_RxPacket(uint8_t rxBuf[], uint8_t *rxlen, uint32_t rxTimeoutMs) 
 	while ((tick_val = SysTick->VAL) > end || tick_val == 0)
 	//while (1)
 	{
-		if (Test_GPIO2())
+		if (Test_GPIO2())		//TODO: handling CRC and Packet ERROR
 		{
 			CMT2300A_GoStby();
 			CMT2300A_ReadFifo(rxBuf, 1);
