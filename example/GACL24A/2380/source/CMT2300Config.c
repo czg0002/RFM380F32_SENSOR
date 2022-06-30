@@ -165,8 +165,3 @@ byte i;
     SDIO_H();	
 }
 
-void Delay(word Cont)
-{
-	for(;Cont!=0;Cont--);
-}
-

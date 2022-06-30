@@ -38,5 +38,5 @@
 #define JOINT_TO_UINT32(array, start) (array[start] + (array[start + 1] << 8) + (array[start + 2] << 16) + (array[start + 3] << 24))
 
 void Delay(uint32_t Count);
-
+uint8_t calc_checksum(uint8_t *ptr, uint16_t len);
 #endif

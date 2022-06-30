@@ -1505,9 +1505,10 @@ static void replyRfWriteCmdStatus(RFCmdStatus_e cmd_status)
 	uint8_t len;
 	gTxPayload[RF_CMD_INDEX + 1] = 0x01;
 	gTxPayload[RF_CMD_INDEX + 2] = (uint8_t) cmd_status;
-	gTxPayload[RF_CMD_INDEX + 3] = gRxPacket.rssi;
+	//gTxPayload[RF_CMD_INDEX + 3] = gRxPacket.rssi;	//change to checksum
 	gTxPayload[RF_CMD_INDEX + 4] = 0;
 	len = RF_CMD_INDEX + 5;
+	gTxPayload[RF_CMD_INDEX + 3] = calc_checksum(&gTxPayload[2],len - 4);
 	if (gRxPacket.cmdType == CMDTYPE_SINGLE)
 		RF_TxPacket(gTxPayload, len, 20);
 	else if (gRxPacket.cmdType == CMDTYPE_BROADCAST)	//delay short id time
