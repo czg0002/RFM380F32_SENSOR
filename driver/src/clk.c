@@ -653,7 +653,7 @@ en_result_t Clk_Enable(en_clk_source_t enSource, boolean_t bFlag)
         case ClkXTL:
             M0P_GPIO->P1ADS_f.P14 = bFlag;
             M0P_GPIO->P1ADS_f.P15 = bFlag;
-            M0P_CLOCK->XTL_CR_f.DRIVER = 0xF;
+            M0P_CLOCK->XTL_CR_f.DRIVER = 0;//0xF;
             M0P_CLOCK->SYSCTRL0_f.XTL_EN = bFlag;
             break;
 

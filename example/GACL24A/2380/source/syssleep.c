@@ -74,4 +74,5 @@ void syssleep_start(uint32_t sec)
 			delay1ms(1);
 		}
 		Lpt_Stop();
+	//TODO: use rtc interrupt to wakeup
 }

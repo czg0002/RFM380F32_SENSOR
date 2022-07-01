@@ -67,13 +67,16 @@ int32_t main(void)
 	uint16_t count = 0;
 	EnumRFResult rxresult;
 	uint8_t rxlen;
-	//--------MCU_Init very important, may damage mcu, offline download cannot rescure-----
+	//--------MCU_Init very important, may damage mcu, offline download cannot rescure??-----
 	MCU_Init();
 	//---------------------
+//	while (1)
+//	{
+//		Rtc_ReadDateTime(&stcReadTime);
+//	}
 	flashData_Init();
 	syssleep_init();
 	SystemCoreClockUpdate();
-	//	Gpio_SetIO(3, 3, 0);	//power control
 	GPIO_EXTPOWER_OFF();
 	CMT2300A_Init();
 	CMT2300A_GoSleep();
@@ -111,7 +114,9 @@ int32_t main(void)
 		//    I2C_MasterReadEepromData((u8DevAddr<<1),0x00,&u8Recdata[0],rlen);
 	}
 #endif
-	rxresult = RF_RxValidPacket(15000);
+	rxresult = RF_RxValidPacket(10000);
+	Rtc_ReadDateTime(&stcReadTime);
+	
 	if (rxresult == RF_RX_DONE) // into wakeup state, except sleep cmd
 	{
 		sysState = sysStateWakeup;
@@ -142,7 +147,7 @@ int32_t main(void)
 			{
 				rfCmdProc_processCmd();
 			}
-			Rtc_ReadDateTime(&stcReadTime);
+			//Rtc_ReadDateTime(&stcReadTime);
 			//			else
 			//			{
 			//				gTxPayload[7] = 0xaa;

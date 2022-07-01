@@ -39,7 +39,7 @@
 //P34: CMT_GPIO2
 //reset state
 #define	P0DIR_Data	0x00000006	//P03z
-#define	P1DIR_Data	0x00000000
+#define	P1DIR_Data	0x00000030
 #define	P2DIR_Data	0x00000000
 #define	P3DIR_Data	0x00000010
 

@@ -43,6 +43,13 @@ typedef struct {
 	uint32_t checksum;
 }FactoryCfg_s;
 
+typedef struct {
+	uint8_t workingMode;
+	uint32_t savingPeriod;
+	uint32_t sendingPeriod;
+	uint8_t dataChecksum;
+}CustomerCfg_s;	//this structure will often be modfied by customer, so in another sector
+
 #if 1	//TODO: move to eepromData.c
 typedef struct {
 	uint16_t pressure;

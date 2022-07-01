@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include <stdint.h>
+#include "common.h"
 #include "gpio.h"
 #include "clk.h"
 #include "i2c.h"
@@ -23,10 +24,10 @@
 #include "gpio_setting.h"
 #include "mcu_init.h"
 
-boolean_t rtcCycled = FALSE;
+uint32_t rtcCycled = 0;
 static void RtcCycCb(void)
 {
-	rtcCycled = TRUE;
+	rtcCycled += 1;
 }
 static void RtcAlarmCb(void)
 {
@@ -57,6 +58,7 @@ CLK_Init(void)
 		if (TRUE == Clk_GetClkRdy(ClkRCL))
 			break;
 	}
+
 	Clk_Enable(ClkXTL, TRUE);
 	// wait for XTL stable
 	for (i = 0; i < 100000; i++)
@@ -64,8 +66,9 @@ CLK_Init(void)
 		if (TRUE == Clk_GetClkRdy(ClkXTL))
 			break;
 	}
+
 	Clk_SetPeripheralGate(ClkPeripheralLpTim, TRUE);
-  Clk_SetPeripheralGate(ClkPeripheralGpio, TRUE);
+	Clk_SetPeripheralGate(ClkPeripheralGpio, TRUE);
 	// systick switch to RCL
 	DDL_ZERO_STRUCT(stcCfg);
 	stcCfg.bNoRef = FALSE;
@@ -89,7 +92,7 @@ IO_Init(void)
 	//Clk_SetPeripheralGate(ClkPeripheralGpio, TRUE);
 
 	M0P_GPIO->P0DIR = P0DIR_Data;
-	M0P_GPIO->P1DIR = P1DIR_Data;
+	M0P_GPIO->P1DIR = P1DIR_Data;		//NOTE: must set P14 to input for XTL to function
 	M0P_GPIO->P2DIR = P2DIR_Data;
 	M0P_GPIO->P3DIR = P3DIR_Data;
 
@@ -232,6 +235,9 @@ static void SystemRtc_Init ( void )
     Rtc_Init(&stcRtcConfig); 
     
     Rtc_EnableFunc(RtcCount);
+		//delay
+//		Delay(800);
+//		Clk_SetFunc(ClkFuncRtcLPWEn, TRUE);
 #endif
 	return ;
 }		/* -----  end of static function RTC_Init  ----- */
@@ -243,7 +249,7 @@ static void SystemRtc_Init ( void )
    */
 void MCU_Init(void)
 {
-	CLK_Init();
+	CLK_Init();	
 	IO_Init();
 	SystemRtc_Init();
 	return;
