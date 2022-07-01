@@ -56,23 +56,23 @@ void syssleep_init(void)
 
 void syssleep_start(uint32_t sec)
 {
-		int i;
-	//Lpt 中断使能
-    Lpt_ClearIntFlag();
-    Lpt_EnableIrq();
-    EnableNvic(LPTIM_IRQn, 3, TRUE);
-    
-    
-    //设置重载值，计数初值，启动计数
-    Lpt_ARRSet(0x10000 - 36571);
-    Lpt_Run();
-    
-    for (i = 0; i < sec; i++)
-		{
-			//进入低功耗模式……
+//		int i;
+//	//Lpt 中断使能
+//    Lpt_ClearIntFlag();
+//    Lpt_EnableIrq();
+//    EnableNvic(LPTIM_IRQn, 3, TRUE);
+//    
+//    
+//    //设置重载值，计数初值，启动计数
+//    Lpt_ARRSet(0x10000 - 36571);
+//    Lpt_Run();
+//    
+//    for (i = 0; i < sec; i++)
+//		{
+//			//进入低功耗模式……
 			Lpm_GotoLpmMode();
-			delay1ms(1);
-		}
-		Lpt_Stop();
+//			delay1ms(1);
+//		}
+//		Lpt_Stop();
 	//TODO: use rtc interrupt to wakeup
 }

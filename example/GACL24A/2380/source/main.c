@@ -147,26 +147,6 @@ int32_t main(void)
 			{
 				rfCmdProc_processCmd();
 			}
-			//Rtc_ReadDateTime(&stcReadTime);
-			//			else
-			//			{
-			//				gTxPayload[7] = 0xaa;
-			//				gTxPayload[8] = count & 0xff;
-			//				gTxPayload[9] = (count >> 8) & 0xff;
-			//				RF_TxPacket(gTxPayload, 12, 20);
-			//				count++;
-			//			}
-
-			// test rtc function.
-			//			while (1)
-			//			{
-			//				Rtc_ReadDateTime(&stcReadTime);
-			//				if (rtcCycled == TRUE)
-			//				{
-			//					RF_TxPacket(gTxPayload, 12, 20);
-			//					rtcCycled = FALSE;
-			//				}
-			//			}
 		}
 	}
 }
