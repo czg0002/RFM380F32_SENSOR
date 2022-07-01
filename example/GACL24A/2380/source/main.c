@@ -133,6 +133,14 @@ int32_t main(void)
 		{
 			syssleep_start(gFactoryCfg.sleepIntervalSeconds);
 #if 1
+			Rtc_ReadDateTime(&stcReadTime);
+			gTxPayload[7] = 0x03;	//tmp just for mark
+			gTxPayload[8] = stcReadTime.u8Second;
+			gTxPayload[9] = stcReadTime.u8Minute;
+			gTxPayload[10] = stcReadTime.u8Hour;
+			gTxPayload[11] = 0;
+			gTxPayload[12] = 0;
+			RF_TxPacket(gTxPayload, 13, 20);
 			rxresult = RF_RxWakeupPacket(10);
 			if (rxresult == RF_RX_DONE)
 			{
