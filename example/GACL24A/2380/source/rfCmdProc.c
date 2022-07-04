@@ -293,7 +293,8 @@ static bool rfCmd_readDB(void)
 static bool rfCmd_sleep(void)
 {
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
-	sysState = sysStateSleep;   //TODO: may move i2cRtc command to sysShutdown, if failed to set rtc, must send rf msg to pad
+	//sysState = sysStateSleep;   //TODO: may move i2cRtc command to sysShutdown, if failed to set rtc, must send rf msg to pad
+	syssleep_setState(sysStateSleep);
 	return true;
 }
 

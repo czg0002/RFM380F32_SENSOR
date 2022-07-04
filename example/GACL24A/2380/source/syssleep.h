@@ -27,7 +27,11 @@ typedef enum {
 	sysStateWaitForCalled,
 	sysStateWaitForDiscovered,
 } SysState_e;
+
+extern SysState_e sysState;
+
 void syssleep_init(void);
 void syssleep_start(uint32_t ms);
+void syssleep_setState(SysState_e new_state);
 
 #endif   /* ----- #ifndef syssleep_INC  ----- */

@@ -40,7 +40,6 @@
  * Local variable definitions ('static')                                      *
  ******************************************************************************/
 extern boolean_t rtcCycled;
-SysState_e sysState = sysStateSleep;
 stc_rtc_time_t stcReadTime;
 /*****************************************************************************
  * Function implementation - global ('extern') and local ('static')
@@ -119,12 +118,14 @@ int32_t main(void)
 	
 	if (rxresult == RF_RX_DONE) // into wakeup state, except sleep cmd
 	{
-		sysState = sysStateWakeup;
+		//sysState = sysStateWakeup;
+		syssleep_setState(sysStateWakeup);
 		rfCmdProc_processCmd();
 	}
 	else // sleep state
 	{
-		sysState = sysStateSleep;
+		//sysState = sysStateSleep;
+		syssleep_setState(sysStateSleep);
 	}
 	//	sysState = sysStateWakeup;	//TO BE REMOVED, just for test
 	while (1)

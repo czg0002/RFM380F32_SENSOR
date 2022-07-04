@@ -17,7 +17,11 @@
  */
 #include "lpt.h"
 #include "lpm.h"
+#include "rtc.h"
 #include "syssleep.h"
+
+SysState_e sysState = sysStateSleep;
+
 static void LptInt(void)
 {
 	if (TRUE == Lpt_GetIntFlag())
@@ -28,7 +32,8 @@ static void LptInt(void)
 
 void syssleep_init(void)
 {
-	stc_lpt_config_t stcConfig;
+#if 1
+		stc_lpt_config_t stcConfig;
     en_result_t      enResult = Error;
 		stc_lpm_config_t stcLpmCfg;
     
@@ -46,7 +51,7 @@ void syssleep_init(void)
     {
         enResult = Error;
     }
-    
+#endif    
     //Lpm Cfg
     stcLpmCfg.enSEVONPEND   = SevPndDisable;
     stcLpmCfg.enSLEEPDEEP   = SlpDpEnable;
@@ -75,4 +80,17 @@ void syssleep_start(uint32_t sec)
 //		}
 //		Lpt_Stop();
 	//TODO: use rtc interrupt to wakeup
+}
+
+void syssleep_setState(SysState_e new_state)
+{
+	sysState = new_state;
+	if (new_state == sysStateSleep)
+	{
+		Rtc_EnAlarmIrq(Rtc_AlarmInt_Enable);
+	}
+	else
+	{
+		Rtc_EnAlarmIrq(Rtc_AlarmInt_Disable);
+	}
 }
