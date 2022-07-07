@@ -117,58 +117,6 @@ IO_Init(void)
  */
 static void SystemRtc_Init ( void )
 {
-#if 0
-		stc_rtc_config_t 	stcRtcConfig; 
-    stc_rtc_irq_cb_t 	stcIrqCb;
-    stc_rtc_time_t  	stcTime;
-    stc_rtc_alarmset_t 	stcAlarm;
-    stc_rtc_cyc_sel_t   stcCycSel;
-    
-    DDL_ZERO_STRUCT(stcRtcConfig);
-    DDL_ZERO_STRUCT(stcIrqCb);
-    DDL_ZERO_STRUCT(stcAlarm);
-    DDL_ZERO_STRUCT(stcTime);
-    DDL_ZERO_STRUCT(stcCycSel);
-    
-//    Clk_Enable(ClkXTL, TRUE);							//enabled in CLK_Init
-    Clk_SetPeripheralGate(ClkPeripheralRtc,TRUE);		//Ê¹ÄÜrtcÊ±ÖÓ
-    
-    stcRtcConfig.enClkSel = RtcClk32768;				//RtcClkHxt1024;//RtcClk32;//
-    stcRtcConfig.enAmpmSel = Rtc24h;					//Rtc12h;//
-   
-    stcCycSel.enCyc_sel = RtcPradx;
-    stcCycSel.u8Prdx = 9;			//default 5s period
-
-    stcRtcConfig.pstcCycSel = &stcCycSel;
-
-    Rtc_DisableFunc(RtcCount);
-    stcAlarm.u8Minute 	= 0x99;	//非法值，关闭闹钟
-    stcAlarm.u8Hour 	= 0x99;
-    stcAlarm.u8Week 	= 0x99;
-    Rtc_DisableFunc(RtcAlarmEn);
-    Rtc_EnAlarmIrq(Rtc_AlarmInt_Enable);
-    Rtc_SetAlarmTime(&stcAlarm);
-    Rtc_EnableFunc(RtcAlarmEn);
-
-    stcTime.u8Year 	= 0x17;
-    stcTime.u8Month = 0x06;
-    stcTime.u8Day 	= 0x07;
-    stcTime.u8Hour 	= 0x12;
-    stcTime.u8Minute = 0x58;
-    stcTime.u8Second = 0x55;
-    stcTime.u8DayOfWeek = Rtc_CalWeek(&stcTime.u8Day);
-    stcRtcConfig.pstcTimeDate = &stcTime;
-    
-    stcIrqCb.pfnAlarmIrqCb = RtcAlarmCb;
-    stcIrqCb.pfnTimerIrqCb = RtcCycCb;
-    stcRtcConfig.pstcIrqCb = &stcIrqCb;
-    stcRtcConfig.bTouchNvic = TRUE;
-    
-    Rtc_DisableFunc(RtcCount);
-    Rtc_Init(&stcRtcConfig); 
-    
-    Rtc_EnableFunc(RtcCount);
-	#endif
 #if 1
     stc_rtc_config_t 	stcRtcConfig; 
     stc_rtc_irq_cb_t 	stcIrqCb;
@@ -182,17 +130,7 @@ static void SystemRtc_Init ( void )
     DDL_ZERO_STRUCT(stcAlarm);
     DDL_ZERO_STRUCT(stcTime);
     DDL_ZERO_STRUCT(stcCycSel);
-//    DDL_ZERO_STRUCT(stcLpmCfg);
-    
-//    stcLpmCfg.enSLEEPDEEP 	= SlpDpEnable;				//SlpDpDisable;//
-//    stcLpmCfg.enSLEEPONEXIT = SlpExtEnable;
-    
-//    Clk_SetPeripheralGate(ClkPeripheralGpio,TRUE);		//Ê¹ÄÜGPIOÊ±ÖÓ
-//    Gpio_InitIO(T1_PORT,T1_PIN,GpioDirOut);
-//    Gpio_SetIO(T1_PORT,T1_PIN,1);
-//    Gpio_InitIO(3,3,GpioDirIn);
-    
-//    Clk_Enable(ClkXTL, TRUE);											//NOTE: 重复打开ClkXTL是否有问题？
+
     Clk_SetPeripheralGate(ClkPeripheralRtc,TRUE);		//Ê¹ÄÜrtcÊ±ÖÓ
     
     stcRtcConfig.enClkSel = RtcClk32768;				//RtcClkHxt1024;//RtcClk32;//

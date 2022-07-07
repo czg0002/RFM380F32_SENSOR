@@ -29,12 +29,15 @@
 #include "syssleep.h"
 #include "rfCmdProc.h"
 #define crc_mul 0x1021 
+
+uint8_t rf_send_len;
+
 extern SysState_e sysState;	//define in main.c
 static uint16_t frame_count = 1;
 
 static uint16_t cal_crc(unsigned char *ptr, unsigned char len);
 static void replyRfWriteCmdStatus(RFCmdStatus_e cmd_status);
-static void replyRfReadCmd(int tail_index);
+static void replyRfReadCmd(void);
 
 /*------------------------cmd process function----------------------------*/
 
@@ -159,7 +162,7 @@ static bool rfCmd_readADC(void)
 {
 	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
 	int8_t result;
-	uint8_t len;
+//	uint8_t len;
 
 	I2C_SetFunc(I2cHlm_En);
 	I2C_SetFunc(I2cMode_En);
@@ -206,10 +209,11 @@ static bool rfCmd_readADC(void)
 	gTxPayload[RF_CMD_INDEX + 14] = 0;	//reserve for pres_raw
 	gTxPayload[RF_CMD_INDEX + 15] = 0;
 	gTxPayload[RF_CMD_INDEX + 16] = 0;
-	gTxPayload[RF_CMD_INDEX + 17] = gRxPacket.rssi;
-	gTxPayload[RF_CMD_INDEX + 18] = 0;
-	len = RF_CMD_INDEX + 19;
-	RF_TxPacket(gTxPayload, len, 20);
+//	gTxPayload[RF_CMD_INDEX + 17] = gRxPacket.rssi;
+//	gTxPayload[RF_CMD_INDEX + 18] = 0;
+	rf_send_len = RF_CMD_INDEX + 19;
+//	RF_TxPacket(gTxPayload, len, 20);
+	replyRfReadCmd();
 	
 	return true;
 }
@@ -328,20 +332,16 @@ return true;
 
 static bool rfCmd_configID(void)
 {
-#if 0
 	//TODO: only change id when in config mode. to insure safety write
-#ifdef UART_DEBUG_DISPLAY
-	Display_printf(displayHandle, 0, 0, "new id: %d, %d, %d, %d, %d.\r\n", gRxPacket.payload[7], gRxPacket.payload[8], gRxPacket.payload[9], gRxPacket.payload[10], gRxPacket.payload[11]);
-#endif
-return true;
-	memcpy(&(gFactoryCfg.manufacturerSer), &(gRxPacket.payload[7]), sizeof(ProductSerial_s));
+	memcpy(&(gFactoryCfg.FactorySerial), &(gRxPacket.payload[RF_CMD_INDEX+2]), 5);
 	flashData_savegFactoryCfg();
 	//updata default tx id
-    memcpy(&(gTxPayload[0]), &(gFactoryCfg.manufacturerSer), sizeof(gFactoryCfg.manufacturerSer));
+    memcpy(&(gTxPayload[2]), &(gFactoryCfg.FactorySerial), 5);
+    memcpy(&(sensorAddr[2]), &(gFactoryCfg.FactorySerial), 5);
+	shortSensorAddr[5] = gFactoryCfg.FactorySerial[3];
+	shortSensorAddr[6] = gFactoryCfg.FactorySerial[4];
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_configTime(void)
@@ -374,37 +374,33 @@ return true;
 
 static bool rfCmd_configSendPeriod(void)
 {
-#if 0
-	if (gRxPacket.payload[6] == 4)
+	if (gRxPacket.payload[RF_CMD_INDEX + 1] == 4)
 	{
-		gCustomerCfg.sendingPeriod = gRxPacket.payload[7] + ((uint32_t) gRxPacket.payload[8] << 8) + ((uint32_t) gRxPacket.payload[9] << 16) + ((uint32_t) gRxPacket.payload[10] << 24);
+		gCustomerCfg.sendingPeriod = gRxPacket.payload[RF_CMD_INDEX + 2] + ((uint32_t) gRxPacket.payload[RF_CMD_INDEX + 3] << 8) + ((uint32_t) gRxPacket.payload[RF_CMD_INDEX + 4] << 16) + ((uint32_t) gRxPacket.payload[RF_CMD_INDEX + 5] << 24);
 	}
-	else if (gRxPacket.payload[6] == 2)	// for backward compatibility
+	else if (gRxPacket.payload[RF_CMD_INDEX + 1] == 2)	// for backward compatibility
 	{
-		gCustomerCfg.sendingPeriod = gRxPacket.payload[7] + ((uint32_t) gRxPacket.payload[8] << 8);
+		gCustomerCfg.sendingPeriod = gRxPacket.payload[RF_CMD_INDEX + 2] + ((uint32_t) gRxPacket.payload[RF_CMD_INDEX + 3] << 8);
 	}
 	flashData_savegCustomerCfg();
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_readSendPeriod(void)
 {
-#if 0
-	gTxPayload[6] = 4;
-	gTxPayload[7] = gCustomerCfg.sendingPeriod & 0xff;
-	gTxPayload[8] = (gCustomerCfg.sendingPeriod >> 8) & 0xff;
-	gTxPayload[9] = (gCustomerCfg.sendingPeriod >> 16) & 0xff;
-	gTxPayload[10] = (gCustomerCfg.sendingPeriod >> 24) & 0xff;
-	gTxPayload[11] = gRxPacket.rssi;
-	gTxPayload[12] = 0;
-	gTxPacket.len = 13;
-	EasyLink_transmit(&gTxPacket);
+	gTxPayload[RF_CMD_INDEX + 1] = 4;
+	gTxPayload[RF_CMD_INDEX + 2] = gCustomerCfg.sendingPeriod & 0xff;
+	gTxPayload[RF_CMD_INDEX + 3] = (gCustomerCfg.sendingPeriod >> 8) & 0xff;
+	gTxPayload[RF_CMD_INDEX + 4] = (gCustomerCfg.sendingPeriod >> 16) & 0xff;
+	gTxPayload[RF_CMD_INDEX + 5] = (gCustomerCfg.sendingPeriod >> 24) & 0xff;
+//	gTxPayload[] = gRxPacket.rssi;
+//	gTxPayload[] = 0;
+//	gTxPayload.len = 13;
+//	EasyLink_transmit(&gTxPacket);
+	rf_send_len = RF_CMD_INDEX + 8;
+	replyRfReadCmd();
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_configSavePeriod(void)
@@ -444,27 +440,23 @@ return true;
 
 static bool rfCmd_configState(void)
 {
-#if 0
-	gCustomerCfg.workingMode = gRxPacket.payload[7];
+	gCustomerCfg.workingMode = gRxPacket.payload[RF_CMD_INDEX + 2];
 	flashData_savegCustomerCfg();
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_readState(void)
 {
-#if 0
-	gTxPayload[6] = 1;
-	gTxPayload[7] = gCustomerCfg.workingMode;
-	gTxPayload[8] = 0;
-	gTxPayload[9] = 0;
-	gTxPacket.len = 10;
-	EasyLink_transmit(&gTxPacket);
+	gTxPayload[RF_CMD_INDEX + 1] = 1;
+	gTxPayload[RF_CMD_INDEX + 2] = gCustomerCfg.workingMode;
+//	gTxPayload[RF_CMD_INDEX + 3] = 0;
+//	gTxPayload[RF_CMD_INDEX + 4] = 0;
+//	gTxPacket.len = 10;
+//	EasyLink_transmit(&gTxPacket);
+	rf_send_len = RF_CMD_INDEX + 5;
+	replyRfReadCmd();
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_outConfig(void)
@@ -478,21 +470,25 @@ return true;
 
 static bool rfCmd_setCustomerSer(void)
 {
-#if 0
-	memcpy(&(gCustomerCfg.customerSer), &(gRxPacket.payload[7]), sizeof(ProductSerial_s));
-	flashData_savegCustomerCfg();
+	memcpy(&(gFactoryCfg.CustomerSerial), &(gRxPacket.payload[RF_CMD_INDEX + 2]), 5);
+	flashData_savegFactoryCfg();
+	shortSensorAddr[5] = gFactoryCfg.CustomerSerial[3];
+	shortSensorAddr[6] = gFactoryCfg.CustomerSerial[4];
 	replyRfWriteCmdStatus(RF_WRITE_CMD_SUCCESS);
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_getCustomerSer(void)
 {
-#if 0
+	gTxPayload[RF_CMD_INDEX + 1] = 5;
+	gTxPayload[RF_CMD_INDEX + 2] = gFactoryCfg.CustomerSerial[0];
+	gTxPayload[RF_CMD_INDEX + 3] = gFactoryCfg.CustomerSerial[1];
+	gTxPayload[RF_CMD_INDEX + 4] = gFactoryCfg.CustomerSerial[2];
+	gTxPayload[RF_CMD_INDEX + 5] = gFactoryCfg.CustomerSerial[3];
+	gTxPayload[RF_CMD_INDEX + 6] = gFactoryCfg.CustomerSerial[4];
+	rf_send_len = RF_CMD_INDEX + 8;
+	replyRfReadCmd();
 	return true;
-#endif
-return true;
 }
 
 static bool rfCmd_callStatus(void)
@@ -1472,6 +1468,64 @@ void rfCmdProc_activeSendRecord(Record_s record)
 	//TODO, add handshake protocol to confirm successful sending.
 #endif
 }
+
+void rfCmdProc_activeSendADC(void)
+{
+	uint16_t temp_raw1, humi_raw1, temp_raw2, humi_raw2, temp_raw3, humi_raw3, pres_raw;
+	int8_t result;
+//	uint8_t len;
+
+	I2C_SetFunc(I2cHlm_En);
+	I2C_SetFunc(I2cMode_En);
+	Gpio_SetFunc_I2CDAT_P35(); 
+	Gpio_SetFunc_I2CCLK_P36();
+	
+	GPIO_EXTPOWER_ON();
+	
+	delay1ms(600);
+	
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw1, &humi_raw1);
+#if 1
+	//switch to bus 2
+	M0P_GPIO->P35_SEL_f.SEL = 0;
+	M0P_GPIO->P36_SEL_f.SEL = 0;
+	I2C_DeInit();  
+	delay1ms(10);
+	I2C_SetFunc(I2cHlm_En);
+	I2C_SetFunc(I2cMode_En);
+	Gpio_SetFunc_I2CDAT_P01(); 
+	Gpio_SetFunc_I2CCLK_P02();
+	// delay1ms(50);
+	result = sht3x_measure_blocking_read_adc(0x44, &temp_raw2, &humi_raw2);
+	result = sht3x_measure_blocking_read_adc(0x45, &temp_raw3, &humi_raw3);
+	M0P_GPIO->P01_SEL_f.SEL = 0;
+	M0P_GPIO->P02_SEL_f.SEL = 0;
+#endif
+	I2C_DeInit();  
+	GPIO_EXTPOWER_OFF();
+	
+	gTxPayload[RF_CMD_INDEX + 1] = 14;
+	gTxPayload[RF_CMD_INDEX + 2] = BYTE0_OF(temp_raw1);
+	gTxPayload[RF_CMD_INDEX + 3] = BYTE1_OF(temp_raw1);
+	gTxPayload[RF_CMD_INDEX + 4] = BYTE0_OF(humi_raw1);
+	gTxPayload[RF_CMD_INDEX + 5] = BYTE1_OF(humi_raw1);
+	gTxPayload[RF_CMD_INDEX + 6] = BYTE0_OF(temp_raw2);
+	gTxPayload[RF_CMD_INDEX + 7] = BYTE1_OF(temp_raw2);
+	gTxPayload[RF_CMD_INDEX + 8] = BYTE0_OF(humi_raw2);
+	gTxPayload[RF_CMD_INDEX + 9] = BYTE1_OF(humi_raw2);
+	gTxPayload[RF_CMD_INDEX + 10] = BYTE0_OF(temp_raw3);
+	gTxPayload[RF_CMD_INDEX + 11] = BYTE1_OF(temp_raw3);
+	gTxPayload[RF_CMD_INDEX + 12] = BYTE0_OF(humi_raw3);
+	gTxPayload[RF_CMD_INDEX + 13] = BYTE1_OF(humi_raw3);
+	gTxPayload[RF_CMD_INDEX + 14] = 0;	//reserve for pres_raw
+	gTxPayload[RF_CMD_INDEX + 15] = 0;
+	gTxPayload[RF_CMD_INDEX + 16] = 0;
+//	gTxPayload[RF_CMD_INDEX + 17] = gRxPacket.rssi;
+//	gTxPayload[RF_CMD_INDEX + 18] = 0;
+	rf_send_len = RF_CMD_INDEX + 19;
+//	RF_TxPacket(gTxPayload, len, 20);
+	replyRfReadCmd();
+}
 /* --------------------end fo public function------------------------- */
 
 uint16_t cal_crc(unsigned char *ptr, unsigned char len)
@@ -1521,14 +1575,15 @@ static void replyRfWriteCmdStatus(RFCmdStatus_e cmd_status)
 //	EasyLink_transmit(&gTxPacket);
 }
 
-/* finish rf read command and then send via rf
- * tail_index must be the last data byte index + 1*/
-static void replyRfReadCmd(int tail_index)
+static void replyRfReadCmd()
 {
-#if 0
-	gTxPayload[tail_index] = gRxPacket.rssi;
-	gTxPayload[tail_index + 1] = 0;
-	gTxPacket.len = tail_index + 2;
-	EasyLink_transmit(&gTxPacket);
-#endif
+	gTxPayload[rf_send_len - 2] = calc_checksum(&gTxPayload[2],rf_send_len - 4);
+	gTxPayload[rf_send_len -1] = 0;
+	if (gRxPacket.cmdType == CMDTYPE_SINGLE)
+		RF_TxPacket(gTxPayload, rf_send_len, 20);
+	else if (gRxPacket.cmdType == CMDTYPE_BROADCAST)	//delay short id time
+	{
+		delay1ms(10);
+		RF_TxPacket(gTxPayload, rf_send_len, 20);
+	}
 }

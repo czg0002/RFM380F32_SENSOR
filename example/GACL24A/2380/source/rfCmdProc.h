@@ -138,5 +138,6 @@ void rfCmdProc_sendOneRecord(Record_s record);
 //active send command, send semaphore  to EasyLink  task.
 void rfCmdProc_activeSendBatteryVoltage(void);
 void rfCmdProc_activeSendRecord(Record_s record);
+void rfCmdProc_activeSendADC(void);
 
 #endif   /* ----- #ifndef rfCmdProc_INC  ----- */

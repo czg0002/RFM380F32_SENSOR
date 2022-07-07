@@ -45,9 +45,11 @@ typedef struct {
 
 typedef struct {
 	uint8_t workingMode;
+	uint8_t reserved1;
+	uint8_t reserved2;
+	uint8_t reserved3;
 	uint32_t savingPeriod;
 	uint32_t sendingPeriod;
-	uint8_t dataChecksum;
 }CustomerCfg_s;	//this structure will often be modfied by customer, so in another sector
 
 #if 1	//TODO: move to eepromData.c
@@ -91,6 +93,7 @@ typedef struct
 #endif
 /* global variable to  load from and save to flash*/
 extern FactoryCfg_s gFactoryCfg;
+extern CustomerCfg_s gCustomerCfg;
 extern FactoryCfg_s defaultFactoryCfg;
 
 int8_t flashData_Init(void);
@@ -102,5 +105,7 @@ int8_t flashData_restoregFactoryCfg(void);
 int8_t flashData_loadgFactoryCfg(void);
 int8_t flashData_savegFactoryCfg(void);
 
+int8_t flashData_loadgCustomerCfg(void);
+int8_t flashData_savegCustomerCfg(void);
 
 #endif   /* ----- #ifndef flashData_INC  ----- */

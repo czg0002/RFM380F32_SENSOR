@@ -22,20 +22,20 @@
 
 SysState_e sysState = sysStateSleep;
 
-static void LptInt(void)
-{
-	if (TRUE == Lpt_GetIntFlag())
-	{
-		Lpt_ClearIntFlag();
-	}
-}
+//static void LptInt(void)
+//{
+//	if (TRUE == Lpt_GetIntFlag())
+//	{
+//		Lpt_ClearIntFlag();
+//	}
+//}
 
 void syssleep_init(void)
 {
-#if 1
+#if 0
 		stc_lpt_config_t stcConfig;
     en_result_t      enResult = Error;
-		stc_lpm_config_t stcLpmCfg;
+
     
     
     stcConfig.enGateP  = LptPositive; 
@@ -52,6 +52,7 @@ void syssleep_init(void)
         enResult = Error;
     }
 #endif    
+		stc_lpm_config_t stcLpmCfg;
     //Lpm Cfg
     stcLpmCfg.enSEVONPEND   = SevPndDisable;
     stcLpmCfg.enSLEEPDEEP   = SlpDpEnable;
@@ -59,7 +60,7 @@ void syssleep_init(void)
     Lpm_Config(&stcLpmCfg);
 }
 
-void syssleep_start(uint32_t sec)
+void syssleep_start(void)
 {
 //		int i;
 //	//Lpt 中断使能
@@ -87,10 +88,16 @@ void syssleep_setState(SysState_e new_state)
 	sysState = new_state;
 	if (new_state == sysStateSleep)
 	{
-		Rtc_EnAlarmIrq(Rtc_AlarmInt_Enable);
+//		Rtc_DisableFunc(RtcAlarmEn);
+//    Rtc_EnAlarmIrq(Rtc_AlarmInt_Enable);
+//    Rtc_EnableFunc(RtcAlarmEn);
+		M0P_RTC->CR0_f.PRDSEL = 1;
 	}
-	else
+	else	//disable rtc period when wakeup
 	{
-		Rtc_EnAlarmIrq(Rtc_AlarmInt_Disable);
+//		Rtc_DisableFunc(RtcAlarmEn);
+//    Rtc_EnAlarmIrq(Rtc_AlarmInt_Disable);
+//		Rtc_EnableFunc(RtcAlarmEn);
+		M0P_RTC->CR0_f.PRDSEL = 0;	// PRDS default to 0;
 	}
 }

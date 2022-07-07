@@ -58,6 +58,10 @@ uint8_t u8Senddata[10] = {0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 
 uint8_t u8Recdata[10] = {0x00};
 // uint8_t u8DevAddr = 0x50;	//7 bit addr, left shit 1 in function para
 
+uint32_t sendingSecondsElapsed;
+uint32_t savingSecondsElapsed;
+
+
 int32_t main(void)
 {
 	uint32_t i;
@@ -68,11 +72,6 @@ int32_t main(void)
 	uint8_t rxlen;
 	//--------MCU_Init very important, may damage mcu, offline download cannot rescure??-----
 	MCU_Init();
-	//---------------------
-//	while (1)
-//	{
-//		Rtc_ReadDateTime(&stcReadTime);
-//	}
 	flashData_Init();
 	syssleep_init();
 	SystemCoreClockUpdate();
@@ -132,8 +131,14 @@ int32_t main(void)
 	{
 		if (sysState == sysStateSleep)
 		{
-			syssleep_start(gFactoryCfg.sleepIntervalSeconds);
-#if 1
+			syssleep_start();
+			rxresult = RF_RxWakeupPacket(10);
+			if (rxresult == RF_RX_DONE)
+			{
+				sysState = sysStateWakeup;
+				continue;
+			}
+#if 0
 			Rtc_ReadDateTime(&stcReadTime);
 			gTxPayload[7] = 0x03;	//tmp just for mark
 			gTxPayload[8] = stcReadTime.u8Second;
@@ -142,12 +147,17 @@ int32_t main(void)
 			gTxPayload[11] = 0;
 			gTxPayload[12] = 0;
 			RF_TxPacket(gTxPayload, 13, 20);
-			rxresult = RF_RxWakeupPacket(10);
-			if (rxresult == RF_RX_DONE)
-			{
-				sysState = sysStateWakeup;
-			}
 #endif
+			if ((gCustomerCfg.workingMode & 0x02) != 0)	//period send mode
+			{
+				sendingSecondsElapsed += 5;
+				if (sendingSecondsElapsed >= gCustomerCfg.sendingPeriod)
+				{
+					sendingSecondsElapsed = 0;
+					Rtc_ReadDateTime(&stcReadTime);
+					rfCmdProc_activeSendADC();
+				}
+			}
 		}
 		else // wakup state
 		{
